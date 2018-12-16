@@ -29,18 +29,18 @@ contract ERC20d {
     mapping (address => bytes) private _vID;
     mapping (bytes => uint) private _trust;
 
-    address private founder = msg.sender;
-    address private admin = address(0x0);
+    address private _founder = msg.sender;
+    address private _admin = address(0x0);
 
     uint private _totalSupply;
     uint private _maxSupply;
 
-    string private name;
-    string private symbol;
-    uint private decimals;
+    string private _name;
+    string private _symbol;
+    uint private _decimals;
 
     modifier _stakeCheck(address _from , address _to) {
-        require(!_stake[_from] && !_stake[_to]);
+        require(!isStaking(_from) && !isStaking(_to));
         _;
     }
 
@@ -61,12 +61,12 @@ contract ERC20d {
     }
 
     modifier _onlyAdmin() {
-        require(msg.sender == admin);
+        require(msg.sender == _admin);
         _;
     }
 
     modifier _onlyFounder() {
-        require(msg.sender == founder);
+        require(msg.sender == _founder);
         _;
     }
 
@@ -76,10 +76,10 @@ contract ERC20d {
         //  2,530,000,000 VLDY - Delegation supply
         uint genesis = uint(48070000000).mul(10**uint(18));
         _maxSupply = uint(50600000000).mul(10**uint(18));
-        _mint(founder, genesis);
-        name = "Validity";
-        symbol = "VLDY";
-        decimals = 18;
+        _mint(_founder, genesis);
+        _name = "Validity";
+        _symbol = "VLDY";
+        _decimals = 18;
     }
 
     function initiateStake() public {
@@ -98,7 +98,7 @@ contract ERC20d {
     }
 
     function adminControl(address _entity) public _onlyFounder {
-        admin = _entity;
+        _admin = _entity;
     }
 
     function totalSupply() public view returns (uint total) {
@@ -130,11 +130,11 @@ contract ERC20d {
     }
 
     function isActive(address _account)  public view returns (bool) {
-          return _active[_account];
+        return _active[_account];
     }
 
     function isStaking(address _account)  public view returns (bool) {
-          return _stake[_account];
+        return _stake[_account];
     }
 
     function totalEvents(bytes _id) public view returns (uint count) {
