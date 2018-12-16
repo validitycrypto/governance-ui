@@ -84,6 +84,7 @@ contract ERC20d {
 
     function initiateStake() public {
         require(!isStaking(msg.sender));
+        require(isActive(msg.sender));
 
         _stake[msg.sender] = true;
         emit Stake(msg.sender);
@@ -126,6 +127,10 @@ contract ERC20d {
 
     function trustLevel(bytes _id) public view returns (uint level) {
         level = uint(_stats[_id]._trustLevel);
+    }
+
+    function isActive(address _account)  public view returns (bool) {
+          return _active[_account];
     }
 
     function isStaking(address _account)  public view returns (bool) {
