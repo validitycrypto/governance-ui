@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 /// @title An implementation of the set data structure for addresses.
 /// @author Noah Zinsmeister
 /// @dev O(1) insertion, removal, contains, and length functions.
-library addressSet {
+library bytesSet {
     struct Set {
         address[] members;
         mapping(address => uint) memberIndices;
