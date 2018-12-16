@@ -101,11 +101,11 @@ contract communalValidation {
       uint weight = votingWeight(msg.sender);
 
       if(_choice == POS) {
-        _event[_live][_round]._positive = bytes32(eventPositive().add(weight));
+        _event[_live][_round]._positive = bytes32(eventPositive(_live, _round).add(weight));
       } else if(_choice == NEU) {
-        _event[_live][_round]._neutral = bytes32(eventNeutral().add(weight));
+        _event[_live][_round]._neutral = bytes32(eventNeutral(_live, _round).add(weight));
       } else if(_choice == NEG) {
-        _event[_live][_round]._negative = bytes32(eventNegative().add(weight));
+        _event[_live][_round]._negative = bytes32(eventNegative(_live, _round).add(weight));
       }
 
       _VLDY.delegationEvent(id, _choice, weight);
@@ -118,10 +118,10 @@ contract communalValidation {
   }
 
   function distributeRewards() _onlyAdmin public {
-      uint totalDelegates = _event[_round][_live]._delegates.length;
+      uint totalDelegates = _event[_live][_round]._delegates.length();
       for(uint v = 0; v < totalDelegates ; v++) {
-        address voter = _event[_round][_live]._delegates.members[v];
-        bytes storage id = _VLDY.getvID(voter);
+        address voter = _event[_live][_round]._delegates.members[v];
+        bytes memory id = _VLDY.getvID(voter);
         uint reward = votingWeight(voter);
         _VLDY.delegationReward(id, voter, reward);
       }
