@@ -1,3 +1,43 @@
-.App {
-  text-align: center;
+
+table, thead, tbody, td, tr {
+
+}
+
+
+
+td {
+
+  height: 30px;
+  width: 300px;
+
+}
+
+th {
+
+  height: 30px;
+  width: 350px;
+
+}
+
+.logHeader {
+
+  overflow-y: hidden;
+
+}
+
+.logBody {
+
+  overflow-y: scroll;
+  display: block;
+  height: 250px;
+}
+
+.delegationLog {
+
+  position: relative;
+  width: 1200px;
+  font-size: 12.5px;
+  top: 350px;
+  left: 40px;
+  right: 0%;
 }

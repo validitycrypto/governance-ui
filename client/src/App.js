@@ -1,6 +1,11 @@
 import React, { Component } from "react";
 import Button from "@atlaskit/button";
 
+
+import { faUser, faUsers, faShareAlt, faUserTag, faStar, faShieldAlt, faLink, faStreetView, faCheck, faTimes , faDiceFive, faEnvelope, faWallet } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Segment, Icon, Table } from 'semantic-ui-react'
+
 import Validation from "./contracts/communalValidation.json";
 import ERC20d from "./contracts/ERC20d.json";
 
@@ -12,7 +17,7 @@ import "./App.css";
 const decimal = Math.pow(10,18);
 
 class App extends Component {
-  state = { web3: null, account: null, token: null , dapp: null };
+  state = { web3: null, account: null, token: null , dapp: null, log: [[],[],[],[]]};
 
   componentDidUpdate = async () => {
       await this.getBalances();
@@ -116,14 +121,105 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <h1>VLDY MVP</h1>
-        <b>vID:&nbsp;{this.state.id}</b>
-        <h3>{this.state.gasBal} &nbsp;EGEM</h3>
-        <h3>{this.state.tokenBal} &nbsp;VLDY</h3>
-        <Button appearance="primary"
-        onClick={this.initialiseOwnership}>
-        Initialise
-        </Button>
+
+        <div className="delegationLog">
+        <Table color="green" key="green" inverted compact celled>
+        <div className="logHeader">
+         <Table.Header className="logHeader">
+           <Table.Row>
+             <Table.HeaderCell textAlign="center" colSpan='4'>
+             <FontAwesomeIcon color="white" icon={faUsers} size='lg'/>
+             &nbsp;&nbsp;Voting Log
+             </Table.HeaderCell>
+           </Table.Row>
+           <Table.Row>
+             <Table.HeaderCell textAlign="center" colSpan='1'>
+             <FontAwesomeIcon color="white" icon={faWallet} size='lg'/>
+             &nbsp;&nbsp;Address
+             </Table.HeaderCell>
+             <Table.HeaderCell textAlign="center" colSpan='1'>
+             <FontAwesomeIcon color="white" icon={faUserTag} size='lg'/>
+             &nbsp;&nbsp;vID
+             </Table.HeaderCell>
+             <Table.HeaderCell textAlign="center" colSpan='1'>
+             <FontAwesomeIcon color="white" icon={faStar} size='lg'/>
+             &nbsp;&nbsp;Type
+             </Table.HeaderCell>
+             <Table.HeaderCell textAlign="center" colSpan='1'>
+             <FontAwesomeIcon color="white" icon={faLink} size='lg'/>
+             &nbsp;&nbsp;Weight
+             </Table.HeaderCell>
+           </Table.Row>
+           </Table.Header>
+           </div>
+
+        <div className="logBody">
+         <Table.Body>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][0]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][0]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][0]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][0]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][1]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][1]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][1]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][1]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][2]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][2]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][2]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][2]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][3]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][3]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][3]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][3]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][4]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][4]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][4]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][4]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][5]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][5]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][5]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][5]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][6]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][6]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][6]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][6]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][7]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][7]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][7]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][7]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][8]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][8]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][8]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][8]}</Table.Cell>
+           </Table.Row>
+           <Table.Row>
+             <Table.Cell textAlign="center">{this.state.log[0][9]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[1][9]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[2][9]}</Table.Cell>
+             <Table.Cell textAlign="center">{this.state.log[3][9]}</Table.Cell>
+           </Table.Row>
+         </Table.Body>
+         </div>
+
+         </Table>
+         </div>
       </div>
     );
   }
