@@ -16,6 +16,7 @@ class App extends Component {
 
   componentDidUpdate = async () => {
       await this.getBalances();
+      await this.getvID();
   }
 
   componentDidMount = async () => {
@@ -47,13 +48,82 @@ class App extends Component {
       gasBal: EGEM })
   }
 
+  getvID = async() => {
+    const vID = await this.state.token.getvID(this.state.account)
+    await this.setState({
+      id: vID
+    })
+  }
+
+  getPositive = async() => {
+    const stat = await this.state.token.positiveVotes(this.state.id)
+    await this.setState({
+      positive: stat
+    })
+  }
+
+  getNegative = async() => {
+    const stat = await this.state.token.negativeVotes(this.state.id)
+    await this.setState({
+      negative: stat
+    })
+  }
+
+  getNeutral = async() => {
+    const stat = await this.state.token.neutralVotes(this.state.id)
+    await this.setState({
+      neutral: stat
+    })
+  }
+
+  getTotal = async() => {
+    const stat = await this.state.token.totalVotes(this.state.id)
+    await this.setState({
+      total: stat
+    })
+  }
+
+  getEvents = async() => {
+    const stat = await this.state.token.totalEvents(this.state.id)
+    await this.setState({
+      events: stat
+    })
+  }
+
+  getTrust = async() => {
+    const stat = await this.state.token.trustLevel(this.state.id)
+    await this.setState({
+      events: stat
+    })
+  }
+
+  getIdentity = async() => {
+    const stat = await this.state.token.getIdentity(this.state.id)
+    await this.setState({
+      identity: stat
+    })
+  }
+
+  initialiseOwnership = async() => {
+    await this.state.token.adminControl(this.state.dapp.address,
+      { from: this.state.account,
+        gas: 6720000 })
+    await this.state.dapp.initialiseAsset(this.state.token.address,
+      { from: this.state.account,
+         gas: 6720000 })
+  }
+
   render() {
     return (
       <div className="App">
         <h1>VLDY MVP</h1>
-        <h2> {this.state.account} </h2>
-        <h3> {this.state.gasBal} &nbsp;EGEM</h3>
-        <h3> {this.state.tokenBal} &nbsp;VLDY</h3>
+        <b>vID:&nbsp;{this.state.id}</b>
+        <h3>{this.state.gasBal} &nbsp;EGEM</h3>
+        <h3>{this.state.tokenBal} &nbsp;VLDY</h3>
+        <Button appearance="primary"
+        onClick={this.initialiseOwnership}>
+        Initialise
+        </Button>
       </div>
     );
   }
