@@ -18,7 +18,6 @@ contract communalValidation {
   struct _validation {
 
       addressSet.Set _delegates;
-      bytes32 _subject;
       bytes32 _ticker;
       bytes32 _type;
       bytes32 _positive;
@@ -65,10 +64,6 @@ contract communalValidation {
       return _event[_live][_round]._delegates.contains(_voter);
   }
 
-  function eventSubject(bytes32 _entity, uint _index) public view returns (bytes32 subject) {
-      subject = _event[_entity][_index]._subject;
-  }
-
   function eventType(bytes32 _entity, uint _index) public view returns (bytes32 class) {
       class = _event[_entity][_index]._type;
   }
@@ -87,7 +82,6 @@ contract communalValidation {
 
   function createEvent(bytes32 _entity, bytes32 _tick, bytes32 _asset, uint _index) public _onlyAdmin
   {
-      _event[_entity][_index]._subject = _entity;
       _event[_entity][_index]._ticker = _tick;
       _event[_entity][_index]._type = _asset;
       _active[_entity] = true;
