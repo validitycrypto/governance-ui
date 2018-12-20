@@ -8,14 +8,14 @@ table, thead, tbody, td, tr {
 td {
 
   height: 30px;
-  width: 300px;
+  width: 400px;
 
 }
 
 th {
 
   height: 30px;
-  width: 350px;
+  width: 400px;
 
 }
 
@@ -29,15 +29,67 @@ th {
 
   overflow-y: scroll;
   display: block;
-  height: 250px;
+  height: 150px;
+}
+
+.delegationSubject {
+
+  position: absolute;
+  width: 750px;
+  left: 250px;
+  top: 100px;
+  right: 0px;
+
+}
+
+.eventSubject {
+
+  position: relative;
+  height: 50px;
+  left: 25px;
+
+}
+
+.eventTitle {
+
+  position: relative;
+  color: white;
+  font-size: 25px;
+  left: 10px;
+
+}
+
+.eventPositive {
+
+  position: relative;
+  height: 50px;
+  left: 75px;
+
+}
+
+.eventNegative {
+
+position: relative;
+height: 50px;
+left: 75px;
+
+}
+
+.eventNeutral {
+
+position: relative;
+height: 50px;
+left: 75px;
+
+
 }
 
 .delegationLog {
 
-  position: relative;
+  position: absolute;
   width: 1200px;
   font-size: 12.5px;
-  top: 350px;
+  top: 450px;
   left: 40px;
   right: 0%;
 }
