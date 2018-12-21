@@ -1,10 +1,27 @@
-import React, { Component } from "react";
-import Button from "@atlaskit/button";
+import React, { Component, Fragment } from 'react';
 
-
-import { faVoteYea, faWeightHanging, faUser, faUsers, faShareAlt, faUserTag, faStar, faShieldAlt, faLink, faStreetView, faCheck, faTimes , faDiceFive, faEnvelope, faWallet } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Segment, Icon, Table } from 'semantic-ui-react'
+import {
+  GlobalNav,
+  LayoutManager,
+  NavigationProvider,
+  MenuSection,
+  SkeletonContainerView,
+  light,
+  dark,
+  settings,
+  ContainerHeader,
+  HeaderSection,
+  ItemAvatar,
+  Item,
+  ThemeProvider,
+} from '@atlaskit/navigation-next';
+import Button from '@atlaskit/button';
+import { Reset, Theme } from '@atlaskit/theme';
+import { gridSize as gridSizeFn } from '@atlaskit/theme';
+
+import { faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import Validation from "./contracts/communalValidation.json";
 import ERC20d from "./contracts/ERC20d.json";
@@ -16,12 +33,57 @@ import "./App.css";
 
 const decimal = Math.pow(10,18);
 
-class App extends Component {
-  state = { web3: null, account: null, token: null , dapp: null, log: [[],[],[],[]]};
+const userIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faUser} size='1x'/>
+const storeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faStore} size='1x'/>
+const cogIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCog} size='1x'/>
+const walletIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faWallet} size='1x'/>
+const neutralIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
+const positiveIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCheck} className="positiveIcon" size='lg'/>
+const negativeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTimes} className="neutralIcon" size='lg'/>
+const crosshairsIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCrosshairs} className="eventsIcon" size='1x'/>
+const starIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faStar} className="starIcon" size='1x'/>
 
-  componentDidUpdate = async () => {
+const gridSize = gridSizeFn();
+const themeModes = { light, dark, settings };
+
+const GlobalNavigation = () => (
+  <GlobalNav primaryItems={[
+    { key: 'market', icon: userIcon, label: 'Stats' },
+    { key: 'wager', icon: walletIcon, label: 'Wallet' },
+    { key: 'settings', icon: cogIcon, label: 'settings' },
+  ]} secondaryItems={[]} />
+);
+
+class App extends Component {
+  state = {
+    web3: null,
+    account: null,
+    token: null ,
+    dapp: null,
+    log: [[],[],[],[]],
+    themeMode: 'dark',
+    shouldShowContainer: true,
+    shouldRenderSkeleton: false
+  };
+
+  initialiseData = async () => {
       await this.getBalances();
+      await this.getEvent();
+      await this.getRound();
       await this.getvID();
+      await this.getTotal();
+      await this.getNeutral();
+      await this.getNegative();
+      await this.getPositive();
+      await this.getTotal();
+      await this.getEvents();
+      await this.getIdentity();
+      await this.getTrust();
+      await this.eventPositive();
+      await this.eventNegative();
+      await this.eventNeutral();
+      await this.eventType();
+
   }
 
   componentDidMount = async () => {
@@ -42,7 +104,37 @@ class App extends Component {
         account: accounts[0],
           token: instance1,
            dapp: instance2,
-           web3: web })
+           web3: web });
+      await this.initialiseData()
+  };
+
+  renderNavigation = () => {
+    return (
+      <Fragment>
+      <ContainerHeader>
+      HELLO
+      </ContainerHeader>
+        <MenuSection>
+          {({ className }) => (
+            <div className={className}>
+              <Item before={crosshairsIcon} text={this.state.events} subText="Events" />
+              <Item before={starIcon} text={this.state.total} subText="Total" />
+              <Item before={positiveIcon} text={this.state.positive} subText="Positive" />
+              <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
+              <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
+            </div>
+          )}
+        </MenuSection>
+      </Fragment>
+    );
+  };
+
+  renderSkeleton = () => {
+    return <SkeletonContainerView />;
+  };
+
+  handleShowContainerChange = () => {
+    this.setState({ shouldShowContainer: !this.state.shouldShowContainer });
   };
 
   logSubject = (event) =>  { this.setState({ subject: event }) }
@@ -68,68 +160,96 @@ class App extends Component {
   getPositive = async() => {
     const stat = await this.state.token.positiveVotes(this.state.id)
     await this.setState({
-      positive: stat
+      positive: parseFloat(stat).toFixed(2)
     })
   }
 
   getNegative = async() => {
     const stat = await this.state.token.negativeVotes(this.state.id)
     await this.setState({
-      negative: stat
+      negative: parseFloat(stat).toFixed(2)
     })
   }
 
   getNeutral = async() => {
     const stat = await this.state.token.neutralVotes(this.state.id)
     await this.setState({
-      neutral: stat
+      neutral: parseFloat(stat).toFixed(2)
     })
   }
 
   getTotal = async() => {
     const stat = await this.state.token.totalVotes(this.state.id)
     await this.setState({
-      total: stat
+      total: parseFloat(stat).toFixed(2)
     })
   }
 
   getEvents = async() => {
     const stat = await this.state.token.totalEvents(this.state.id)
     await this.setState({
-      events: stat
+      events: parseFloat(stat).toFixed(2)
     })
   }
 
   getTrust = async() => {
     const stat = await this.state.token.trustLevel(this.state.id)
     await this.setState({
-      trust: stat
+      trust: parseFloat(stat).toFixed(2)
     })
   }
 
   getIdentity = async() => {
     const stat = await this.state.token.getIdentity(this.state.account)
     await this.setState({
-      identity: stat
+      identity: this.state.web3.utils.fromAscii(stat)
     })
   }
 
   getEvent = async() => {
-    const stat = await this.state.token.currentEvent()
+    const stat = await this.state.dapp.currentEvent()
     await this.setState({
-      subject: stat
+      subject: this.state.web3.utils.fromAscii(stat)
     })
   }
 
   getRound = async() => {
-    const stat = await this.state.token.currentRound()
+    const stat = await this.state.dapp.currentRound()
+    await this.setState({
+      round: parseFloat(stat).toFixed(2)
+    })
+  }
+
+  eventPositive = async() => {
+    const stat = await this.state.dapp.eventPositive(this.state.subject, this.state.round)
     await this.setState({
       round: stat
     })
   }
 
+  eventNegative = async() => {
+    const stat = await this.state.dapp.eventNegative(this.state.subject, this.state.round)
+    await this.setState({
+      round: stat
+    })
+  }
+
+  eventNeutral = async() => {
+    const stat = await this.state.dapp.eventNeutral(this.state.subject, this.state.round)
+    await this.setState({
+      round: stat
+    })
+  }
+
+  eventType = async() => {
+    const stat = await this.state.dapp.eventType(this.state.subject, this.state.round)
+    await this.setState({
+      subject: this.state.web3.utils.fromAscii(stat)
+    })
+  }
+
   createEvent = async() => {
-    await this.state.token.createEvent(this.state.subject)
+    await this.state.dapp.createEvent(this.state.subject)
   }
 
   initialiseOwnership = async() => {
@@ -142,37 +262,39 @@ class App extends Component {
   }
 
   render() {
+    const { shouldRenderSkeleton, shouldShowContainer, themeMode } = this.state;
+    const renderer = shouldRenderSkeleton
+      ? this.renderSkeleton
+      : this.renderNavigation;
     return (
       <div className="App">
+
+      <NavigationProvider>
+        <ThemeProvider
+          theme={theme => ({
+            ...theme,
+            mode: themeModes[themeMode],
+          })}
+        >
+          <LayoutManager
+            globalNavigation={GlobalNavigation}
+            productNavigation={renderer}
+          >
+
+          </LayoutManager>
+        </ThemeProvider>
+        </NavigationProvider>
 
         <div className="delegationSubject">
         <Segment color="green" key="green" inverted raised>
 
-          <div className="eventSubject">
-            <FontAwesomeIcon color="white" icon={faStar} size='2x'/>
-            <b className="eventTitle"></b>
-          </div>
 
-          <div className="eventPositive">
-            <FontAwesomeIcon color="white" icon={faCheck} size='2x'/>
-            <b className="eventTitle"></b>
-          </div>
-
-          <div className="eventNegative">
-            <FontAwesomeIcon color="white" icon={faTimes} size='2x'/>
-            <b className="eventTitle"></b>
-          </div>
-
-          <div className="eventNeutral">
-            <FontAwesomeIcon color="white" icon={faTimes} size='2x'/>
-            <b className="eventTitle">=</b>
-          </div>
 
         </Segment>
         </div>
 
         <div className="delegationLog">
-        <Table color="green" key="green" inverted compact celled>
+        <Table key="green" color="green" inverted compact celled>
         <div className="logHeader">
          <Table.Header className="logHeader">
            <Table.Row>

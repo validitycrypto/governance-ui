@@ -32,64 +32,33 @@ th {
   height: 150px;
 }
 
-.delegationSubject {
-
-  position: absolute;
-  width: 750px;
-  left: 250px;
-  top: 100px;
-  right: 0px;
+.neutralIcon {
+  font-size: 23px;
 
 }
 
-.eventSubject {
-
-  position: relative;
-  height: 50px;
-  left: 25px;
+.eventsIcon {
+  font-size: 17.5px;
 
 }
 
-.eventTitle {
-
-  position: relative;
-  color: white;
-  font-size: 25px;
-  left: 10px;
+.starIcon {
+  font-size: 16.5px;
 
 }
 
-.eventPositive {
-
-  position: relative;
-  height: 50px;
-  left: 75px;
+.positiveIcon {
+  font-size: 18px;
 
 }
 
-.eventNegative {
-
-position: relative;
-height: 50px;
-left: 75px;
-
-}
-
-.eventNeutral {
-
-position: relative;
-height: 50px;
-left: 75px;
-
-
-}
 
 .delegationLog {
 
   position: absolute;
-  width: 1200px;
+  width: 750px;
   font-size: 12.5px;
-  top: 450px;
-  left: 40px;
+  top: 460px;
+  left: 500px;
   right: 0%;
 }
