@@ -1,3 +1,9 @@
+.App {
+
+  height: 725px;
+
+}
+
 
 table, thead, tbody, td, tr {
 
@@ -29,7 +35,7 @@ th {
 
   overflow-y: scroll;
   display: block;
-  height: 150px;
+  height: 240px;
 }
 
 .neutralIcon {
@@ -59,7 +65,7 @@ th {
   width: 750px;
   font-size: 12.5px;
   font-family: sans-serif;
-  top: 460px;
+  top: 375px;
   left: 500px;
   right: 0%;
 }
@@ -67,5 +73,69 @@ th {
 .textColor {
   color: #bde1e7;
 
+}
+
+.validatingIdentifier {
+
+  position: relative;
+  writing-mode: tb-rl;
+  z-index: 333;
+  left: -282.5px;
+  top: 160px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #0cff6f;
+
+}
+
+.eventBorder {
+    position: absolute;
+    display: block;
+    background-color: black;
+    border-radius: 50%;
+    height: 325px;
+    width: 325px;
+    margin: 0;
+    top: 2.5%;
+    left: 10%;
+
+}
+
+.eventPicture {
+    position: relative;
+    display: block;
+    background-color: #8ae3ae;
+    border-radius: 50%;
+    height: 300px;
+    width: 300px;
+    margin: 0;
+    top: 4%;
+    left: 4%
+
+}
+
+.eventX {
+  position: absolute;
+  top: -360px;
+  width: 325px;
+  left: 10%;
+
+}
+
+.voteModal {
+
+  position: absolute;
+  top: -750px;
+  width: 750px;
+  left: 39%;
+
+
+}
+
+.colorMain {
+  position: relative;
+  color: #0cff6f;
+  font-size: 25px;
+  top: 3.5px;
 
 }

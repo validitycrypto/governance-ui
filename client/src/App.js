@@ -20,7 +20,7 @@ import Button from '@atlaskit/button';
 import { Reset, Theme } from '@atlaskit/theme';
 import { gridSize as gridSizeFn } from '@atlaskit/theme';
 
-import { faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faInfo, faBullseye, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 
@@ -47,6 +47,7 @@ const trustIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faShieldAlt} clas
 const identityIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faIdCard} className="starIcon" size='1x'/>
 const tokenIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTag} className="starIcon" size='1x'/>
 const ethIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faEthereum} className="starIcon" size='1x'/>
+const bullseyeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBullseye} className="starIcon" size='1x'/>
 
 const gridSize = gridSizeFn();
 const themeModes = { light, dark, settings };
@@ -315,15 +316,63 @@ class App extends Component {
               <GlobalNav primaryItems={[
                 { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true })},
                 { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false })},
-                { key: 'settings', icon: cogIcon, label: 'settings' },
-              ]} secondaryItems={[]} />
+                { key: 'settings', icon: bullseyeIcon, label: 'settings'},
+              ]} secondaryItems ={[  ]} />
             )}
             productNavigation={renderer}
           >
-
+          <div className="validatingIdentifier">
+          {this.state.id}
+          </div>
           </LayoutManager>
         </ThemeProvider>
         </NavigationProvider>
+
+        <Segment raised inverted key="black" color="black" className="eventX">
+        &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.type}
+        </Segment>
+
+        <Segment raised inverted key="black" color="black" className="eventX">
+        &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.type}
+        </Segment>
+
+        <Segment raised inverted key="black" color="black" className="eventX">
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.positive}
+        </Segment>
+
+        <Segment raised inverted key="black" color="black" className="eventX">
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.neutral}
+        </Segment>
+
+        <Segment raised inverted key="black" color="black" className="eventX">
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.negative}
+
+        </Segment>
+
+        <Segment raised inverted key="black" color="black" className="voteModal">
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.weight}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;<span className="colorMain">Δ</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Impact: {this.state.weight}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faStar} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reward: {this.state.voted}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faEdit} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
+        </Segment>
+
+
+        <div className="eventBorder">
+        <div className="eventPicture">
+        </div>
+        </div>
 
         <div className="delegationLog">
         <Table key="black" color="black" inverted compact celled>
