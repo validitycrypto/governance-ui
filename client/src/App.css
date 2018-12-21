@@ -58,7 +58,14 @@ th {
   position: absolute;
   width: 750px;
   font-size: 12.5px;
+  font-family: sans-serif;
   top: 460px;
   left: 500px;
   right: 0%;
+}
+
+.textColor {
+  color: #bde1e7;
+
+
 }

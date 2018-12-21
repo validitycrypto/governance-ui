@@ -20,8 +20,9 @@ import Button from '@atlaskit/button';
 import { Reset, Theme } from '@atlaskit/theme';
 import { gridSize as gridSizeFn } from '@atlaskit/theme';
 
-import { faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
+import { faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 
 import Validation from "./contracts/communalValidation.json";
 import ERC20d from "./contracts/ERC20d.json";
@@ -33,15 +34,19 @@ import "./App.css";
 
 const decimal = Math.pow(10,18);
 
-const userIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faUser} size='1x'/>
-const storeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faStore} size='1x'/>
-const cogIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCog} size='1x'/>
-const walletIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faWallet} size='1x'/>
+const userIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faUser} size='lg'/>
+
+const cogIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCog} size='lg'/>
+const walletIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
 const neutralIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
 const positiveIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCheck} className="positiveIcon" size='lg'/>
 const negativeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTimes} className="neutralIcon" size='lg'/>
 const crosshairsIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCrosshairs} className="eventsIcon" size='1x'/>
 const starIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faStar} className="starIcon" size='1x'/>
+const trustIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faShieldAlt} className="starIcon" size='1x'/>
+const identityIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faIdCard} className="starIcon" size='1x'/>
+const tokenIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTag} className="starIcon" size='1x'/>
+const ethIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faEthereum} className="starIcon" size='1x'/>
 
 const gridSize = gridSizeFn();
 const themeModes = { light, dark, settings };
@@ -62,8 +67,7 @@ class App extends Component {
     dapp: null,
     log: [[],[],[],[]],
     themeMode: 'dark',
-    shouldShowContainer: true,
-    shouldRenderSkeleton: false
+    toggle: true
   };
 
   initialiseData = async () => {
@@ -108,20 +112,49 @@ class App extends Component {
       await this.initialiseData()
   };
 
-  renderNavigation = () => {
+  renderSidebar = () => {
+    if(this.state.toggle)
+      return (this.renderStatistics())
+    else{
+      return (this.renderWallet())
+    }
+  }
+
+  renderStatistics= () => {
     return (
       <Fragment>
-      <ContainerHeader>
-      HELLO
+      <ContainerHeader
+      text="&nbsp;&nbsp;Voting Statistics">
       </ContainerHeader>
         <MenuSection>
           {({ className }) => (
             <div className={className}>
+              <Item before={identityIcon} text={this.state.identity} subText="Identity" />
               <Item before={crosshairsIcon} text={this.state.events} subText="Events" />
               <Item before={starIcon} text={this.state.total} subText="Total" />
+              <Item before={trustIcon} text={this.state.trust} subText="Trust" />
               <Item before={positiveIcon} text={this.state.positive} subText="Positive" />
               <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
+
+            </div>
+          )}
+        </MenuSection>
+      </Fragment>
+    );
+  };
+
+  renderWallet= () => {
+    return (
+      <Fragment>
+      <ContainerHeader
+      text="&nbsp;&nbsp;Delegate Funds">
+      </ContainerHeader>
+        <MenuSection>
+          {({ className }) => (
+            <div className={className}>
+              <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
+              <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
             </div>
           )}
         </MenuSection>
@@ -202,14 +235,14 @@ class App extends Component {
   getIdentity = async() => {
     const stat = await this.state.token.getIdentity(this.state.account)
     await this.setState({
-      identity: this.state.web3.utils.fromAscii(stat)
+      identity: this.state.web3.utils.toAscii(stat)
     })
   }
 
   getEvent = async() => {
     const stat = await this.state.dapp.currentEvent()
     await this.setState({
-      subject: this.state.web3.utils.fromAscii(stat)
+      subject: this.state.web3.utils.toAscii(stat)
     })
   }
 
@@ -244,7 +277,7 @@ class App extends Component {
   eventType = async() => {
     const stat = await this.state.dapp.eventType(this.state.subject, this.state.round)
     await this.setState({
-      subject: this.state.web3.utils.fromAscii(stat)
+      subject: this.state.web3.utils.toAscii(stat)
     })
   }
 
@@ -265,7 +298,8 @@ class App extends Component {
     const { shouldRenderSkeleton, shouldShowContainer, themeMode } = this.state;
     const renderer = shouldRenderSkeleton
       ? this.renderSkeleton
-      : this.renderNavigation;
+      : this.renderSidebar;
+
     return (
       <div className="App">
 
@@ -277,7 +311,13 @@ class App extends Component {
           })}
         >
           <LayoutManager
-            globalNavigation={GlobalNavigation}
+            globalNavigation={() =>  (
+              <GlobalNav primaryItems={[
+                { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true })},
+                { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false })},
+                { key: 'settings', icon: cogIcon, label: 'settings' },
+              ]} secondaryItems={[]} />
+            )}
             productNavigation={renderer}
           >
 
@@ -285,36 +325,36 @@ class App extends Component {
         </ThemeProvider>
         </NavigationProvider>
 
-        <div className="delegationSubject">
-        <Segment color="green" key="green" inverted raised>
-
-
-
-        </Segment>
-        </div>
-
         <div className="delegationLog">
-        <Table key="green" color="green" inverted compact celled>
+        <Table key="black" color="black" inverted compact celled>
         <div className="logHeader">
          <Table.Header className="logHeader">
            <Table.Row>
              <Table.HeaderCell textAlign="center" colSpan='3'>
-             <FontAwesomeIcon color="white" icon={faVoteYea} size='lg'/>
+             <div className="textColor">
+             <FontAwesomeIcon color="#0cff6f" icon={faVoteYea} size='lg'/>
              &nbsp;&nbsp;Voting Log
+             </div>
              </Table.HeaderCell>
            </Table.Row>
            <Table.Row>
              <Table.HeaderCell textAlign="center" colSpan='1'>
-             <FontAwesomeIcon color="white" icon={faUserTag} size='lg'/>
+             <div className="textColor">
+             <FontAwesomeIcon color="#0cff6f" icon={faUserTag} size='lg'/>
              &nbsp;&nbsp;vID
+             </div>
              </Table.HeaderCell>
              <Table.HeaderCell textAlign="center" colSpan='1'>
-             <FontAwesomeIcon color="white" icon={faStar} size='lg'/>
+            <div className="textColor">
+            <FontAwesomeIcon color="#0cff6f" icon={faStar} size='lg'/>
              &nbsp;&nbsp;Type
+             </div>
              </Table.HeaderCell>
              <Table.HeaderCell textAlign="center" colSpan='1'>
-             <FontAwesomeIcon color="white" icon={faWeightHanging} size='lg'/>
+             <div className="textColor">
+             <FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
              &nbsp;&nbsp;Weight
+             </div>
              </Table.HeaderCell>
            </Table.Row>
            </Table.Header>
