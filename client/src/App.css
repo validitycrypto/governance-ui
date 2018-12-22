@@ -122,13 +122,100 @@ th {
 
 }
 
-.voteModal {
+.statModal {
 
   position: absolute;
   top: -750px;
   width: 750px;
   left: 39%;
 
+
+}
+
+.voteModal {
+
+  position: absolute;
+  top: -1087.5px;
+  width: 750px;
+  height: 250px;
+  left: 39%;
+
+
+}
+
+.positiveToggle {
+
+  position: absolute;
+  left: 50px;
+  top: 25px;
+
+}
+
+.positiveHeader {
+
+  position: relative;
+  left: 25px;
+  top: -7.5px;
+
+}
+
+.positiveValue {
+
+  color: #0cff6f;
+  font-weight: bold;
+
+}
+
+.neutralToggle {
+
+  position: absolute;
+  left: 50px;
+  top: 100px;
+
+}
+
+.neutralHeader {
+
+  position: relative;
+  left: 25px;
+  top: -7.5px;
+
+}
+
+.neutralValue {
+
+  color: cyan;
+  font-weight: bold;
+
+}
+
+.negativeToggle {
+    position: absolute;
+    left: 50px;
+    top: 175px;
+
+}
+
+.negativeHeader {
+
+  position: relative;
+  left: 25px;
+  top: -7.5px;
+
+}
+
+.negativeValue {
+
+  color: red;
+  font-weight: bold;
+
+}
+
+.voteButton {
+
+  position: absolute;
+  left: 575px;
+  top: 175px;
 
 }
 

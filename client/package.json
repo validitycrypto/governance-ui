@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@atlaskit/button": "^9.0.16",
+    "@atlaskit/css-reset": "^3.0.5",
     "@atlaskit/field-text": "^7.0.13",
     "@atlaskit/flag": "^9.1.2",
     "@atlaskit/global-navigation": "^5.1.0",
@@ -23,6 +24,7 @@
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-scripts": "1.1.4",
+    "react-toggle": "^4.0.2",
     "semantic-ui-react": "^0.83.0",
     "styled-components": "^4.0.2",
     "truffle-contract": "^3.0.6",

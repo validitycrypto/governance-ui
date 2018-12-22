@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from 'react';
 
 import { Segment, Icon, Table } from 'semantic-ui-react'
+import TextField from '@atlaskit/field-text';
+import Toggle from 'react-toggle'
 import {
   GlobalNav,
   LayoutManager,
@@ -30,6 +32,7 @@ import ERC20d from "./contracts/ERC20d.json";
 import truffleContract from "truffle-contract";
 import getWeb3 from "./utils/getWeb3";
 
+import "react-toggle/style.css" // for ES6 modules
 import "./App.css";
 
 const decimal = Math.pow(10,18);
@@ -286,6 +289,39 @@ class App extends Component {
     await this.state.dapp.createEvent(this.state.subject)
   }
 
+  optionOne = async() => {
+    await this.setState({
+      choice1: "0x506f736974697665",
+      choice2: null,
+      choice3: null,
+      option1: true,
+      option2: false,
+      option3: false
+    })
+  }
+
+  optionTwo = async() => {
+    await this.setState({
+      choice1: null,
+      choice2: "0x6e65757472616c",
+      choice3: null,
+      option1: false,
+      option2: true,
+      option3: false
+    })
+  }
+
+  optionThree = async() => {
+    await this.setState({
+      choice1: null,
+      choice2: null,
+      choice3: "0x4e65676174697665",
+      option1: false,
+      option2: false,
+      option3: true
+    })
+  }
+
   initialiseOwnership = async() => {
     await this.state.token.adminControl(this.state.dapp.address,
       { from: this.state.account,
@@ -354,7 +390,7 @@ class App extends Component {
 
         </Segment>
 
-        <Segment raised inverted key="black" color="black" className="voteModal">
+        <Segment raised inverted key="black" color="black" className="statModal">
         &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.weight}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -368,6 +404,44 @@ class App extends Component {
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
         </Segment>
 
+        <Segment raised inverted key="black" color="black" className="voteModal">
+        <label className="positiveToggle">
+          <Toggle
+            defaultChecked={this.state.option1}
+            checked={this.state.option1}
+            icons={{
+              checked: <FontAwesomeIcon color="#0cff6f" icon={faCheck}/>,
+              unchecked: null,
+            }}
+            onChange={this.optionOne} />
+          <span className="positiveHeader">Positive: <span className="positiveValue">&nbsp;&nbsp;&nbsp;{this.state.choice1}</span></span>
+        </label>
+        <label className="neutralToggle">
+          <Toggle
+            checked={this.state.option2}
+            icons={{
+              checked: <FontAwesomeIcon color="#0cff6f" icon={faBalanceScale}/>,
+              unchecked: null,
+            }}
+            onChange={this.optionTwo} />
+            <span className="neutralHeader">Neutral: <span className="neutralValue">&nbsp;&nbsp;&nbsp;{this.state.choice2}</span></span>
+        </label>
+        <label className="negativeToggle">
+          <Toggle
+            checked={this.state.option3}
+            icons={{
+              checked: <FontAwesomeIcon color="#0cff6f" icon={faTimes}/>,
+              unchecked: null,
+            }}
+            onChange={this.optionThree} />
+            <span className="negativeHeader">Negative:  <span className="negativeValue">&nbsp;&nbsp;&nbsp;{this.state.choice3}</span></span>
+        </label>
+
+        <Button appearance="primary" className="voteButton">
+        Submit Vote
+        </Button>
+
+        </Segment>
 
         <div className="eventBorder">
         <div className="eventPicture">
