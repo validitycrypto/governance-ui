@@ -3,6 +3,7 @@ import React, { Component, Fragment } from 'react';
 import { Segment, Icon, Table } from 'semantic-ui-react'
 import TextField from '@atlaskit/field-text';
 import Toggle from 'react-toggle'
+import Select from '@atlaskit/select';
 import {
   GlobalNav,
   LayoutManager,
@@ -83,14 +84,17 @@ class App extends Component {
       await this.getNeutral();
       await this.getNegative();
       await this.getPositive();
+      await this.eventType();
       await this.getTotal();
       await this.getEvents();
       await this.getIdentity();
       await this.getTrust();
+      await this.isStaking();
+      await this.isVoted();
       await this.eventPositive();
       await this.eventNegative();
       await this.eventNeutral();
-      await this.eventType();
+      await this.getLog();
 
   }
 
@@ -117,10 +121,12 @@ class App extends Component {
   };
 
   renderSidebar = () => {
-    if(this.state.toggle)
+    if(this.state.toggle) {
       return (this.renderStatistics())
-    else{
+    } else if(this.state.wallet){
       return (this.renderWallet())
+    } else if(this.state.admin){
+      return (this.renderAdmin())
     }
   }
 
@@ -166,6 +172,41 @@ class App extends Component {
     );
   };
 
+  renderAdmin= () => {
+    return (
+      <Fragment>
+      <ContainerHeader
+      text="&nbsp;&nbsp;Admin Panel">
+      </ContainerHeader>
+        <MenuSection>
+          {({ className }) => (
+            <div className={className}>
+            <Select className="subjectType" onChange={this.logType}
+                options={[
+                  { label: 'dApp', value: "dApp"  },
+                  { label: 'Coin', value: "Coin" },
+                  { label: 'Token', value: "Token" },
+                  { label: 'Exchange', value: "Exchange" },
+                ]}
+                placeholder="Type"
+              />
+              <TextField onChange={this.logSubject} placeholder="Name"/>
+              <TextField onChange={this.logTicker} placeholder="Ticker"/>
+              <TextField onChange={this.logIndex} placeholder="Round"/>
+           <Button appearance="primary" className="subjectButton" onClick={this.createEvent}>
+           Create
+           </Button>
+
+           <Button appearance="danger" className="ownerButton" onClick={this.initialiseOwnership}>
+           Initialise
+           </Button>
+            </div>
+          )}
+        </MenuSection>
+      </Fragment>
+    );
+  };
+
   renderSkeleton = () => {
     return <SkeletonContainerView />;
   };
@@ -174,10 +215,10 @@ class App extends Component {
     this.setState({ shouldShowContainer: !this.state.shouldShowContainer });
   };
 
-  logSubject = (event) =>  { this.setState({ subject: event }) }
-  logTicker = (event) => { this.setState({ ticker: event }) }
-  logIndex = (event) => { this.setState({ index: event }) }
-  logType = (event) => { this.setState({ type: event }) }
+  logSubject = (event) =>  { this.setState({ subject: event.target.value }) }
+  logTicker = (event) => { this.setState({ ticker: event.target.value }) }
+  logIndex = (event) => { this.setState({ index: event.target.value }) }
+  logType = (event) => { this.setState({ type: event.value }) }
 
   getBalances = async() => {
     const EGEM = (parseFloat(await this.state.web3.eth.getBalance(this.state.account))/decimal).toFixed(2);
@@ -246,7 +287,7 @@ class App extends Component {
   getEvent = async() => {
     const stat = await this.state.dapp.currentEvent()
     await this.setState({
-      subject: this.state.web3.utils.toAscii(stat)
+      eventSubject: this.state.web3.utils.toAscii(stat)
     })
   }
 
@@ -258,39 +299,89 @@ class App extends Component {
   }
 
   eventPositive = async() => {
-    const stat = await this.state.dapp.eventPositive(this.state.subject, this.state.round)
+    const stat = await this.state.dapp.eventPositive(this.state.eventSubject, this.state.round)
     await this.setState({
-      round: stat
+      eventPositive: parseFloat(stat).toFixed(2)
     })
   }
 
   eventNegative = async() => {
-    const stat = await this.state.dapp.eventNegative(this.state.subject, this.state.round)
+    const stat = await this.state.dapp.eventNegative(this.state.eventSubject, this.state.round)
     await this.setState({
-      round: stat
+      eventNegative: parseFloat(stat).toFixed(2)
     })
   }
 
   eventNeutral = async() => {
-    const stat = await this.state.dapp.eventNeutral(this.state.subject, this.state.round)
+    const stat = await this.state.dapp.eventNeutral(this.state.eventSubject, this.state.round)
     await this.setState({
-      round: stat
+      eventNeutral: parseFloat(stat).toFixed(2)
     })
   }
 
   eventType = async() => {
-    const stat = await this.state.dapp.eventType(this.state.subject, this.state.round)
+    const stat = await this.state.dapp.eventType(this.state.eventSubject, this.state.round)
     await this.setState({
-      subject: this.state.web3.utils.toAscii(stat)
+      eventType: this.state.web3.utils.toAscii(stat)
+    })
+  }
+
+  isStaking = async() => {
+    const stat = await this.state.token.isStaking(this.state.account)
+    var input;
+    if(stat == true){ input = "True"
+    } else if(stat == false){ input = "False"}
+    await this.setState({
+      stake: input
+    })
+  }
+
+  isVoted = async() => {
+    const stat = await this.state.dapp.isVoted(this.state.account)
+    var input;
+    if(stat == true){ input = "True"
+    } else if(stat == false){ input = "False"}
+    await this.setState({
+      voted: input
     })
   }
 
   createEvent = async() => {
-    await this.state.dapp.createEvent(this.state.subject)
+    await this.state.dapp.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index,
+                                     {from: this.state.account, gas: 5725000 });
   }
+
+  voteEvent = async() => {
+    console.log(this.state.choice);
+    await this.state.dapp.voteSubmit(this.state.choice, {from: this.state.account, gas: 5725000 });
+  }
+
+  eventStake = async() => {
+    await this.state.token.initiateStake({from: this.state.account, gas: 5725000 });
+  }
+
+  getLog = async () => {
+    return await this.state.token.Vote({}, { fromBlock: 0, toBlock: 'latest' }).get((error, eventResult) => {
+    if (error) { console.log(error);
+    } else {
+      var array = [[],[],[],[]];
+      for(var x = 0; x < eventResult.length; x++ ){
+          var id = JSON.stringify(eventResult[x].args.vID).replace(/["]+/g, '')
+          var choice = this.state.web3.utils.toAscii(JSON.stringify(eventResult[x].args.choice).replace(/["]+/g, ''))
+          var weight = JSON.stringify(eventResult[x].args.weight).replace(/["]+/g, '')
+          array[0].push(id)
+          array[1].push(choice)
+          array[2].push(weight)
+      }
+      this.setState({log: array});
+    }
+  })
+}
+
 
   optionOne = async() => {
     await this.setState({
+      choice: "Positive",
       choice1: "0x506f736974697665",
       choice2: null,
       choice3: null,
@@ -302,6 +393,7 @@ class App extends Component {
 
   optionTwo = async() => {
     await this.setState({
+      choice: "Negative",
       choice1: null,
       choice2: "0x6e65757472616c",
       choice3: null,
@@ -313,6 +405,7 @@ class App extends Component {
 
   optionThree = async() => {
     await this.setState({
+      choice: "Neutral",
       choice1: null,
       choice2: null,
       choice3: "0x4e65676174697665",
@@ -350,9 +443,9 @@ class App extends Component {
           <LayoutManager
             globalNavigation={() =>  (
               <GlobalNav primaryItems={[
-                { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true })},
-                { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false })},
-                { key: 'settings', icon: bullseyeIcon, label: 'settings'},
+                { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true , wallet: false, admin: false }) },
+                { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false , wallet: true, admin: false }) },
+                { key: 'settings', icon: bullseyeIcon, label: 'settings' , onClick: () => this.setState({ toggle: false , wallet: false, admin: true }) },
               ]} secondaryItems ={[  ]} />
             )}
             productNavigation={renderer}
@@ -366,27 +459,27 @@ class App extends Component {
 
         <Segment raised inverted key="black" color="black" className="eventX">
         &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.type}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventSubject}
         </Segment>
 
         <Segment raised inverted key="black" color="black" className="eventX">
         &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.type}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}
         </Segment>
 
         <Segment raised inverted key="black" color="black" className="eventX">
         &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.positive}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}
         </Segment>
 
         <Segment raised inverted key="black" color="black" className="eventX">
         &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.neutral}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}
         </Segment>
 
         <Segment raised inverted key="black" color="black" className="eventX">
         &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.negative}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
 
         </Segment>
 
@@ -395,13 +488,16 @@ class App extends Component {
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.weight}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;<span className="colorMain">Δ</span>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Impact: {this.state.weight}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Impact: {this.state.impact}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faStar} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reward: {this.state.voted}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reward: {this.state.reward}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faEdit} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
         </Segment>
 
         <Segment raised inverted key="black" color="black" className="voteModal">
@@ -437,7 +533,11 @@ class App extends Component {
             <span className="negativeHeader">Negative:  <span className="negativeValue">&nbsp;&nbsp;&nbsp;{this.state.choice3}</span></span>
         </label>
 
-        <Button appearance="primary" className="voteButton">
+        <Button appearance="warning" className="stakeButton" onClick={this.eventStake}>
+        Commit Stake
+        </Button>
+
+        <Button appearance="primary" className="voteButton" onClick={this.voteEvent}>
         Submit Vote
         </Button>
 
@@ -449,7 +549,7 @@ class App extends Component {
         </div>
 
         <div className="delegationLog">
-        <Table key="black" color="black" inverted compact celled>
+        <Table color="black" inverted compact celled>
         <div className="logHeader">
          <Table.Header className="logHeader">
            <Table.Row>
@@ -486,27 +586,27 @@ class App extends Component {
         <div className="logBody">
          <Table.Body>
            <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][0]}</Table.Cell>
+             <Table.Cell className="logid" textAlign="center">{this.state.log[0][0]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[1][0]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[2][0]}</Table.Cell>
            </Table.Row>
            <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][1]}</Table.Cell>
+             <Table.Cell className="logid" textAlign="center">{this.state.log[0][1]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[1][1]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[2][1]}</Table.Cell>
            </Table.Row>
            <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][2]}</Table.Cell>
+             <Table.Cell className="logid" textAlign="center">{this.state.log[0][2]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[1][2]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[2][2]}</Table.Cell>
            </Table.Row>
            <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][3]}</Table.Cell>
+             <Table.Cell className="logid" textAlign="center">{this.state.log[0][3]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[1][3]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[2][3]}</Table.Cell>
            </Table.Row>
            <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][4]}</Table.Cell>
+             <Table.Cell className="logid" textAlign="center">{this.state.log[0][4]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[1][4]}</Table.Cell>
              <Table.Cell textAlign="center">{this.state.log[2][4]}</Table.Cell>
            </Table.Row>

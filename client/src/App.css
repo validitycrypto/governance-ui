@@ -38,6 +38,13 @@ th {
   height: 240px;
 }
 
+.logid {
+  font-size: 10px;
+
+
+
+}
+
 .neutralIcon {
   font-size: 23px;
 
@@ -211,6 +218,22 @@ th {
 
 }
 
+.subjectType {
+
+  position: relative;
+  width: 165px;
+
+}
+
+.subjectButton {
+
+  position: relative;
+  top: 25px;
+  left: 100px;
+
+}
+
+
 .voteButton {
 
   position: absolute;
@@ -218,6 +241,23 @@ th {
   top: 175px;
 
 }
+
+.stakeButton {
+
+  position: absolute;
+  left: 575px;
+  top: 100px;
+
+}
+
+.ownerButton {
+
+  position: relative;
+  top: 25px;
+  left: -65px;
+
+}
+
 
 .colorMain {
   position: relative;

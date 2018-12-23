@@ -110,18 +110,6 @@ contract communalValidation {
 
       uint wager = _VLDY.balanceOf(_voter);
       uint trust = _VLDY.trustLevel(_id);
-      uint weightUsage;
-
-      if(trust == 0){
-        weightUsage = 25;
-      } else if(trust > 0) {
-        weightUsage = 50;
-      } else if(trust > 5) {
-        weightUsage = 75;
-      } else if(trust > 10) {
-        weightUsage = 100;
-      }
-      wager = wager.mul(weightUsage.div(100));
       stake = wager.div(VOTE);
   }
 

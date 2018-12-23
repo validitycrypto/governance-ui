@@ -226,7 +226,6 @@ contract ERC20d {
     function delegationEvent(bytes _id, bytes32 _choice, uint _weight) public _onlyAdmin {
         require(_choice == POS || _choice == NEU || _choice == NEG);
 
-        _stake[_wallet[_id]] = true;
         _delegate storage x = _stats[_id];
         if(_choice == POS) {
             x._positiveVotes = bytes32(positiveVotes(_id).add(_weight));
@@ -237,6 +236,7 @@ contract ERC20d {
         }
         x._totalVotes = bytes32(totalVotes(_id).add(_weight));
         x._totalEvents = bytes32(totalEvents(_id).add(1));
+        emit Vote(_id, _choice, _weight);
     }
 
     function delegationIdentifier(address _account) internal view returns (bytes id) {
@@ -287,6 +287,8 @@ contract ERC20d {
     event Transfer(address indexed from, address indexed to, uint value);
 
     event Neo(address indexed subject, bytes vID, uint block);
+
+    event Vote(bytes vID, bytes32 choice , uint weight);
 
     event Reward(bytes vID, uint reward);
 
