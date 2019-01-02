@@ -233,6 +233,14 @@ th {
 
 }
 
+.addressButton {
+
+  position: relative;
+  top: 25px;
+  left: 67.5px;
+
+}
+
 
 .voteButton {
 

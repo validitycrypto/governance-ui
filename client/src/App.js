@@ -85,7 +85,6 @@ class App extends Component {
       await this.getNegative();
       await this.getPositive();
       await this.eventType();
-      await this.getTotal();
       await this.getEvents();
       await this.getIdentity();
       await this.getTrust();
@@ -96,6 +95,22 @@ class App extends Component {
       await this.eventNeutral();
       await this.getLog();
 
+  }
+
+  refreshData = async () => {
+      await this.getBalances();
+      await this.getTotal();
+      await this.getNeutral();
+      await this.getNegative();
+      await this.getPositive();
+      await this.getEvents();
+      await this.getTrust();
+      await this.isStaking();
+      await this.isVoted();
+      await this.eventPositive();
+      await this.eventNegative();
+      await this.eventNeutral();
+      await this.getLog();
   }
 
   componentDidMount = async () => {
@@ -119,6 +134,7 @@ class App extends Component {
            web3: web });
       await this.initialiseData()
   };
+
 
   renderSidebar = () => {
     if(this.state.toggle) {
@@ -147,6 +163,11 @@ class App extends Component {
               <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
 
+
+              <TextField onChange={this.logIdentity} placeholder="Identity"/>
+              <Button appearance="primary" className="addressButton" onClick={this.registerIdentity}>
+                Register
+              </Button>
             </div>
           )}
         </MenuSection>
@@ -163,6 +184,15 @@ class App extends Component {
         <MenuSection>
           {({ className }) => (
             <div className={className}>
+            <TextField onChange={this.logAddress} placeholder="Address"/>
+            <TextField onChange={this.logAmount} placeholder="Amount"/>
+              <Button appearance="primary" className="addressButton" onClick={this.transferValidty}>
+                Send VLDY
+              </Button>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
               <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
               <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
             </div>
@@ -215,7 +245,10 @@ class App extends Component {
     this.setState({ shouldShowContainer: !this.state.shouldShowContainer });
   };
 
+  logAmount = (event) =>  { this.setState({ amount: parseFloat(event.target.value*Math.pow(10,18)) }) }
+  logIdentity = (event) =>  { this.setState({ nickname: event.target.value }) }
   logSubject = (event) =>  { this.setState({ subject: event.target.value }) }
+  logAddress = (event) =>  { this.setState({ recipent: event.target.value }) }
   logTicker = (event) => { this.setState({ ticker: event.target.value }) }
   logIndex = (event) => { this.setState({ index: event.target.value }) }
   logType = (event) => { this.setState({ type: event.value }) }
@@ -278,7 +311,7 @@ class App extends Component {
   }
 
   getIdentity = async() => {
-    const stat = await this.state.token.getIdentity(this.state.account)
+    const stat = await this.state.token.getIdentity(this.state.id)
     await this.setState({
       identity: this.state.web3.utils.toAscii(stat)
     })
@@ -326,6 +359,12 @@ class App extends Component {
     })
   }
 
+
+    registerIdentity = async() => {
+      const stat = await this.state.token.setIdentity(this.state.nickname , {from: this.state.account, gas: 3725000})
+      await await this.getIdentity();
+    }
+
   isStaking = async() => {
     const stat = await this.state.token.isStaking(this.state.account)
     var input;
@@ -348,16 +387,23 @@ class App extends Component {
 
   createEvent = async() => {
     await this.state.dapp.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index,
-                                     {from: this.state.account, gas: 5725000 });
+                                     {from: this.state.account, gas: 3725000 });
   }
+
+  transferValidty = async() => {
+      console.log(this.state.amount)
+      await this.state.token.transfer(this.state.recipent, this.state.amount, {from: this.state.account, gas: 3725000 });
+      await this.getBalances();
+    }
 
   voteEvent = async() => {
     console.log(this.state.choice);
-    await this.state.dapp.voteSubmit(this.state.choice, {from: this.state.account, gas: 5725000 });
+    await this.state.dapp.voteSubmit(this.state.choice, {from: this.state.account, gas: 3725000 });
+    await this.refreshData();
   }
 
   eventStake = async() => {
-    await this.state.token.initiateStake({from: this.state.account, gas: 5725000 });
+    await this.state.token.initiateStake({from: this.state.account, gas: 3725000 });
   }
 
   getLog = async () => {
@@ -366,12 +412,15 @@ class App extends Component {
     } else {
       var array = [[],[],[],[]];
       for(var x = 0; x < eventResult.length; x++ ){
-          var id = JSON.stringify(eventResult[x].args.vID).replace(/["]+/g, '')
+          var event = this.state.web3.utils.toAscii(JSON.stringify(eventResult[x].args.subject).replace(/["]+/g, ''));
+          if(event === this.state.eventSubject){
           var choice = this.state.web3.utils.toAscii(JSON.stringify(eventResult[x].args.choice).replace(/["]+/g, ''))
+          var id = JSON.stringify(eventResult[x].args.vID).replace(/["]+/g, '')
           var weight = JSON.stringify(eventResult[x].args.weight).replace(/["]+/g, '')
           array[0].push(id)
           array[1].push(choice)
           array[2].push(weight)
+        }
       }
       this.setState({log: array});
     }
@@ -418,10 +467,10 @@ class App extends Component {
   initialiseOwnership = async() => {
     await this.state.token.adminControl(this.state.dapp.address,
       { from: this.state.account,
-        gas: 6720000 })
+        gas: 3725000 })
     await this.state.dapp.initialiseAsset(this.state.token.address,
       { from: this.state.account,
-         gas: 6720000 })
+         gas: 3725000 })
   }
 
   render() {
