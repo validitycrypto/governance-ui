@@ -21,20 +21,19 @@ import {
 } from '@atlaskit/navigation-next';
 import Button from '@atlaskit/button';
 import { Reset, Theme } from '@atlaskit/theme';
-import { gridSize as gridSizeFn } from '@atlaskit/theme';
-
+import Page, { Grid, GridColumn } from '@atlaskit/page';
 import { faEdit, faInfo, faBullseye, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 
-import Validation from "./contracts/communalValidation.json";
-import ERC20d from "./contracts/ERC20d.json";
+import Validation from "../build/contracts/communalValidation.json";
+import ERC20d from "../build/contracts/ERC20d.json";
 
 import truffleContract from "truffle-contract";
 import getWeb3 from "./utils/getWeb3";
 
 import "react-toggle/style.css" // for ES6 modules
-import "./App.css";
+import "./css/mvp.css";
 
 const decimal = Math.pow(10,18);
 
@@ -53,7 +52,6 @@ const tokenIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTag} className=
 const ethIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faEthereum} className="starIcon" size='1x'/>
 const bullseyeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBullseye} className="starIcon" size='1x'/>
 
-const gridSize = gridSizeFn();
 const themeModes = { light, dark, settings };
 
 const GlobalNavigation = () => (
@@ -227,7 +225,7 @@ class App extends Component {
            Create
            </Button>
 
-           <Button appearance="danger" className="ownerButton" onClick={this.initialiseOwnership}>
+           <Button appearance="danger" className="ownerButton" onClick={this.timeTravel}>
            Initialise
            </Button>
             </div>
@@ -267,6 +265,18 @@ class App extends Component {
       id: vID
     })
   }
+
+  timeTravel = async() => {
+    for(var x = 0 ; x < 100 ; x++){
+    this.state.web3.currentProvider.sendAsync({
+      jsonrpc: '2.0',
+      method: 'evm_mine',
+      params: [],
+      id: 0,
+    })
+  }
+}
+
 
   getPositive = async() => {
     const stat = await this.state.token.positiveVotes(this.state.id)
@@ -442,9 +452,9 @@ class App extends Component {
 
   optionTwo = async() => {
     await this.setState({
-      choice: "Negative",
+      choice: "Neutral",
       choice1: null,
-      choice2: "0x6e65757472616c",
+      choice2: "0x4e65757472616c",
       choice3: null,
       option1: false,
       option2: true,
@@ -454,7 +464,7 @@ class App extends Component {
 
   optionThree = async() => {
     await this.setState({
-      choice: "Neutral",
+      choice: "Negative",
       choice1: null,
       choice2: null,
       choice3: "0x4e65676174697665",
@@ -471,6 +481,7 @@ class App extends Component {
     await this.state.dapp.initialiseAsset(this.state.token.address,
       { from: this.state.account,
          gas: 3725000 })
+    await this.timeTravel();
   }
 
   render() {
@@ -481,75 +492,59 @@ class App extends Component {
 
     return (
       <div className="App">
-
-      <NavigationProvider>
+      <Grid layout="fluid">
+        <GridColumn>
+        <NavigationProvider>
         <ThemeProvider
           theme={theme => ({
             ...theme,
             mode: themeModes[themeMode],
           })}
         >
-          <LayoutManager
-            globalNavigation={() =>  (
-              <GlobalNav primaryItems={[
-                { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true , wallet: false, admin: false }) },
-                { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false , wallet: true, admin: false }) },
-                { key: 'settings', icon: bullseyeIcon, label: 'settings' , onClick: () => this.setState({ toggle: false , wallet: false, admin: true }) },
-              ]} secondaryItems ={[  ]} />
-            )}
-            productNavigation={renderer}
-          >
-          <div className="validatingIdentifier">
-          {this.state.id}
-          </div>
-          </LayoutManager>
-        </ThemeProvider>
-        </NavigationProvider>
+        <LayoutManager
+          globalNavigation={() =>  (
+            <GlobalNav primaryItems={[
+              { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true , wallet: false, admin: false }) },
+              { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false , wallet: true, admin: false }) },
+              { key: 'settings', icon: bullseyeIcon, label: 'settings' , onClick: () => this.setState({ toggle: false , wallet: false, admin: true }) },
+            ]} secondaryItems ={[  ]} />
+          )}
+          productNavigation={renderer}
+        >
+        <div className="validatingIdentifier">
+        {this.state.id}
+        </div>
+        </LayoutManager>
+      </ThemeProvider>
+      </NavigationProvider>
+      </GridColumn>
+      <GridColumn>
 
-        <Segment raised inverted key="black" color="black" className="eventX">
-        &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventSubject}
-        </Segment>
+        <div className="eventStats">
+        <div className="eventName"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventSubject}</div>
 
-        <Segment raised inverted key="black" color="black" className="eventX">
-        &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}
-        </Segment>
+        <div className="eventType"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}</div>
 
-        <Segment raised inverted key="black" color="black" className="eventX">
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}
-        </Segment>
+        <div className="eventPositive"><FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}</div>
 
-        <Segment raised inverted key="black" color="black" className="eventX">
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}
-        </Segment>
+        <div className="eventNeutral">&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}</div>
 
-        <Segment raised inverted key="black" color="black" className="eventX">
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
+        <div className="eventNegative"><FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}</div>
+        </div>
 
-        </Segment>
+        <div className="eventBorder">
+        </div>
 
-        <Segment raised inverted key="black" color="black" className="statModal">
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.weight}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;<span className="colorMain">Δ</span>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Impact: {this.state.impact}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faStar} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reward: {this.state.reward}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faEdit} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
-        </Segment>
+        <div className="statModal">
 
-        <Segment raised inverted key="black" color="black" className="voteModal">
+        </div>
+
+        <div className="voteModal">
         <label className="positiveToggle">
           <Toggle
             defaultChecked={this.state.option1}
@@ -590,105 +585,104 @@ class App extends Component {
         Submit Vote
         </Button>
 
-        </Segment>
+        <div className="votingStatus"><FontAwesomeIcon color="#0cff6f" icon={faEdit} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}</div>
+        <div className="stakingStatus"><FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}</div>
 
-        <div className="eventBorder">
-        <div className="eventPicture">
-        </div>
         </div>
 
         <div className="delegationLog">
-        <Table color="black" inverted compact celled>
+        <table>
         <div className="logHeader">
-         <Table.Header className="logHeader">
-           <Table.Row>
-             <Table.HeaderCell textAlign="center" colSpan='3'>
+        <thead>
+         <tr>
+             <th textAlign="center" colSpan='3'>
              <div className="textColor">
              <FontAwesomeIcon color="#0cff6f" icon={faVoteYea} size='lg'/>
              &nbsp;&nbsp;Voting Log
              </div>
-             </Table.HeaderCell>
-           </Table.Row>
-           <Table.Row>
-             <Table.HeaderCell textAlign="center" colSpan='1'>
+             </th>
+             <th textAlign="center" colSpan='1'>
              <div className="textColor">
              <FontAwesomeIcon color="#0cff6f" icon={faUserTag} size='lg'/>
              &nbsp;&nbsp;vID
              </div>
-             </Table.HeaderCell>
-             <Table.HeaderCell textAlign="center" colSpan='1'>
+             </th>
+             <th textAlign="center" colSpan='1'>
             <div className="textColor">
             <FontAwesomeIcon color="#0cff6f" icon={faStar} size='lg'/>
              &nbsp;&nbsp;Type
              </div>
-             </Table.HeaderCell>
-             <Table.HeaderCell textAlign="center" colSpan='1'>
+             </th>
+             <th textAlign="center" colSpan='1'>
              <div className="textColor">
              <FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
              &nbsp;&nbsp;Weight
              </div>
-             </Table.HeaderCell>
-           </Table.Row>
-           </Table.Header>
+             </th>
+           </tr>
+           </thead>
            </div>
 
         <div className="logBody">
-         <Table.Body>
-           <Table.Row>
-             <Table.Cell className="logid" textAlign="center">{this.state.log[0][0]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][0]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][0]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell className="logid" textAlign="center">{this.state.log[0][1]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][1]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][1]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell className="logid" textAlign="center">{this.state.log[0][2]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][2]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][2]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell className="logid" textAlign="center">{this.state.log[0][3]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][3]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][3]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell className="logid" textAlign="center">{this.state.log[0][4]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][4]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][4]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][5]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][5]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][5]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][6]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][6]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][6]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][7]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][7]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][7]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][8]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][8]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][8]}</Table.Cell>
-           </Table.Row>
-           <Table.Row>
-             <Table.Cell textAlign="center">{this.state.log[0][9]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[1][9]}</Table.Cell>
-             <Table.Cell textAlign="center">{this.state.log[2][9]}</Table.Cell>
-           </Table.Row>
-         </Table.Body>
+         <tbody>
+           <tr>
+             <td className="logid" textAlign="center">{this.state.log[0][0]}</td>
+             <td textAlign="center">{this.state.log[1][0]}</td>
+             <td textAlign="center">{this.state.log[2][0]}</td>
+           </tr>
+           <tr>
+             <td className="logid" textAlign="center">{this.state.log[0][1]}</td>
+             <td textAlign="center">{this.state.log[1][1]}</td>
+             <td textAlign="center">{this.state.log[2][1]}</td>
+           </tr>
+           <tr>
+             <td className="logid" textAlign="center">{this.state.log[0][2]}</td>
+             <td textAlign="center">{this.state.log[1][2]}</td>
+             <td textAlign="center">{this.state.log[2][2]}</td>
+           </tr>
+           <tr>
+             <td className="logid" textAlign="center">{this.state.log[0][3]}</td>
+             <td textAlign="center">{this.state.log[1][3]}</td>
+             <td textAlign="center">{this.state.log[2][3]}</td>
+           </tr>
+           <tr>
+             <td className="logid" textAlign="center">{this.state.log[0][4]}</td>
+             <td textAlign="center">{this.state.log[1][4]}</td>
+             <td textAlign="center">{this.state.log[2][4]}</td>
+           </tr>
+           <tr>
+             <td textAlign="center">{this.state.log[0][5]}</td>
+             <td textAlign="center">{this.state.log[1][5]}</td>
+             <td textAlign="center">{this.state.log[2][5]}</td>
+           </tr>
+           <tr>
+             <td textAlign="center">{this.state.log[0][6]}</td>
+             <td textAlign="center">{this.state.log[1][6]}</td>
+             <td textAlign="center">{this.state.log[2][6]}</td>
+           </tr>
+           <tr>
+             <td textAlign="center">{this.state.log[0][7]}</td>
+             <td textAlign="center">{this.state.log[1][7]}</td>
+             <td textAlign="center">{this.state.log[2][7]}</td>
+           </tr>
+           <tr>
+             <td textAlign="center">{this.state.log[0][8]}</td>
+             <td textAlign="center">{this.state.log[1][8]}</td>
+             <td textAlign="center">{this.state.log[2][8]}</td>
+           </tr>
+           <tr>
+             <td textAlign="center">{this.state.log[0][9]}</td>
+             <td textAlign="center">{this.state.log[1][9]}</td>
+             <td textAlign="center">{this.state.log[2][9]}</td>
+           </tr>
+         </tbody>
          </div>
-
-         </Table>
+         </table>
          </div>
+         </GridColumn>
+         </Grid>
       </div>
     );
   }

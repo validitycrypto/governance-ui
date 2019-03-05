@@ -10,10 +10,10 @@ contract communalValidation {
   using SafeMath for uint;
 
   bytes32 constant POS = 0x506f736974697665000000000000000000000000000000000000000000000000;
-  bytes32 constant NEU = 0x6e65757472616c00000000000000000000000000000000000000000000000000;
+  bytes32 constant NEU = 0x4e65757472616c00000000000000000000000000000000000000000000000000;
   bytes32 constant NEG = 0x4e65676174697665000000000000000000000000000000000000000000000000;
 
-  uint constant VOTE = 1000000000000000000000;
+  uint constant VOTE = 10000000000000000000000;
 
   struct _validation {
 
@@ -102,7 +102,9 @@ contract communalValidation {
         _event[_live][_round]._negative = bytes32(eventNegative(_live, _round).add(weight));
       }
 
-      _VLDY.delegationEvent(id, _choice, weight);
+      _VLDY.delegationEvent(id, _live, _choice, weight);
+      _VLDY.delegationReward(id, msg.sender, VOTE);
+      _VLDY.increaseTrust(id);
   }
 
   function votingWeight(bytes _id, address _voter) public view returns (uint stake) {
@@ -110,18 +112,20 @@ contract communalValidation {
 
       uint wager = _VLDY.balanceOf(_voter);
       uint trust = _VLDY.trustLevel(_id);
-      stake = wager.div(VOTE);
-  }
+      uint weightUsage;
 
-  function distributeRewards() _onlyAdmin public {
-      uint totalDelegates = _event[_live][_round]._delegates.length();
-      for(uint v = 0; v < totalDelegates ; v++) {
-        address voter = _event[_live][_round]._delegates.members[v];
-        bytes memory id = _VLDY.getvID(voter);
-        uint reward = votingWeight(id, voter);
-        _VLDY.delegationReward(id, voter, reward);
-        _VLDY.increaseTrust(id);
+      if(trust == 0){
+        weightUsage = 2500;
+      } else if(trust > 0) {
+        weightUsage = 5000;
+      } else if(trust > 5) {
+        weightUsage = 7500;
+      } else if(trust > 10) {
+        weightUsage = 10000;
       }
+
+      wager = wager.mul(weightUsage.div(100));
+      stake = wager.div(VOTE);
   }
 
 }

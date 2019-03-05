@@ -1,7 +1,8 @@
-.App {
+body, html  {
 
-  height: 725px;
-
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -11,259 +12,255 @@ table, thead, tbody, td, tr {
 
 
 
-td {
-
-  height: 30px;
-  width: 400px;
-
-}
-
-th {
-
-  height: 30px;
-  width: 400px;
-
+td, th {
+  background-color: 'transparent' !important;
+  height: 4vh;
+  width: 27.5vw;
 }
 
 .logHeader {
-
   overflow-y: hidden;
-
 }
 
 .logBody {
-
+  background-color: 'transparent' !important;
   overflow-y: scroll;
   display: block;
-  height: 240px;
+  height: 32vh;
 }
 
 .logid {
   font-size: 10px;
-
-
-
 }
 
 .neutralIcon {
   font-size: 23px;
-
 }
 
 .eventsIcon {
   font-size: 17.5px;
-
 }
 
 .starIcon {
   font-size: 16.5px;
-
 }
 
 .positiveIcon {
   font-size: 18px;
-
 }
 
 
 .delegationLog {
-
+  background-color: 'transparent' !important;
   position: absolute;
-  width: 750px;
+  width: 50vw;
+  padding: 1vw;
   font-size: 12.5px;
+  border-radius: 2.5vw;
   font-family: sans-serif;
-  top: 375px;
-  left: 500px;
-  right: 0%;
-}
+  right: 2.5vw;
+  top: 55vh;
+  border-style: solid;
+  border-color: #4d00bd;
+  border-width: 0.75vw;}
 
 .textColor {
-  color: #bde1e7;
+  color: #4d00bd;
 
 }
 
 .validatingIdentifier {
-
   position: relative;
   writing-mode: tb-rl;
-  z-index: 333;
-  left: -282.5px;
-  top: 160px;
   font-weight: bold;
   font-size: 13px;
+  left: -282.5px;
   color: #0cff6f;
-
+  z-index: 333;
 }
 
 .eventBorder {
     position: absolute;
-    display: block;
-    background-color: black;
+    background-color: 'transparent';
     border-radius: 50%;
-    height: 325px;
-    width: 325px;
-    margin: 0;
-    top: 2.5%;
-    left: 10%;
-
+    border-style: solid;
+    border-color: #4d00bd;
+    border-width: 0.75vw;    display: block;
+    height: 22.5vw;
+    width: 22.5vw;
+    left: 12.5vw;
+    top: 5vh;
 }
 
-.eventPicture {
-    position: relative;
-    display: block;
-    background-color: #8ae3ae;
-    border-radius: 50%;
-    height: 300px;
-    width: 300px;
-    margin: 0;
-    top: 4%;
-    left: 4%
 
-}
 
-.eventX {
+.eventStats {
   position: absolute;
-  top: -360px;
-  width: 325px;
-  left: 10%;
+  top: 5.5vh;
+  left: 37.5vw;
+  font-weight: bold;
+  font-size: 1.5vw;
+  color: #4d00bd;
+
+}
+
+.eventName {
+  position: relative;
+  top: 1vh;
+  left: -5vw;
+}
+
+.eventType {
+  position: relative;
+  top: 5vh;
+  left: -2vw;
+
+
+}
+
+
+.eventPositive {
+  position: relative;
+  top: 10vh;
+  left: -1.5vw;
+
+}
+
+.eventNeutral {
+  position: relative;
+  top: 15vh;
+  left: -2.5vw;
+
+}
+
+.eventNegative {
+  position: relative;
+  top: 20vh;
+  left: -3.5vw;
+
 
 }
 
 .statModal {
-
   position: absolute;
-  top: -750px;
-  width: 750px;
-  left: 39%;
-
-
+  width: 60vw;
+  right: 0;
+  left: 0;
 }
 
 .voteModal {
 
   position: absolute;
-  top: -1087.5px;
-  width: 750px;
-  height: 250px;
-  left: 39%;
+  border-radius: 2.5vw;
+  font-weight: bold;
+  border-style: solid;
+  border-color: #4d00bd;
+  border-width: 0.75vw;  font-size: 1.375vw;
+  width: 35vw;
+  height: 42.5vh;
+  top: 55vh;
+  left: 10vw;
+  color: #4d00bd;
 
 
+}
+
+.votingStatus {
+  position: relative;
+  top: 22.5vh;
+  left: 2.5vw;
+}
+
+.stakingStatus {
+  position: relative;
+  top: 27.5vh;
+  left: 2.5vw;
 }
 
 .positiveToggle {
-
   position: absolute;
-  left: 50px;
-  top: 25px;
-
-}
+  top: 2.5vh;
+  left: 2.5vw;}
 
 .positiveHeader {
-
   position: relative;
-  left: 25px;
-  top: -7.5px;
-
+  left: 2.5vw;
+  top: -1vh;
 }
 
 .positiveValue {
-
   color: #0cff6f;
   font-weight: bold;
-
 }
 
 .neutralToggle {
-
   position: absolute;
-  left: 50px;
-  top: 100px;
-
+  left: 2.5vw;  top: 8.25vh;
 }
 
 .neutralHeader {
-
   position: relative;
-  left: 25px;
-  top: -7.5px;
-
+  left: 2.5vw;  top: -0.75vh;
 }
 
 .neutralValue {
-
   color: cyan;
   font-weight: bold;
-
 }
 
 .negativeToggle {
     position: absolute;
-    left: 50px;
-    top: 175px;
-
+    left: 2.5vw;
+    top: 14vh;
 }
 
 .negativeHeader {
-
   position: relative;
-  left: 25px;
-  top: -7.5px;
-
+  left: 2.5vw;  top: -0.75vh;
 }
 
 .negativeValue {
-
   color: red;
   font-weight: bold;
-
 }
 
 .subjectType {
-
   position: relative;
   width: 165px;
-
 }
 
 .subjectButton {
-
   position: relative;
   top: 25px;
   left: 100px;
-
 }
 
 .addressButton {
-
   position: relative;
   top: 25px;
   left: 67.5px;
-
 }
 
 
 .voteButton {
-
   position: absolute;
-  left: 575px;
-  top: 175px;
+  top: 30vh;
+  left: 20vw;
+  font-size: 1.25vw;
 
 }
 
 .stakeButton {
-
   position: absolute;
-  left: 575px;
-  top: 100px;
-
+  top: 20vh;
+  left: 20vw;
+  font-size: 1.25vw;
 }
 
 .ownerButton {
-
   position: relative;
   top: 25px;
   left: -65px;
-
 }
 
 
@@ -272,5 +269,4 @@ th {
   color: #0cff6f;
   font-size: 25px;
   top: 3.5px;
-
 }
