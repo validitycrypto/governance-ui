@@ -10,7 +10,20 @@ table, thead, tbody, td, tr {
 
 }
 
+.eventGraph {
+  border-radius: 2.5vw;
+  font-weight: bold;
+  border-style: solid;
+  border-color: #4d00bd;
+  border-width: 0.50vw;  font-size: 1.375vw;
+  position: absolute;
+  right: 2.5vw;
+  top: 2.5vh;
+  padding: 1.5vw;
 
+
+
+}
 
 td, th {
   background-color: 'transparent' !important;
@@ -26,7 +39,7 @@ td, th {
   background-color: 'transparent' !important;
   overflow-y: scroll;
   display: block;
-  height: 32vh;
+  height: 33vh;
 }
 
 .logid {
@@ -62,7 +75,7 @@ td, th {
   top: 55vh;
   border-style: solid;
   border-color: #4d00bd;
-  border-width: 0.75vw;}
+  border-width: 0.50vw;}
 
 .textColor {
   color: #4d00bd;
@@ -85,59 +98,82 @@ td, th {
     border-radius: 50%;
     border-style: solid;
     border-color: #4d00bd;
-    border-width: 0.75vw;    display: block;
-    height: 22.5vw;
-    width: 22.5vw;
-    left: 12.5vw;
-    top: 5vh;
+    border-width: 0.50vw;    display: block;
+    height: 15vw;
+    width: 15vw;
+    left: 10vw;
+    top: 7.5vh;
 }
 
 
 
 .eventStats {
   position: absolute;
-  top: 5.5vh;
+  top: 2.5vh;
   left: 37.5vw;
   font-weight: bold;
-  font-size: 1.5vw;
+  font-size: 1.25vw;
   color: #4d00bd;
 
 }
 
 .eventName {
+  border-style: solid;
+  border-color: #4d00bd;
+  border-width: 0.40vw;;
+  border-radius: 2.5vw;
+  padding: 0.5vw;
   position: relative;
-  top: 1vh;
-  left: -5vw;
+  left: -12.5vw;
 }
 
 .eventType {
+  border-style: solid;
+  border-color: #4d00bd;
+  border-width: 0.40vw;;
+  border-radius: 2.5vw;
+  padding: 0.5vw;
   position: relative;
-  top: 5vh;
-  left: -2vw;
+  top: 1vh;
+  left: -10vw;
 
 
 }
 
 
 .eventPositive {
+  border-style: solid;
+  border-color: #4d00bd;
+  border-width: 0.40vw;;
+  border-radius: 2.5vw;
+  padding: 0.5vw;
   position: relative;
-  top: 10vh;
-  left: -1.5vw;
+  top: 2vh;
+  left: -10vw;
 
 }
 
 .eventNeutral {
   position: relative;
-  top: 15vh;
-  left: -2.5vw;
+  top: 3vh;
+  left: -11.25vw;
+  border-style: solid;
+  border-color: #4d00bd;
+  border-width: 0.40vw;;
+  border-radius: 2.5vw;
+  padding: 0.6vw;
 
 }
 
 .eventNegative {
   position: relative;
-  top: 20vh;
-  left: -3.5vw;
-
+  top: 4vh;
+  left: -12.5vw;
+  border-style: solid;
+  border-color: #4d00bd;
+  border-width: 0.40vw;;
+  border-radius: 2.5vw;
+  padding: 0.5vw;
 
 }
 
@@ -155,7 +191,7 @@ td, th {
   font-weight: bold;
   border-style: solid;
   border-color: #4d00bd;
-  border-width: 0.75vw;  font-size: 1.375vw;
+  border-width: 0.50vw;  font-size: 1.375vw;
   width: 35vw;
   height: 42.5vh;
   top: 55vh;
