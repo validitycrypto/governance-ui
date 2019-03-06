@@ -1,8 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-} from 'recharts';
+import Delegation from './delegation'
 
 import { Segment, Icon, Table } from 'semantic-ui-react'
 import TextField from '@atlaskit/field-text';
@@ -57,30 +55,6 @@ const ethIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faEthereum} classNa
 const bullseyeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBullseye} className="starIcon" size='1x'/>
 
 const themeModes = { light, dark, settings };
-
-const data = [
-  {
-    name: '0', uv: 4000, pv: 2400, amt: 2400,
-  },
-  {
-    name: '1', uv: 3000, pv: 1398, amt: 2210,
-  },
-  {
-    name: '2', uv: 2000, pv: 9800, amt: 2290,
-  },
-  {
-    name: '3', uv: 2780, pv: 3908, amt: 2000,
-  },
-  {
-    name: '4', uv: 1890, pv: 4800, amt: 2181,
-  },
-  {
-    name: '5', uv: 2390, pv: 3800, amt: 2500,
-  },
-  {
-    name: '6', uv: 3490, pv: 4300, amt: 2100,
-  },
-]
 
 const GlobalNavigation = () => (
   <GlobalNav primaryItems={[
@@ -568,166 +542,10 @@ class App extends Component {
         <div className="eventBorder">
         </div>
 
-        <div className="eventGraph">
-        <AreaChart
-        width={587.5}
-        height={287.5}
-        data={data}
-        margin={{
-          top: 10, right: 30, left: 0, bottom: 0,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Area type="monotone" dataKey="uv" stackId="1" stroke="#ff0c9e" fill="#ff0c9e" />
-        <Area type="monotone" dataKey="pv" stackId="1" stroke="cyan" fill="cyan" />
-        <Area type="monotone" dataKey="amt" stackId="1" stroke="#0cff6d" fill="#0cff6d" />
-        </AreaChart>
+        <div className="votingBubbles">
+        <Delegation width="1100" height="700"/>
         </div>
 
-        <div className="statModal">
-
-        </div>
-
-        <div className="voteModal">
-        <label className="positiveToggle">
-          <Toggle
-            defaultChecked={this.state.option1}
-            checked={this.state.option1}
-            icons={{
-              checked: <FontAwesomeIcon color="#0cff6f" icon={faCheck}/>,
-              unchecked: null,
-            }}
-            onChange={this.optionOne} />
-          <span className="positiveHeader">Positive: <span className="positiveValue">&nbsp;&nbsp;&nbsp;{this.state.choice1}</span></span>
-        </label>
-        <label className="neutralToggle">
-          <Toggle
-            checked={this.state.option2}
-            icons={{
-              checked: <FontAwesomeIcon color="#0cff6f" icon={faBalanceScale}/>,
-              unchecked: null,
-            }}
-            onChange={this.optionTwo} />
-            <span className="neutralHeader">Neutral: <span className="neutralValue">&nbsp;&nbsp;&nbsp;{this.state.choice2}</span></span>
-        </label>
-        <label className="negativeToggle">
-          <Toggle
-            checked={this.state.option3}
-            icons={{
-              checked: <FontAwesomeIcon color="#0cff6f" icon={faTimes}/>,
-              unchecked: null,
-            }}
-            onChange={this.optionThree} />
-            <span className="negativeHeader">Negative:  <span className="negativeValue">&nbsp;&nbsp;&nbsp;{this.state.choice3}</span></span>
-        </label>
-
-        <Button appearance="warning" className="stakeButton" onClick={this.eventStake}>
-        Commit Stake
-        </Button>
-
-        <Button appearance="primary" className="voteButton" onClick={this.voteEvent}>
-        Submit Vote
-        </Button>
-
-        <div className="votingStatus"><FontAwesomeIcon color="#0cff6f" icon={faEdit} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}</div>
-        <div className="stakingStatus"><FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}</div>
-
-        </div>
-
-        <div className="delegationLog">
-        <table>
-        <div className="logHeader">
-        <thead>
-         <tr>
-             <th textAlign="center" colSpan='3'>
-             <div className="textColor">
-             <FontAwesomeIcon color="#0cff6f" icon={faVoteYea} size='lg'/>
-             &nbsp;&nbsp;Voting Log
-             </div>
-             </th>
-             <th textAlign="center" colSpan='1'>
-             <div className="textColor">
-             <FontAwesomeIcon color="#0cff6f" icon={faUserTag} size='lg'/>
-             &nbsp;&nbsp;vID
-             </div>
-             </th>
-             <th textAlign="center" colSpan='1'>
-            <div className="textColor">
-            <FontAwesomeIcon color="#0cff6f" icon={faStar} size='lg'/>
-             &nbsp;&nbsp;Validator
-             </div>
-             </th>
-             <th textAlign="center" colSpan='1'>
-             <div className="textColor">
-             <FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
-             &nbsp;&nbsp;Weight
-             </div>
-             </th>
-           </tr>
-           </thead>
-           </div>
-
-        <div className="logBody">
-         <tbody>
-           <tr>
-             <td className="logid" textAlign="center">{this.state.log[0][0]}</td>
-             <td textAlign="center">{this.state.log[1][0]}</td>
-             <td textAlign="center">{this.state.log[2][0]}</td>
-           </tr>
-           <tr>
-             <td className="logid" textAlign="center">{this.state.log[0][1]}</td>
-             <td textAlign="center">{this.state.log[1][1]}</td>
-             <td textAlign="center">{this.state.log[2][1]}</td>
-           </tr>
-           <tr>
-             <td className="logid" textAlign="center">{this.state.log[0][2]}</td>
-             <td textAlign="center">{this.state.log[1][2]}</td>
-             <td textAlign="center">{this.state.log[2][2]}</td>
-           </tr>
-           <tr>
-             <td className="logid" textAlign="center">{this.state.log[0][3]}</td>
-             <td textAlign="center">{this.state.log[1][3]}</td>
-             <td textAlign="center">{this.state.log[2][3]}</td>
-           </tr>
-           <tr>
-             <td className="logid" textAlign="center">{this.state.log[0][4]}</td>
-             <td textAlign="center">{this.state.log[1][4]}</td>
-             <td textAlign="center">{this.state.log[2][4]}</td>
-           </tr>
-           <tr>
-             <td textAlign="center">{this.state.log[0][5]}</td>
-             <td textAlign="center">{this.state.log[1][5]}</td>
-             <td textAlign="center">{this.state.log[2][5]}</td>
-           </tr>
-           <tr>
-             <td textAlign="center">{this.state.log[0][6]}</td>
-             <td textAlign="center">{this.state.log[1][6]}</td>
-             <td textAlign="center">{this.state.log[2][6]}</td>
-           </tr>
-           <tr>
-             <td textAlign="center">{this.state.log[0][7]}</td>
-             <td textAlign="center">{this.state.log[1][7]}</td>
-             <td textAlign="center">{this.state.log[2][7]}</td>
-           </tr>
-           <tr>
-             <td textAlign="center">{this.state.log[0][8]}</td>
-             <td textAlign="center">{this.state.log[1][8]}</td>
-             <td textAlign="center">{this.state.log[2][8]}</td>
-           </tr>
-           <tr>
-             <td textAlign="center">{this.state.log[0][9]}</td>
-             <td textAlign="center">{this.state.log[1][9]}</td>
-             <td textAlign="center">{this.state.log[2][9]}</td>
-           </tr>
-         </tbody>
-         </div>
-         </table>
-         </div>
          </GridColumn>
          </Grid>
       </div>
