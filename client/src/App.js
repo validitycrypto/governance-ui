@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 
 import Delegation from './delegation'
 
-import { Segment, Icon, Table } from 'semantic-ui-react'
 import TextField from '@atlaskit/field-text';
 import Toggle from 'react-toggle'
 import Select from '@atlaskit/select';
@@ -31,7 +30,6 @@ import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 import Validation from "../build/contracts/communalValidation.json";
 import ERC20d from "../build/contracts/ERC20d.json";
 
-import truffleContract from "truffle-contract";
 import getWeb3 from "./utils/getWeb3";
 
 import "react-toggle/style.css" // for ES6 modules
@@ -115,19 +113,21 @@ class App extends Component {
   }
 
   componentDidMount = async () => {
-
       const web = await getWeb3()
-      const accounts = await web.eth.getAccounts()
-
-      const AB1 = truffleContract(ERC20d)
-      const AB2 = truffleContract(Validation)
-
-      AB1.setProvider(web.currentProvider)
-      AB2.setProvider(web.currentProvider)
-
-      const instance1 = await AB1.deployed()
-      const instance2 = await AB2.deployed()
-
+      const accounts = await web.eth.getAccounts();
+      const networkId = await web.eth.net.getId();
+      const tokenContract = ERC20d.networks[networkId];
+      const validationContract = Validation.networks[networkId];
+      const instance1 = new web.eth.Contract(
+              ERC20d.abi,
+              tokenContract && tokenContract.address,
+            );
+      const instance2 = new web.eth.Contract(
+             Validation.abi,
+             validationContract && validationContract.address,
+             );
+      instance1.setProvider(web.currentProvider)
+      instance2.setProvider(web.currentProvider)
       await this.setState({
         account: accounts[0],
           token: instance1,
@@ -228,7 +228,7 @@ class App extends Component {
            Create
            </Button>
 
-           <Button appearance="danger" className="ownerButton" onClick={this.timeTravel}>
+           <Button appearance="danger" className="ownerButton" onClick={this.initialiseOwnership}>
            Initialise
            </Button>
             </div>
@@ -255,15 +255,21 @@ class App extends Component {
   logType = (event) => { this.setState({ type: event.value }) }
 
   getBalances = async() => {
-    const EGEM = (parseFloat(await this.state.web3.eth.getBalance(this.state.account))/decimal).toFixed(2);
-    const VLDY = (parseFloat(await this.state.token.balanceOf(this.state.account))/decimal).toFixed(2)
-    await this.setState({
-      tokenBal: VLDY,
-      gasBal: EGEM })
+    const value = await this.state.token.methods.balanceOf(this.state.account).call();
+    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2) })
+    await this.state.web3.eth.getBalance(this.state.account,
+      async(error, value) => {
+        if(error){
+          console.log("Error:", error)
+        } else if(value) {
+          value = parseFloat(value/decimal).toFixed(2)
+          this.setState({ gasBal: value })
+        }
+      })
   }
 
   getvID = async() => {
-    const vID = await this.state.token.getvID(this.state.account)
+    const vID = await this.state.token.methods.getvID(this.state.account).call()
     await this.setState({
       id: vID
     })
@@ -282,104 +288,108 @@ class App extends Component {
 
 
   getPositive = async() => {
-    const stat = await this.state.token.positiveVotes(this.state.id)
+    const stat = await this.state.token.methods.positiveVotes(this.state.id).call()
     await this.setState({
       positive: parseFloat(stat).toFixed(2)
     })
   }
 
   getNegative = async() => {
-    const stat = await this.state.token.negativeVotes(this.state.id)
+    const stat = await this.state.token.methods.negativeVotes(this.state.id).call()
     await this.setState({
       negative: parseFloat(stat).toFixed(2)
     })
   }
 
   getNeutral = async() => {
-    const stat = await this.state.token.neutralVotes(this.state.id)
+    const stat = await this.state.token.methods.neutralVotes(this.state.id).call()
     await this.setState({
       neutral: parseFloat(stat).toFixed(2)
     })
   }
 
   getTotal = async() => {
-    const stat = await this.state.token.totalVotes(this.state.id)
+    const stat = await this.state.token.methods.totalVotes(this.state.id).call()
     await this.setState({
       total: parseFloat(stat).toFixed(2)
     })
   }
 
   getEvents = async() => {
-    const stat = await this.state.token.totalEvents(this.state.id)
+    const stat = await this.state.token.methods.totalEvents(this.state.id).call()
     await this.setState({
       events: parseFloat(stat).toFixed(2)
     })
   }
 
   getTrust = async() => {
-    const stat = await this.state.token.trustLevel(this.state.id)
+    const stat = await this.state.token.methods.trustLevel(this.state.id).call()
     await this.setState({
       trust: parseFloat(stat).toFixed(2)
     })
   }
 
   getIdentity = async() => {
-    const stat = await this.state.token.getIdentity(this.state.id)
+    const stat = await this.state.token.methods.getIdentity(this.state.id).call()
     await this.setState({
       identity: this.state.web3.utils.toAscii(stat)
     })
   }
 
   getEvent = async() => {
-    const stat = await this.state.dapp.currentEvent()
+    const stat = await this.state.dapp.methods.currentEvent.call()
     await this.setState({
-      eventSubject: this.state.web3.utils.toAscii(stat)
+      eventSubject: stat,
+      eventDecode: this.state.web3.utils.toAscii(stat)
     })
   }
 
   getRound = async() => {
-    const stat = await this.state.dapp.currentRound()
+    const stat = await this.state.dapp.methods.currentRound.call()
     await this.setState({
-      round: parseFloat(stat).toFixed(2)
+      round: parseInt(stat)
     })
   }
 
   eventPositive = async() => {
-    const stat = await this.state.dapp.eventPositive(this.state.eventSubject, this.state.round)
+    const stat = await this.state.dapp.methods.eventPositive(this.state.eventSubject, this.state.round).call()
     await this.setState({
       eventPositive: parseFloat(stat).toFixed(2)
     })
   }
 
   eventNegative = async() => {
-    const stat = await this.state.dapp.eventNegative(this.state.eventSubject, this.state.round)
+    const stat = await this.state.dapp.methods.eventNegative(this.state.eventSubject, this.state.round).call()
     await this.setState({
       eventNegative: parseFloat(stat).toFixed(2)
     })
   }
 
   eventNeutral = async() => {
-    const stat = await this.state.dapp.eventNeutral(this.state.eventSubject, this.state.round)
+    const stat = await this.state.dapp.methods.eventNeutral(this.state.eventSubject, this.state.round).call()
     await this.setState({
       eventNeutral: parseFloat(stat).toFixed(2)
     })
   }
 
   eventType = async() => {
-    const stat = await this.state.dapp.eventType(this.state.eventSubject, this.state.round)
+    const stat = await this.state.dapp.methods.eventType(this.state.eventSubject, this.state.round).call()
     await this.setState({
       eventType: this.state.web3.utils.toAscii(stat)
     })
   }
 
 
-    registerIdentity = async() => {
-      const stat = await this.state.token.setIdentity(this.state.nickname , {from: this.state.account, gas: 3725000})
+
+  registerIdentity = async() => {
+      var converge = this.state.web3.utils.fromAscii(this.state.nickname)
+      await this.state.token.methods.setIdentity(converge)
+      .send({ from: this.state.account, gas: 3725000})
       await await this.getIdentity();
     }
 
   isStaking = async() => {
-    const stat = await this.state.token.isStaking(this.state.account)
+    const stat = await this.state.token.methods.isStaking(this.state.account).call()
     var input;
     if(stat == true){ input = "True"
     } else if(stat == false){ input = "False"}
@@ -389,7 +399,7 @@ class App extends Component {
   }
 
   isVoted = async() => {
-    const stat = await this.state.dapp.isVoted(this.state.account)
+    const stat = await this.state.dapp.methods.isVoted(this.state.account).call()
     var input;
     if(stat == true){ input = "True"
     } else if(stat == false){ input = "False"}
@@ -399,33 +409,34 @@ class App extends Component {
   }
 
   createEvent = async() => {
-    await this.state.dapp.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index,
+    await this.state.dapp.methods.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index,
                                      {from: this.state.account, gas: 3725000 });
   }
 
   transferValidty = async() => {
       console.log(this.state.amount)
-      await this.state.token.transfer(this.state.recipent, this.state.amount, {from: this.state.account, gas: 3725000 });
+      await this.state.token.methods.transfer(this.state.recipent, this.state.amount, {from: this.state.account, gas: 3725000 });
       await this.getBalances();
     }
 
   voteEvent = async() => {
     console.log(this.state.choice);
-    await this.state.dapp.voteSubmit(this.state.choice, {from: this.state.account, gas: 3725000 });
+    await this.state.dapp.methods.voteSubmit(this.state.choice, {from: this.state.account, gas: 3725000 });
     await this.refreshData();
   }
 
   eventStake = async() => {
-    await this.state.token.initiateStake({from: this.state.account, gas: 3725000 });
+    await this.state.token.methods.initiateStake({from: this.state.account, gas: 3725000 });
   }
 
   getLog = async () => {
-    return await this.state.token.Vote({}, { fromBlock: 0, toBlock: 'latest' }).get((error, eventResult) => {
+    return await this.state.token.events.Vote({ fromBlock: 0, toBlock: 'latest' },
+    (error, eventResult) => {
     if (error) { console.log(error);
     } else {
       var array = [[],[],[],[]];
       for(var x = 0; x < eventResult.length; x++ ){
-          var event = this.state.web3.utils.toAscii(JSON.stringify(eventResult[x].args.subject).replace(/["]+/g, ''));
+          var event = JSON.stringify(eventResult[x].args.subject).replace(/["]+/g, '');
           if(event === this.state.eventSubject){
           var choice = this.state.web3.utils.toAscii(JSON.stringify(eventResult[x].args.choice).replace(/["]+/g, ''))
           var id = JSON.stringify(eventResult[x].args.vID).replace(/["]+/g, '')
@@ -478,13 +489,10 @@ class App extends Component {
   }
 
   initialiseOwnership = async() => {
-    await this.state.token.adminControl(this.state.dapp.address,
-      { from: this.state.account,
-        gas: 3725000 })
-    await this.state.dapp.initialiseAsset(this.state.token.address,
-      { from: this.state.account,
-         gas: 3725000 })
-    await this.timeTravel();
+    await this.state.token.methods.adminControl(this.state.dapp.address)
+    .send({ from: this.state.account, gas: 3725000 })
+    await this.state.dapp.methods.initialiseAsset(this.state.token.address)
+    .send({ from: this.state.account, gas: 3725000 })
   }
 
   render() {
@@ -525,7 +533,7 @@ class App extends Component {
 
         <div className="eventStats">
         <div className="eventName"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventSubject}</div>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}</div>
 
         <div className="eventType"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}</div>

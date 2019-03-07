@@ -110,8 +110,8 @@ class Delegation extends React.Component {
                 dx,
                 dy,
               }) => {
-                console.log("ID", d.id)
                 console.log("DROP", dx, dy)
+                console.log("ID", d.id, dy)
 
                 return (
                   <circle
