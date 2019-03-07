@@ -72,7 +72,8 @@ class App extends Component {
     dapp: null,
     log: [[],[],[],[]],
     themeMode: 'dark',
-    toggle: true
+    toggle: true,
+    pool: 0
   };
 
   initialiseData = async () => {
@@ -541,9 +542,19 @@ class App extends Component {
 
         <div className="eventBorder">
         </div>
+        {this.state.pool}
 
         <div className="votingBubbles">
-        <Delegation width="1100" height="700"/>
+        <Button onClick={() => this.setState({ pool: this.state.pool+1 })} appearance="primary"> Generate </Button>
+        <Delegation
+          width="1100"
+          height="700"
+          amount={this.state.pool}
+          negative={5}
+          positive={5}
+          neutral={5}
+          stake={5}
+          />
         </div>
 
          </GridColumn>
