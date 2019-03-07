@@ -169,6 +169,9 @@ class App extends Component {
               <Button appearance="primary" className="addressButton" onClick={this.registerIdentity}>
                 Register
               </Button>
+              <Button appearance="warning" className="stakeButton" onClick={this.eventStake}>
+                Stake
+              </Button>
             </div>
           )}
         </MenuSection>
@@ -246,17 +249,17 @@ class App extends Component {
     this.setState({ shouldShowContainer: !this.state.shouldShowContainer });
   };
 
-  logAmount = (event) =>  { this.setState({ amount: parseFloat(event.target.value*Math.pow(10,18)) }) }
-  logIdentity = (event) =>  { this.setState({ nickname: event.target.value }) }
-  logSubject = (event) =>  { this.setState({ subject: event.target.value }) }
+  logAmount = (event) =>  { this.setState({ amount: this.state.web3.utils.toHex(this.state.web3.utils.toBN(event.target.value).mul(this.state.web3.utils.toBN(1e18))) }); }
+  logIdentity = (event) =>  { this.setState({ nickname: this.state.web3.utils.fromAscii(event.target.value) }) }
+  logSubject = (event) =>  { this.setState({ subject: this.state.web3.utils.fromAscii(event.target.value) }) }
+  logTicker = (event) => { this.setState({ ticker: this.state.web3.utils.fromAscii(event.target.value) }) }
+  logType = (event) => { this.setState({ type: this.state.web3.utils.fromAscii(event.value) }) }
   logAddress = (event) =>  { this.setState({ recipent: event.target.value }) }
-  logTicker = (event) => { this.setState({ ticker: event.target.value }) }
   logIndex = (event) => { this.setState({ index: event.target.value }) }
-  logType = (event) => { this.setState({ type: event.value }) }
 
   getBalances = async() => {
     const value = await this.state.token.methods.balanceOf(this.state.account).call();
-    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2) })
+    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2), voteBal: parseInt(value/decimal)/750000 })
     await this.state.web3.eth.getBalance(this.state.account,
       async(error, value) => {
         if(error){
@@ -409,24 +412,26 @@ class App extends Component {
   }
 
   createEvent = async() => {
-    await this.state.dapp.methods.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index,
-                                     {from: this.state.account, gas: 3725000 });
+    await this.state.dapp.methods.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index)
+    .send({from: this.state.account, gas: 3725000 });
   }
 
   transferValidty = async() => {
-      console.log(this.state.amount)
-      await this.state.token.methods.transfer(this.state.recipent, this.state.amount, {from: this.state.account, gas: 3725000 });
+      await this.state.token.methods.transfer(this.state.recipent, this.state.amount)
+      .send({from: this.state.account, gas: 3725000 });
       await this.getBalances();
     }
 
   voteEvent = async() => {
     console.log(this.state.choice);
-    await this.state.dapp.methods.voteSubmit(this.state.choice, {from: this.state.account, gas: 3725000 });
+    await this.state.dapp.methods.voteSubmit(this.state.choice)
+    .send({from: this.state.account, gas: 3725000 });
     await this.refreshData();
   }
 
   eventStake = async() => {
-    await this.state.token.methods.initiateStake({from: this.state.account, gas: 3725000 });
+    await this.state.token.methods.toggleStake()
+    .send({from: this.state.account, gas: 3725000 });
   }
 
   getLog = async () => {
@@ -553,15 +558,15 @@ class App extends Component {
         {this.state.pool}
 
         <div className="votingBubbles">
-        <Button onClick={() => this.setState({ pool: this.state.pool+1 })} appearance="primary"> Generate </Button>
+        <Button onClick={() => this.setState({ pool: this.state.voteBal })} appearance="primary"> Generate </Button>
         <Delegation
           width="1100"
           height="700"
           amount={this.state.pool}
-          negative={5}
-          positive={5}
-          neutral={5}
-          stake={5}
+          negative={1}
+          positive={1}
+          neutral={1}
+          stake={10000}
           />
         </div>
 
