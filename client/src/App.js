@@ -259,7 +259,7 @@ class App extends Component {
 
   getBalances = async() => {
     const value = await this.state.token.methods.balanceOf(this.state.account).call();
-    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2), voteBal: parseInt(value/decimal)/750000 })
+    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2), voteBal: parseInt(value/decimal)/100000000 })
     await this.state.web3.eth.getBalance(this.state.account,
       async(error, value) => {
         if(error){
@@ -566,7 +566,7 @@ class App extends Component {
           negative={1}
           positive={1}
           neutral={1}
-          stake={10000}
+          stake={12500}
           />
         </div>
 

@@ -8,13 +8,19 @@ const neut = ['#ff6f0c']
 const pos = ['#0cff6d']
 const stake = ['#0cffe9']
 
+var largeBubble =  100;
+var mediumBubble =  50;
+var smallBubble =  25;
+var tinyBubble =  10;
+var minuteBubble = 1;
+
 function genCircles({ num, width, height, positive, neutral, negative, staking }) {
   return Array(num)
     .fill(1)
     .map((d, i) => {
       var xcord;
       var ycord;
-      const radius = 25 - Math.random() * 20;
+      var radius = 25 - Math.random() * 20;
       if(i < positive){
         xcord = 950;
         ycord = 100;
@@ -33,11 +39,48 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
       return {
         id: i,
         radius,
-        x: Math.round(xcord + (Math.floor(Math.random() * (radius * 5)))),
-        y: Math.round(ycord + (Math.floor(Math.random() * (radius * 5)))),
+        x: Math.round(xcord + (Math.floor(Math.random() * (radius * 7.5)))),
+        y: Math.round(ycord + (Math.floor(Math.random() * (radius * 7.5)))),
       };
     });
 }
+
+
+function computeBubbles(_amount ) {
+    var minuteAmount = 0;
+    var mediumAmount = 0;
+    var smallAmount = 0;
+    var tinyAmount = 0;
+    var largeAmount = 0;
+    var remainder;
+    remainder = _amount % largeBubble;
+    largeAmount = Math.floor(_amount/largeBubble);
+    if(remainder != 0){
+      _amount = _amount - remainder;
+      remainder = _amount % mediumBubble;
+      mediumAmount = Math.floor(_amount/mediumBubble);
+      if(remainder != 0){
+        _amount = _amount - remainder;
+        remainder = _amount % smallBubble;
+        smallAmount = Math.floor(_amount/smallBubble);
+        if(remainder != 0){
+          _amount = _amount - remainder;
+          remainder = _amount % tinyBubble;
+          tinyAmount = Math.floor(_amount/tinyBubble);
+          if(remainder != 0){
+            _amount = _amount - remainder;
+            remainder = _amount % minuteBubble;
+            minuteAmount = Math.floor(_amount/minuteBubble);
+          }
+        }
+      }
+    }
+
+    var sum = largeAmount+mediumAmount+smallAmount+tinyAmount+smallAmount+3
+    console.log(sum)
+    return sum;
+  }
+
 
 class Delegation extends React.Component {
   constructor(props) {
@@ -64,14 +107,15 @@ class Delegation extends React.Component {
 
   genItems = ({ width, height, amount, negative, positive, neutral, staking }) =>
     genCircles({
-      num: width < 360 ? 40 : parseInt(amount),
+      num: width < 360 ? 40 : computeBubbles(parseInt(amount)),
       width,
       height,
       negative,
       positive,
       neutral,
-      staking
+      staking,
   });
+
 
   render() {
     const { width, height } = this.props;
@@ -110,9 +154,6 @@ class Delegation extends React.Component {
                 dx,
                 dy,
               }) => {
-                console.log("DROP", dx, dy)
-                console.log("ID", d.id, dy)
-
                 return (
                   <circle
                     key={`dot-${d.id}`}
