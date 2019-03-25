@@ -3,23 +3,35 @@ import { scaleOrdinal } from '@vx/scale';
 import { LinearGradient } from '@vx/gradient';
 import { Drag, raise } from '@vx/drag';
 
+const negativeVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
+const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
+const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
+
 const neg = ['#ff0c9e']
 const neut = ['#ff6f0c']
 const pos = ['#0cff6d']
 const stake = ['#0cffe9']
 
-var largeBubble =  100;
-var mediumBubble =  50;
-var smallBubble =  25;
+var largeBubble =  500;
+var mediumBubble =  250;
+var smallBubble =  100;
 var tinyBubble =  10;
 var minuteBubble = 1;
 
 function genCircles({ num, width, height, positive, neutral, negative, staking }) {
-  return Array(num)
+  return Array(num.sum)
     .fill(1)
     .map((d, i) => {
       var xcord;
       var ycord;
+      var largeBubbles = num.data[0]-1;
+      var mediumBubbles = num.data[1]-1;
+      var smallBubbles = num.data[2]-1;
+      var tinyBubbles = num.data[3]-1;
+      var minuteBubbles = num.data[4]-1;
+      positive = computeBubbles(parseInt(positive)).sum-3
+      negative = computeBubbles(parseInt(negative)).sum-2
+      neutral = computeBubbles(parseInt(neutral)).sum-1
       var radius = 25 - Math.random() * 20;
       if(i < positive){
         xcord = 950;
@@ -36,17 +48,34 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
         xcord = 500;
         ycord = 300;
       }
-      return {
+
+      if(i < largeBubbles){
+        radius = 25;
+      } else if(i >= largeBubbles
+        && i < largeBubbles+mediumBubbles){
+        radius = 15;
+      } else if(i >= largeBubbles+mediumBubbles
+        && i < largeBubbles+mediumBubbles+smallBubbles){
+        radius = 10;
+      } else if(i >= largeBubbles+mediumBubbles+smallBubbles
+        && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
+        radius = 5;
+      } else if(i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
+        && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
+        radius = 2;
+      }
+     return {
         id: i,
+        owner: d,
         radius,
-        x: Math.round(xcord + (Math.floor(Math.random() * (radius * 7.5)))),
-        y: Math.round(ycord + (Math.floor(Math.random() * (radius * 7.5)))),
+        x: Math.round(xcord + (Math.floor(Math.random() * (radius * 5)))),
+        y: Math.round(ycord + (Math.floor(Math.random() * (radius * 5)))),
       };
     });
 }
 
 
-function computeBubbles(_amount ) {
+function computeBubbles(_amount) {
     var minuteAmount = 0;
     var mediumAmount = 0;
     var smallAmount = 0;
@@ -76,31 +105,37 @@ function computeBubbles(_amount ) {
       }
     }
 
+    var data = [ largeAmount, mediumAmount, smallAmount, tinyAmount, smallAmount ]
     var sum = largeAmount+mediumAmount+smallAmount+tinyAmount+smallAmount+3
-    console.log(sum)
-    return sum;
+    var output = { sum: sum, data: data }
+    return output;
   }
 
 
 class Delegation extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
+     this.state = {
+      bubbleStack: computeBubbles(parseInt(props.amount)).sum-3,
       items: this.genItems({ ...props }),
+      bubbleState: 1
     };
     this.colorScale = scaleOrdinal({
-      range: Array(props.negative).fill(pos).concat(
-        Array(props.negative).fill(neut).concat(
-          Array(props.neutral).fill(neg).concat(
-            Array(props.stake).fill(stake)))),
-      domain: this.state.items.map(d => d.id),
+       domain: this.state.items.map(d => d.id),
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps = async(nextProps) => {
+    var userBubbles = computeBubbles(parseInt(nextProps.amount)).sum-3
+    this.colorScale = scaleOrdinal({
+    range: Array(nextProps.positive).fill(pos).concat(
+      Array(nextProps.negative).fill(neut).concat(
+        Array(nextProps.neutral).fill(neg).concat(
+          Array(userBubbles).fill(stake)))) })
       this.setState(() => {
         return {
           items: this.genItems({ ...nextProps }),
+          bubbleStack: userBubbles,
         };
       });
   }
@@ -129,19 +164,29 @@ class Delegation extends React.Component {
             height={height}
             rx={14}
           />
-          {this.state.items.map((d, i) => (
+          {
+            this.state.items.map((d, i) => (
             <Drag
               key={`${d.id}`}
               width={width}
               height={height}
+              onDragEnd={async() => {
+                await this.setState({
+                  log: true
+                })
+                if(this.state.bubbleStack == this.state.bubbleState){
+                  await this.props.vote(this.state.votingOption)
+                }
+              }}
               onDragStart={() => {
                 // svg follows the painter model
                 // so we need to move the data item
                 // to end of the array for it to be drawn
                 // "on top of" the other data items
+
                 this.setState((state, props) => {
                   return {
-                    items: raise(state.items, i),
+                    items: raise(state.items, i)
                   };
                 });
               }}
@@ -154,6 +199,40 @@ class Delegation extends React.Component {
                 dx,
                 dy,
               }) => {
+                  if(isDragging && d.id > 2){
+                    console.log("ID", d.id);
+                    console.log("X", dx);
+                    console.log("Y", dy);
+                    if(dx > 300 && dy < -150){
+                      console.log("POSITIVE");
+                      if(this.state.log == true){
+                        this.setState({
+                          bubbleState: this.state.bubbleState+1,
+                          votingOption: positiveVote,
+                          log: false,
+                        })
+                      }
+                    } else if(dx > 275 && dy > 150){
+                      console.log("NEUTRAL");
+                      if(this.state.log == true){
+                        this.setState({
+                          bubbleState: this.state.bubbleState+1,
+                          votingOption: neutralVote,
+                          log: false,
+                        })
+                      }
+                    } else if(dx < -200 && dy > 150){
+                      console.log("NEGATIVE");
+                      if(this.state.log == true){
+                        this.setState({
+                          bubbleState: this.state.bubbleState+1,
+                          votingOption: negativeVote,
+                          log: false,
+                        })
+                      }
+                    }
+                }
+
                 return (
                   <circle
                     key={`dot-${d.id}`}

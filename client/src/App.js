@@ -71,7 +71,8 @@ class App extends Component {
     log: [[],[],[],[]],
     themeMode: 'dark',
     toggle: true,
-    pool: 0
+    pool: 0,
+    choice: "0x506f736974697665000000000000000000000000000000000000000000000000"
   };
 
   initialiseData = async () => {
@@ -259,7 +260,7 @@ class App extends Component {
 
   getBalances = async() => {
     const value = await this.state.token.methods.balanceOf(this.state.account).call();
-    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2), voteBal: parseInt(value/decimal)/100000000 })
+    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2), voteBal: parseInt(value/decimal)/10000 })
     await this.state.web3.eth.getBalance(this.state.account,
       async(error, value) => {
         if(error){
@@ -413,7 +414,7 @@ class App extends Component {
 
   createEvent = async() => {
     await this.state.dapp.methods.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index)
-    .send({from: this.state.account, gas: 3725000 });
+    .send({from: this.state.account, gas: 3725000 })
   }
 
   transferValidty = async() => {
@@ -422,11 +423,10 @@ class App extends Component {
       await this.getBalances();
     }
 
-  voteEvent = async() => {
-    console.log(this.state.choice);
-    await this.state.dapp.methods.voteSubmit(this.state.choice)
-    .send({from: this.state.account, gas: 3725000 });
-    await this.refreshData();
+  voteEvent = async(_decision) => {
+    console.log(_decision)
+      await this.state.dapp.methods.voteSubmit(_decision)
+      .send({from: this.state.account, gas: 3725000 });
   }
 
   eventStake = async() => {
@@ -559,14 +559,17 @@ class App extends Component {
 
         <div className="votingBubbles">
         <Button onClick={() => this.setState({ pool: this.state.voteBal })} appearance="primary"> Generate </Button>
+        <Button onClick={this.voteEvent} appearance="warning"> Stake </Button>
+
         <Delegation
+          vote={this.voteEvent}
           width="1100"
           height="700"
           amount={this.state.pool}
-          negative={1}
-          positive={1}
-          neutral={1}
-          stake={12500}
+          negative={this.state.eventNegative}
+          positive={this.state.eventPositive}
+          neutral={this.state.eventNeutral}
+          staking={this.state.pool}
           />
         </div>
 
