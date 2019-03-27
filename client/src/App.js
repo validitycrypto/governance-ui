@@ -76,7 +76,6 @@ class App extends Component {
   };
 
   initialiseData = async () => {
-      await this.getBalances();
       await this.getEvent();
       await this.getRound();
       await this.getvID();
@@ -94,6 +93,7 @@ class App extends Component {
       await this.eventNegative();
       await this.eventNeutral();
       await this.getLog();
+      await this.getBalances();
 
   }
 
@@ -304,6 +304,14 @@ class App extends Component {
       negative: parseFloat(stat).toFixed(2)
     })
   }
+
+    getCommune = async() => {
+      var totalBubbles = parseFloat(this.state.eventNegative) + parseFloat(this.state.eventPositive)
+      + parseFloat(this.state.eventNeutral) + parseFloat(this.state.voteBal)
+      await this.setState({
+        pool: totalBubbles
+      })
+    }
 
   getNeutral = async() => {
     const stat = await this.state.token.methods.neutralVotes(this.state.id).call()
@@ -558,18 +566,18 @@ class App extends Component {
         {this.state.pool}
 
         <div className="votingBubbles">
-        <Button onClick={() => this.setState({ pool: this.state.voteBal })} appearance="primary"> Generate </Button>
-        <Button onClick={this.voteEvent} appearance="warning"> Stake </Button>
+        <Button onClick={this.getCommune} appearance="primary"> Generate </Button>
+        <Button onClick={this.eventStake} appearance="warning"> Stake </Button>
 
         <Delegation
           vote={this.voteEvent}
           width="1100"
           height="700"
           amount={this.state.pool}
-          negative={this.state.eventNegative}
-          positive={this.state.eventPositive}
-          neutral={this.state.eventNeutral}
-          staking={this.state.pool}
+          negative={parseInt(this.state.eventNegative)+1}
+          positive={parseInt(this.state.eventPositive)+1}
+          neutral={parseInt(this.state.eventNeutral)+1}
+          staking={this.state.voteBal}
           />
         </div>
 
