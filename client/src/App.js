@@ -573,10 +573,9 @@ class App extends Component {
           vote={this.voteEvent}
           width="1100"
           height="700"
-          amount={this.state.pool}
-          negative={parseInt(this.state.eventNegative)+1}
-          positive={parseInt(this.state.eventPositive)+1}
-          neutral={parseInt(this.state.eventNeutral)+1}
+          negative={parseInt(this.state.eventNegative)}
+          positive={parseInt(this.state.eventPositive)}
+          neutral={parseInt(this.state.eventNeutral)}
           staking={this.state.voteBal}
           />
         </div>
