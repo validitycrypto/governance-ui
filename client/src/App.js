@@ -72,7 +72,8 @@ class App extends Component {
     themeMode: 'dark',
     toggle: true,
     pool: 0,
-    choice: "0x506f736974697665000000000000000000000000000000000000000000000000"
+    choice: "0x506f736974697665000000000000000000000000000000000000000000000000",
+    bubbleComponent: <div/>
   };
 
   initialiseData = async () => {
@@ -242,6 +243,31 @@ class App extends Component {
     );
   };
 
+  getCommune = async() => {
+       var totalBubbles = parseFloat(this.state.eventNegative) + parseFloat(this.state.eventPositive)
+       + parseFloat(this.state.eventNeutral) + parseFloat(this.state.voteBal)
+       console.log(totalBubbles);
+       await this.setState({
+         pool: totalBubbles
+       })
+     }
+
+  renderBubbles = async() => {
+    await this.getCommune();
+    await this.setState({ bubbleComponent:
+      <Delegation
+        width={1100}
+        height={700}
+        total={this.state.pool}
+        vote={this.voteEvent}
+        negative={parseInt(this.state.eventNegative)}
+        positive={parseInt(this.state.eventPositive)}
+        neutral={parseInt(this.state.eventNeutral)}
+        staking={this.state.voteBal}
+        />
+    })
+  }
+
   renderSkeleton = () => {
     return <SkeletonContainerView />;
   };
@@ -290,7 +316,6 @@ class App extends Component {
   }
 }
 
-
   getPositive = async() => {
     const stat = await this.state.token.methods.positiveVotes(this.state.id).call()
     await this.setState({
@@ -304,14 +329,6 @@ class App extends Component {
       negative: parseFloat(stat).toFixed(2)
     })
   }
-
-    getCommune = async() => {
-      var totalBubbles = parseFloat(this.state.eventNegative) + parseFloat(this.state.eventPositive)
-      + parseFloat(this.state.eventNeutral) + parseFloat(this.state.voteBal)
-      await this.setState({
-        pool: totalBubbles
-      })
-    }
 
   getNeutral = async() => {
     const stat = await this.state.token.methods.neutralVotes(this.state.id).call()
@@ -566,18 +583,10 @@ class App extends Component {
         {this.state.pool}
 
         <div className="votingBubbles">
-        <Button onClick={this.getCommune} appearance="primary"> Generate </Button>
         <Button onClick={this.eventStake} appearance="warning"> Stake </Button>
+        <Button onClick={this.renderBubbles.bind(this)} appearance="help"> Create </Button>
 
-        <Delegation
-          vote={this.voteEvent}
-          width="1100"
-          height="700"
-          negative={parseInt(this.state.eventNegative)}
-          positive={parseInt(this.state.eventPositive)}
-          neutral={parseInt(this.state.eventNeutral)}
-          staking={this.state.voteBal}
-          />
+        {this.state.bubbleComponent}
         </div>
 
          </GridColumn>
