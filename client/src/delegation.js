@@ -19,7 +19,11 @@ var tinyBubble =  100;
 var minuteBubble = 7;
 
 function genCircles({ num, width, height, positive, neutral, negative, staking }) {
-  return Array(num.sum)
+  positive = positive+1
+  negative = negative+1
+  neutral = neutral+1
+  console.lot(num)
+  return Array(num)
     .fill(1)
     .map((d, i) => {
       var xcord;
@@ -30,16 +34,13 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
       var tinyBubbles = num.data[3]-1;
       var minuteBubbles = num.data[4]-1;
       var radius = 25 - Math.random() * 20;
-      neutral = computeBubbles(parseInt(neutral)).sum
-      positive = computeBubbles(parseInt(positive)).sum+1
-      negative = computeBubbles(parseInt(negative)).sum+1
-      staking = computeBubbles(parseInt(staking)).sum
+
+      var data = { positive, neutral, negative, staking }
       var sortArray= [positive, neutral , negative, staking].sort(function(a, b){return a - b})
-      console.log(sortArray)
-      if(i <= sortArray[0]){
+      if(i < sortArray[0]){
         xcord = 950;
         ycord = 100;
-      } else if(i > sortArray[0] && i < sortArray[0]+sortArray[1]){
+      } else if(i >= sortArray[0] && i < sortArray[0]+sortArray[1]){
         xcord = 950;
         ycord = 550;
       } else if(i >= sortArray[0]+sortArray[1]
@@ -74,6 +75,14 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
         y: Math.round(ycord + (Math.floor(Math.random() * (radius * 5)))),
       };
     });
+}
+
+function totalBubbles(_positive, _neutral, _negatitive, _stake ) {
+  var userBubbles = computeBubbles(parseInt(_stake)).sum
+  var neutralBubbles = computeBubbles(parseInt(_neutral)).sum+1
+  var positiveBubbles = computeBubbles(parseInt(_positive)).sum+1
+  var negativeBubbles = computeBubbles(parseInt(_negatitive)).sum+1
+  return(neutralBubbles+userBubbles+positiveBubbles+negativeBubbles);
 }
 
 
@@ -136,15 +145,14 @@ class Delegation extends React.Component {
 
   componentWillReceiveProps = async(nextProps) => {
     var userBubbles = computeBubbles(parseInt(nextProps.staking)).sum
-    var neutralBubbles = computeBubbles(parseInt(nextProps.neutral)).sum
-    var positiveBubbles = computeBubbles(parseInt(nextProps.positive)).sum
-    var negativeBubbles = computeBubbles(parseInt(nextProps.negative)).sum
-    console.log(nextProps.staking, neutralBubbles)
+    var neutralBubbles = computeBubbles(parseInt(nextProps.neutral)).sum+1
+    var positiveBubbles = computeBubbles(parseInt(nextProps.positive)).sum+1
+    var negativeBubbles = computeBubbles(parseInt(nextProps.negative)).sum+1
     this.colorScale = scaleOrdinal({
     range:
-      Array(1).fill(pos).concat(
+      Array(positiveBubbles).fill(pos).concat(
       Array(neutralBubbles).fill(neut).concat(
-        Array(1).fill(neg).concat(
+        Array(negativeBubbles).fill(neg).concat(
           Array(userBubbles).fill(stake)))) })
       this.setState(() => {
         return {
@@ -154,9 +162,9 @@ class Delegation extends React.Component {
       });
   }
 
-  genItems = ({ width, height, amount, negative, positive, neutral, staking }) =>
+  genItems = ({ width, height, negative, positive, neutral, staking }) =>
     genCircles({
-      num: width < 360 ? 40 : computeBubbles(parseInt(amount)),
+      num: width < 360 ? 40 : 3,
       width,
       height,
       positive,
