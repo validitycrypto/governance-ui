@@ -19,7 +19,7 @@ var tinyBubble =  100;
 var minuteBubble = 7;
 
 function genCircles({ num, width, height, positive, neutral, negative, staking }) {
-  return Array(num)
+   return Array(num.sum)
     .fill(1)
     .map((d, i) => {
       var xcord;
@@ -30,20 +30,17 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
       var tinyBubbles = num.data[3]-1;
       var minuteBubbles = num.data[4]-1;
       var radius = 25 - Math.random() * 20;
-
-      var data = { positive, neutral, negative, staking }
-      var sortArray = [positive, neutral , negative, staking].sort(function(a, b){return a - b})
-      if(i < sortArray[0]){
+      if(i < positive){
         xcord = 950;
         ycord = 100;
-      } else if(i >= sortArray[0] && i < sortArray[0]+sortArray[1]){
+      } else if(i >= positive && i < positive+neutral){
         xcord = 950;
         ycord = 550;
-      } else if(i >= sortArray[0]+sortArray[1]
-        && i < sortArray[0]+sortArray[1]+sortArray[2]){
+      } else if(i >= positive+neutral
+        && i < positive+neutral+negative){
         xcord = 100;
         ycord = 550;
-      } else if( i >= sortArray[0]+sortArray[1]+sortArray[2]){
+      } else if( i >= positive+neutral+negative){
         xcord = 500;
         ycord = 300;
       }
@@ -122,58 +119,39 @@ class Delegation extends React.Component {
   constructor(props) {
     super(props);
      this.state = {
-      items: this.genItems({ ...props }),
-      bubbleState: 0
-    };
-    this.colorScale = scaleOrdinal({
-      range: Array(1).fill(pos).concat(
-        Array(1).fill(neut).concat(
-          Array(1).fill(neg).concat(
-            Array(1).fill(stake)))),
-            domain: this.state.items.map(d => d.id)
-        })
-  }
+       bubbleStack: computeBubbles(parseInt(props.staking)).sum,
+       items: this.genItems( props.total, props.width, props.height,
+        computeBubbles(parseInt(props.positive)).sum+1,
+          computeBubbles(parseInt(props.neutral)).sum+1,
+            computeBubbles(parseInt(props.negative)).sum+1,
+              computeBubbles(parseInt(props.staking)).sum),
+              bubbleState: 0 };
+       this.colorScale = scaleOrdinal({
+        range: this.colorSortation(
+          computeBubbles(parseInt(props.positive)).sum+1,
+            computeBubbles(parseInt(props.neutral)).sum+1,
+              computeBubbles(parseInt(props.negative)).sum+1,
+                computeBubbles(parseInt(props.staking)).sum),
+        domain: this.state.items.map(d => d.id)
+        });
+      }
 
-  componentWillReceiveProps = async(nextProps) => {
-    var userBubbles = computeBubbles(parseInt(nextProps.staking)).sum
-    var neutralBubbles = computeBubbles(parseInt(nextProps.neutral)).sum+1
-    var positiveBubbles = computeBubbles(parseInt(nextProps.positive)).sum+1
-    var negativeBubbles = computeBubbles(parseInt(nextProps.negative)).sum+1
-      this.setState(() => {
-        return {
-          items: this.genItems({ ...nextProps }),
-          bubbleStack: userBubbles,
-        };
-      });
-      this.colorScale = scaleOrdinal({
-        range: Array(1).fill(pos).concat(
-          Array(1).fill(neut).concat(
-            Array(1).fill(neg).concat(
-              Array(1).fill(stake)))),
-              domain: this.state.items.map(d => d.id)
-          })
-  }
-
-  genItems = ({ total, width, height, negative, positive, neutral, staking }) =>
+  genItems = (total, width, height, positive, neutral, negative, staking) =>
     genCircles({
       num: width < 360 ? 40 : computeBubbles(parseInt(total)),
-      width,
-      height,
-      positive,
-      neutral,
-      negative,
-      staking,
+      width: width,
+      height: height,
+      positive: positive,
+      neutral: neutral,
+      negative: negative,
+      staking: staking
   });
 
-  totalBubbles = (_positive, _neutral, _negatitive, _stake ) => {
-   var userBubbles = computeBubbles(parseInt(_stake)).sum;
-   var neutralBubbles = computeBubbles(parseInt(_neutral)).sum+1;
-   var positiveBubbles = computeBubbles(parseInt(_positive)).sum+1;
-   var negativeBubbles = computeBubbles(parseInt(_negatitive)).sum+1;
-   var sum = neutralBubbles+userBubbles+positiveBubbles+negativeBubbles;
-   var data
- }
-
+  colorSortation = (_positive, _neutral, _negative, _staking) => {
+  return(Array(_positive).fill(pos).concat(Array(_neutral).fill
+    (neut).concat(Array(_negative).fill(neg).concat(Array(_staking)
+    .fill(stake)))));
+  }
 
   render() {
     const { width, height } = this.props;
