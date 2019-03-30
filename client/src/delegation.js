@@ -3,7 +3,7 @@ import { scaleOrdinal } from '@vx/scale';
 import { LinearGradient } from '@vx/gradient';
 import { Drag, raise } from '@vx/drag';
 
-const negativeVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
+const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
 const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
 const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
 
@@ -19,6 +19,7 @@ var tinyBubble =  100;
 var minuteBubble = 7;
 
 function genCircles({ num, width, height, positive, neutral, negative, staking }) {
+  num.sum = positive + neutral + negative + staking;
    return Array(num.sum)
     .fill(1)
     .map((d, i) => {
