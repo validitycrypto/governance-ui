@@ -1,9 +1,11 @@
-###Validity Delegation MVP 
+# Validity MVP 
+Created, designed and developed by @samgos (founder)
 
-#### Libraries used
+#### Technology stack
 
-* ERC20d
-* Delegation Contract (Unfinished)
-* truffle-react-box
-
+* communalValidation (*smart contract*)
+* truffle-react-box (*react.js, node.js*)
+* vx-drag (*node.js, react.js*)
+* ERC20d (*smart contract*)
+* atlaskit (*react.js*)
 
