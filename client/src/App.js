@@ -256,8 +256,8 @@ class App extends Component {
     await this.getCommune();
     await this.setState({ bubbleComponent:
       <Delegation
-        width={1100}
-        height={700}
+        width={window.screen.width}
+        height={window.screen.height}
         total={this.state.pool}
         vote={this.voteEvent}
         negative={parseInt(this.state.eventNegative)}
@@ -286,7 +286,7 @@ class App extends Component {
 
   getBalances = async() => {
     const value = await this.state.token.methods.balanceOf(this.state.account).call();
-    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2), voteBal: parseInt(value/decimal)/10000 })
+    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2), voteBal: parseFloat(value/decimal)/10000 })
     await this.state.web3.eth.getBalance(this.state.account,
       async(error, value) => {
         if(error){
@@ -580,12 +580,11 @@ class App extends Component {
 
         <div className="eventBorder">
         </div>
-        {this.state.pool}
 
-        <div className="votingBubbles">
         <Button onClick={this.eventStake} appearance="warning"> Stake </Button>
         <Button onClick={this.renderBubbles.bind(this)} appearance="help"> Create </Button>
 
+        <div className="votingBubbles">
         {this.state.bubbleComponent}
         </div>
 
