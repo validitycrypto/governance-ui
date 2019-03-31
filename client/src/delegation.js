@@ -3,6 +3,9 @@ import { scaleOrdinal } from '@vx/scale';
 import { LinearGradient } from '@vx/gradient';
 import { Drag, raise } from '@vx/drag';
 
+import "./css/bubble.css";
+
+
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
 const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
 const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
@@ -13,10 +16,10 @@ const pos = ['#0cff6d']
 const stake = ['#0cffe9']
 
 var largeBubble =  10000;
-var mediumBubble =  1250;
+var mediumBubble =  2500;
 var smallBubble =  500;
-var tinyBubble =  100;
-var minuteBubble = 7;
+var tinyBubble =  250;
+var minuteBubble = 100;
 
 function genCircles({ num, width, height, positive, neutral, negative, staking }) {
   num.sum = positive + neutral + negative + staking;
@@ -30,17 +33,20 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
       var smallBubbles = num.data[2]-1;
       var tinyBubbles = num.data[3]-1;
       var minuteBubbles = num.data[4]-1;
+      var operativeX = 0;
+      var operativeY = 0;
+
       var radius = 25 - Math.random() * 20;
       if(i < positive){
-        xcord = 950;
-        ycord = 100;
+        xcord = 850;
+        ycord = 25;
       } else if(i >= positive && i < positive+neutral){
-        xcord = 950;
-        ycord = 550;
+        xcord = 850;
+        ycord = 400;
       } else if(i >= positive+neutral
         && i < positive+neutral+negative){
         xcord = 100;
-        ycord = 550;
+        ycord = 400;
       } else if( i >= positive+neutral+negative){
         xcord = 500;
         ycord = 300;
@@ -61,12 +67,21 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
         && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
         radius = 2;
       }
+
+      if(i % 1 == 1) {
+        operativeX = Math.random() ^ (radius * i);
+        operativeY = 0;
+      } else {
+        operativeY = Math.random() ^ (radius + i)
+        operativeX = 0;
+      }
+
      return {
         id: i,
         owner: d,
         radius,
-        x: Math.round(xcord + (Math.floor(Math.random() * (radius * 5)))),
-        y: Math.round(ycord + (Math.floor(Math.random() * (radius * 5)))),
+        x: operativeX + Math.round(xcord + (Math.floor(Math.random() * (radius * 15 )))),
+        y: operativeY + Math.round(ycord + (Math.floor(Math.random() * (radius * 15 )))),
       };
     });
 }
@@ -249,7 +264,7 @@ class Delegation extends React.Component {
                         ? 'url(#stroke)'
                         : this.colorScale(d.id)
                     }
-                    fillOpacity={0.9}
+                    fillOpacity={0.85}
                     stroke={isDragging ? 'white' : 'transparent'}
                     strokeWidth={2}
                     onMouseMove={dragMove}
