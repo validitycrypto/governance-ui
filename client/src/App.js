@@ -95,6 +95,7 @@ class App extends Component {
       await this.eventNeutral();
       await this.getLog();
       await this.getBalances();
+      await this.renderBubbles();
 
   }
 
@@ -112,6 +113,7 @@ class App extends Component {
       await this.eventNegative();
       await this.eventNeutral();
       await this.getLog();
+      await this.renderBubbles();
   }
 
   componentDidMount = async () => {
@@ -409,7 +411,6 @@ class App extends Component {
   }
 
 
-
   registerIdentity = async() => {
       var converge = this.state.web3.utils.fromAscii(this.state.nickname)
       await this.state.token.methods.setIdentity(converge)
@@ -481,43 +482,6 @@ class App extends Component {
   })
 }
 
-
-  optionOne = async() => {
-    await this.setState({
-      choice: "Positive",
-      choice1: "0x506f736974697665",
-      choice2: null,
-      choice3: null,
-      option1: true,
-      option2: false,
-      option3: false
-    })
-  }
-
-  optionTwo = async() => {
-    await this.setState({
-      choice: "Neutral",
-      choice1: null,
-      choice2: "0x4e65757472616c",
-      choice3: null,
-      option1: false,
-      option2: true,
-      option3: false
-    })
-  }
-
-  optionThree = async() => {
-    await this.setState({
-      choice: "Negative",
-      choice1: null,
-      choice2: null,
-      choice3: "0x4e65676174697665",
-      option1: false,
-      option2: false,
-      option3: true
-    })
-  }
-
   initialiseOwnership = async() => {
     await this.state.token.methods.adminControl(this.state.dapp.address)
     .send({ from: this.state.account, gas: 3725000 })
@@ -552,37 +516,31 @@ class App extends Component {
           )}
           productNavigation={renderer}
         >
-        <div className="validatingIdentifier">
-        {this.state.id}
-        </div>
+        <div/>
         </LayoutManager>
       </ThemeProvider>
       </NavigationProvider>
       </GridColumn>
       <GridColumn>
 
+
+      <div className="validatingIdentifier">
+      {this.state.id}
+      </div>
         <div className="eventStats">
-        <div className="eventName"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        <div className="eventName"><FontAwesomeIcon color="#6f0cff" icon={faInfo} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}</div>
-
-        <div className="eventType"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        <div className="eventType"><FontAwesomeIcon color="#6f0cff" icon={faInfo} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}</div>
-
-        <div className="eventPositive"><FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
+        <div className="eventPositive"><FontAwesomeIcon color="#6f0cff" icon={faCheck} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}</div>
-
-        <div className="eventNeutral">&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
+        <div className="eventNeutral">&nbsp;&nbsp;<FontAwesomeIcon color="#6f0cff" icon={faBalanceScale} size='1x'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}</div>
-
-        <div className="eventNegative"><FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
+        <div className="eventNegative"><FontAwesomeIcon color="#6f0cff" icon={faTimes} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}</div>
         </div>
-
         <div className="eventBorder">
         </div>
-
-        <Button onClick={this.eventStake} appearance="warning"> Stake </Button>
-        <Button onClick={this.renderBubbles.bind(this)} appearance="help"> Create </Button>
 
         <div className="votingBubbles">
         {this.state.bubbleComponent}

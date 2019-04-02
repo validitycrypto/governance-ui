@@ -14,6 +14,7 @@ table, thead, tbody, td, tr {
 
 .votingBubbles {
   position: absolute;
+  padding: 5vw;
   left: 5vw;
   top: -5vh;
 
@@ -56,22 +57,6 @@ td, th {
   font-size: 18px;
 }
 
-
-.delegationLog {
-  position: absolute;
-  width: 50vw;
-  padding: 1vw;
-  font-size: 12.5px;
-  border-radius: 1vw;
-  font-family: sans-serif;
-  right: 2.5vw;
-  top: 55vh;
-  border-style: solid;
-  border-color: #1e00bd;
-  background-color: rgba(30, 0, 189, 0.5);
-  border-width: 0.50vw;
-}
-
 .textColor {
   color: white;
   font-size: 1.125vw;
@@ -79,62 +64,61 @@ td, th {
 }
 
 .validatingIdentifier {
-  position: relative;
+  position: absolute;
   writing-mode: tb-rl;
-  font-size: 13px;
-  left: -287.5px;
-  top: 200px;
+  font-size: 1vw;
+  left: 2vw;
+  top: 25vh;
   color: #0cff6f;
   z-index: 333;
 }
 
 .eventBorder {
-    position: absolute;
+    position: relative;
     background-color: 'transparent';
     border-radius: 50%;
     border-style: solid;
-    border-color: #1e00bd;
-    background-color: rgba(30, 0, 189, 0.5);
+    background: linear-gradient(to right, rgba(12,255,111,0.5),rgba(12,255,111,0.25) 35%,rgba(12,255,111,0.1));
     border-width: 0.375vw;
     display: block;
     height: 15vw;
     width: 15vw;
-    left: 10vw;
-    top: 7.5vh;
+    left: 33.75vw;
+    top: -25vh;
 }
 
 
 
 .eventStats {
-  position: absolute;
-  top: 2.5vh;
-  left: 37.5vw;
+  position: relative;
+  top: 5vh;
+  left: 20vw;
   font-size: 1.25vw;
   color: white;
-
+  width: 15vw;
 }
 
 .eventName {
   border-style: solid;
-  background-color: rgba(30, 0, 189, 0.5);
-  border-color: #1e00bd;
+  background: linear-gradient(to right, rgba(12,255,111,0.5),rgba(12,255,111,0.25) 35%,rgba(12,255,111,0.1));
   border-width: 0.375vw;
   border-radius: 2.5vw;
   padding: 0.5vw;
   position: relative;
-  left: -12.5vw;
+  left: -2.5vw;
+  color: black;
 }
 
 .eventType {
   border-style: solid;
-  background-color: rgba(30, 0, 189, 0.5);
-  border-color: #1e00bd;
+  background: linear-gradient(to right, rgba(12,255,111,0.5),rgba(12,255,111,0.25) 35%,rgba(12,255,111,0.1));
   border-width: 0.375vw;
   border-radius: 2.5vw;
   padding: 0.5vw;
   position: relative;
   top: 1vh;
-  left: -10vw;
+  left: -3.5vw;
+  color: black;
 
 
 }
@@ -142,40 +126,42 @@ td, th {
 
 .eventPositive {
   border-style: solid;
-  background-color: rgba(30, 0, 189, 0.5);
-  border-color: #1e00bd;
+  background: linear-gradient(to right, rgba(12,255,111,0.5),rgba(12,255,111,0.25) 35%,rgba(12,255,111,0.1));
   border-width: 0.375vw;
   border-radius: 2.5vw;
   padding: 0.5vw;
   position: relative;
   top: 2vh;
-  left: -10vw;
+  left: -3.5vw;
+  color: black;
+
 
 }
 
 .eventNeutral {
   position: relative;
-  background-color: rgba(30, 0, 189, 0.5);
+  background: linear-gradient(to right, rgba(12,255,111,0.5),rgba(12,255,111,0.25) 35%,rgba(12,255,111,0.1));
   top: 3vh;
-  left: -11.25vw;
+  left: -2.5vw;
   border-style: solid;
-  border-color: #1e00bd;
   border-width: 0.375vw;
   border-radius: 2.5vw;
+  color: black;
+  border-color: linear-gradient(to right, rgba(12,255,111,0.5),rgba(12,255,111,0.25) 35%,rgba(12,255,111,0.1));
   padding: 0.6vw;
 
 }
 
 .eventNegative {
   position: relative;
-  background-color: rgba(30, 0, 189, 0.5);
+  background: linear-gradient(to right, rgba(12,255,111,0.5),rgba(12,255,111,0.25) 35%,rgba(12,255,111,0.1));
   top: 4vh;
-  left: -12.5vw;
+  left: -1.0vw;
   border-style: solid;
-  border-color: #1e00bd;
   border-width: 0.375vw;
   border-radius: 2.5vw;
   padding: 0.5vw;
+  color: black;
 
 }
 

@@ -37,26 +37,39 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
       var operativeY = 0;
 
       var radius = 25 - Math.random() * 20;
+
+      if(i % 2 != 0) {
+        operativeX = (radius * (i/10));
+        operativeY = i ^ 2;
+      } else {
+        operativeX = (-1) * (i/2 ^ radius);
+        operativeY = radius * (i/10);
+      }
+
       if(i < positive){
-        xcord = 850;
-        ycord = 25;
+        xcord = 225 + operativeX;
+        ycord = 25 + operativeY;
+        if(xcord > 350) xcord = 150 + (radius/2 * i/4);
+        if(ycord > 200) ycord = 25 + (radius/2 * i/3);
       } else if(i >= positive && i < positive+neutral){
-        xcord = 850;
-        ycord = 400;
+        xcord = 900 + operativeX;
+        ycord = 450 + operativeY
       } else if(i >= positive+neutral
         && i < positive+neutral+negative){
-        xcord = 100;
-        ycord = 400;
+        xcord = 50 - operativeX;
+        ycord = 450 - operativeY;
       } else if( i >= positive+neutral+negative){
-        xcord = 500;
-        ycord = 300;
+        xcord = 400;
+        ycord = 250;
+        operativeY = i ^ 4;
+        operativeX = i ^ 2;
       }
 
       if(i < largeBubbles){
-        radius = 25;
+        radius = 15;
       } else if(i >= largeBubbles
         && i < largeBubbles+mediumBubbles){
-        radius = 15;
+        radius = 12.5;
       } else if(i >= largeBubbles+mediumBubbles
         && i < largeBubbles+mediumBubbles+smallBubbles){
         radius = 10;
@@ -68,20 +81,12 @@ function genCircles({ num, width, height, positive, neutral, negative, staking }
         radius = 2;
       }
 
-      if(i % 1 == 1) {
-        operativeX = Math.random() ^ (radius * i);
-        operativeY = 0;
-      } else {
-        operativeY = Math.random() ^ (radius + i)
-        operativeX = 0;
-      }
-
      return {
         id: i,
         owner: d,
         radius,
-        x: operativeX + Math.round(xcord + (Math.floor(Math.random() * (radius * 15 )))),
-        y: operativeY + Math.round(ycord + (Math.floor(Math.random() * (radius * 15 )))),
+        x: Math.round(xcord + (Math.floor(Math.random() * (radius ^ (radius * operativeX))))),
+        y: Math.round(ycord + (Math.floor(Math.random() * (radius ^ (radius * operativeY ))))),
       };
     });
 }
@@ -185,8 +190,8 @@ class Delegation extends React.Component {
             this.state.items.map((d, i) => (
             <Drag
               key={`${d.id}`}
-              width={width}
-              height={height}
+              width={window.screen.width}
+              height={window.screen.height}
               onDragEnd={async() => {
                 await this.setState({
                   log: true
