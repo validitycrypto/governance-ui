@@ -26,6 +26,7 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
   var positiveCounter = 0;
   var negativeCounter = 0;
   var neutralCounter = 0;
+  var stakingCounter = 0;
    return Array(num)
     .fill(1)
     .map((d, i) => {
@@ -43,8 +44,6 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
       var radius = 25 - Math.random() * 20;
 
       if(i < positive.sum+1){
-        xcord = 225;
-        ycord = 25;
         largeBubbles = positive.data[0];
         mediumBubbles = positive.data[1];
         smallBubbles = positive.data[2];
@@ -53,8 +52,6 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         positiveCounter++;
         counter = positiveCounter;
       } else if(i >= positive.sum+1 && i < positive.sum+neutral.sum+2){
-        xcord = 900;
-        ycord = 450;
         largeBubbles = neutral.data[0];
         mediumBubbles = neutral.data[1];
         smallBubbles = neutral.data[2];
@@ -64,8 +61,6 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         counter = neutralCounter;
       } else if(i >= positive.sum+neutral.sum+2
         && i < positive.sum+neutral.sum+negative.sum+3){
-        xcord = 50;
-        ycord = 450;
         largeBubbles = negative.data[0];
         mediumBubbles = negative.data[1];
         smallBubbles = negative.data[2];
@@ -74,13 +69,13 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         negativeCounter++;
         counter = negativeCounter;
       } else if( i >= positive.sum+neutral.sum+negative.sum+3){
-        xcord = 400;
-        ycord = 250;
         largeBubbles = staking.data[0];
         mediumBubbles = staking.data[1];
         smallBubbles = staking.data[2];
         tinyBubbles = staking.data[3];
         minuteBubbles = staking.data[4];
+        stakingCounter++;
+        counter = stakingCounter;
       }
 
       if(counter < largeBubbles){
@@ -100,28 +95,27 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
       }
 
 
-
       if(i % 2 != 0) {
-        operativeX = (radius * (i/25));
-        operativeY = radius ^ 2;
+        operativeY = radius ^ i
+        operativeX = i ^ counter;
       } else {
-        operativeX = (-1) * (i/2 ^ radius);
-        operativeY = radius * (i/25);
+        operativeX = (-1) * i ^ radius;
+        operativeY = counter ^ i;
       }
 
       if(i < positive.sum+1){
-        xcord = 225 + operativeX;
-        ycord = 25 + operativeY;
+        xcord = 100 + operativeX;
+        ycord = 75 + operativeY;
       } else if(i >= positive.sum+1 && i < positive.sum+neutral.sum+2){
-        xcord = 900 - operativeX;
-        ycord = 450 + operativeY;
+        xcord = 900;
+        ycord = 500 ;
       } else if(i >= positive.sum+neutral.sum+2
         && i < positive.sum+neutral.sum+negative.sum+3){
-        xcord = 50 + operativeX;
-        ycord = 450 +operativeY;
+        xcord = 150;
+        ycord = 500;
       } else if( i >= positive.sum+neutral.sum+negative.sum+3){
-        xcord = 400 + operativeX;
-        ycord = 250 + operativeY;
+        xcord = 550;
+        ycord = 250;
       }
 
 
@@ -129,8 +123,8 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         id: i,
         owner: d,
         radius,
-        x: Math.floor(xcord + (Math.floor(Math.random() * (radius ^ (radius * operativeX))))),
-        y: Math.floor(ycord + (Math.floor(Math.random() * (radius ^ (radius * operativeY ))))),
+        x: Math.floor(xcord + (Math.floor(Math.random() * ( operativeX )))),
+        y: Math.floor(ycord + (Math.floor(Math.random() * ( operativeY  )))),
       };
     });
 }
@@ -308,8 +302,8 @@ class Delegation extends React.Component {
                         ? 'url(#stroke)'
                         : this.colorScale(d.id)
                     }
-                    fillOpacity={0.85}
-                    stroke={isDragging ? 'white' : 'transparent'}
+                    fillOpacity={0.75}
+                    stroke={isDragging ? 'white' : 'black'}
                     strokeWidth={2}
                     onMouseMove={dragMove}
                     onMouseUp={dragEnd}
