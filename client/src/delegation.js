@@ -21,72 +21,116 @@ var smallBubble =  500;
 var tinyBubble =  250;
 var minuteBubble = 100;
 
-function genCircles({ num, width, height, positive, neutral, negative, staking }) {
-  num.sum = positive + neutral + negative + staking;
-   return Array(num.sum)
+function genCircles({ width, height, positive, neutral, negative, staking }) {
+  var num = positive.sum + 1 + neutral.sum + 1 + negative.sum + 1 + staking.sum;
+  var positiveCounter = 0;
+  var negativeCounter = 0;
+  var neutralCounter = 0;
+   return Array(num)
     .fill(1)
     .map((d, i) => {
       var xcord;
       var ycord;
-      var largeBubbles = num.data[0]-1;
-      var mediumBubbles = num.data[1]-1;
-      var smallBubbles = num.data[2]-1;
-      var tinyBubbles = num.data[3]-1;
-      var minuteBubbles = num.data[4]-1;
+      var largeBubbles;
+      var mediumBubbles;
+      var smallBubbles;
+      var tinyBubbles;
+      var minuteBubbles;
       var operativeX = 0;
       var operativeY = 0;
+      var counter = 0;
 
       var radius = 25 - Math.random() * 20;
 
-      if(i % 2 != 0) {
-        operativeX = (radius * (i/10));
-        operativeY = i ^ 2;
-      } else {
-        operativeX = (-1) * (i/2 ^ radius);
-        operativeY = radius * (i/10);
-      }
-
-      if(i < positive){
-        xcord = 225 + operativeX;
-        ycord = 25 + operativeY;
-        if(xcord > 350) xcord = 150 + (radius/2 * i/4);
-        if(ycord > 200) ycord = 25 + (radius/2 * i/3);
-      } else if(i >= positive && i < positive+neutral){
-        xcord = 900 + operativeX;
-        ycord = 450 + operativeY
-      } else if(i >= positive+neutral
-        && i < positive+neutral+negative){
-        xcord = 50 - operativeX;
-        ycord = 450 - operativeY;
-      } else if( i >= positive+neutral+negative){
+      if(i < positive.sum+1){
+        xcord = 225;
+        ycord = 25;
+        largeBubbles = positive.data[0];
+        mediumBubbles = positive.data[1];
+        smallBubbles = positive.data[2];
+        tinyBubbles = positive.data[3];
+        minuteBubbles = positive.data[4];
+        positiveCounter++;
+        counter = positiveCounter;
+      } else if(i >= positive.sum+1 && i < positive.sum+neutral.sum+2){
+        xcord = 900;
+        ycord = 450;
+        largeBubbles = neutral.data[0];
+        mediumBubbles = neutral.data[1];
+        smallBubbles = neutral.data[2];
+        tinyBubbles = neutral.data[3];
+        minuteBubbles = neutral.data[4];
+        neutralCounter++;
+        counter = neutralCounter;
+      } else if(i >= positive.sum+neutral.sum+2
+        && i < positive.sum+neutral.sum+negative.sum+3){
+        xcord = 50;
+        ycord = 450;
+        largeBubbles = negative.data[0];
+        mediumBubbles = negative.data[1];
+        smallBubbles = negative.data[2];
+        tinyBubbles = negative.data[3];
+        minuteBubbles = negative.data[4];
+        negativeCounter++;
+        counter = negativeCounter;
+      } else if( i >= positive.sum+neutral.sum+negative.sum+3){
         xcord = 400;
         ycord = 250;
-        operativeY = i ^ 4;
-        operativeX = i ^ 2;
+        largeBubbles = staking.data[0];
+        mediumBubbles = staking.data[1];
+        smallBubbles = staking.data[2];
+        tinyBubbles = staking.data[3];
+        minuteBubbles = staking.data[4];
       }
 
-      if(i < largeBubbles){
+      if(counter < largeBubbles){
         radius = 15;
-      } else if(i >= largeBubbles
-        && i < largeBubbles+mediumBubbles){
+      } else if(counter >= largeBubbles
+        && counter < largeBubbles+mediumBubbles){
         radius = 12.5;
-      } else if(i >= largeBubbles+mediumBubbles
-        && i < largeBubbles+mediumBubbles+smallBubbles){
+      } else if(counter >= largeBubbles+mediumBubbles
+        && counter < largeBubbles+mediumBubbles+smallBubbles){
         radius = 10;
-      } else if(i >= largeBubbles+mediumBubbles+smallBubbles
-        && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
+      } else if(counter >= largeBubbles+mediumBubbles+smallBubbles
+        && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
         radius = 5;
-      } else if(i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
-        && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
+      } else if(counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
+        && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
         radius = 2;
       }
+
+
+
+      if(i % 2 != 0) {
+        operativeX = (radius * (i/25));
+        operativeY = radius ^ 2;
+      } else {
+        operativeX = (-1) * (i/2 ^ radius);
+        operativeY = radius * (i/25);
+      }
+
+      if(i < positive.sum+1){
+        xcord = 225 + operativeX;
+        ycord = 25 + operativeY;
+      } else if(i >= positive.sum+1 && i < positive.sum+neutral.sum+2){
+        xcord = 900 - operativeX;
+        ycord = 450 + operativeY;
+      } else if(i >= positive.sum+neutral.sum+2
+        && i < positive.sum+neutral.sum+negative.sum+3){
+        xcord = 50 + operativeX;
+        ycord = 450 +operativeY;
+      } else if( i >= positive.sum+neutral.sum+negative.sum+3){
+        xcord = 400 + operativeX;
+        ycord = 250 + operativeY;
+      }
+
 
      return {
         id: i,
         owner: d,
         radius,
-        x: Math.round(xcord + (Math.floor(Math.random() * (radius ^ (radius * operativeX))))),
-        y: Math.round(ycord + (Math.floor(Math.random() * (radius ^ (radius * operativeY ))))),
+        x: Math.floor(xcord + (Math.floor(Math.random() * (radius ^ (radius * operativeX))))),
+        y: Math.floor(ycord + (Math.floor(Math.random() * (radius ^ (radius * operativeY ))))),
       };
     });
 }
@@ -100,34 +144,30 @@ function computeBubbles(_amount) {
     var remainder;
 
     if(_amount >= largeBubble){
-    remainder = _amount % largeBubble;
-    largeAmount = Math.floor(_amount/largeBubble);
-    if(remainder != 0){
+      remainder = _amount % largeBubble;
+      largeAmount = Math.floor(_amount/largeBubble);
       _amount = _amount - remainder;
+    }
+    if(_amount != 0){
       remainder = _amount % mediumBubble;
       mediumAmount = Math.floor(_amount/mediumBubble);
-      if(remainder != 0){
-        _amount = _amount - remainder;
+      _amount = _amount - remainder;
+    }
+    if(_amount != 0){
         remainder = _amount % smallBubble;
         smallAmount = Math.floor(_amount/smallBubble);
-        if(remainder != 0){
-          _amount = _amount - remainder;
+        _amount = _amount - remainder;
+    }
+    if(_amount != 0){
           remainder = _amount % tinyBubble;
           tinyAmount = Math.floor(_amount/tinyBubble);
-         if (remainder != 0) {
-            _amount = _amount - remainder;
+          _amount = _amount - remainder;
+   } if (_amount != 0) {
             remainder = _amount % minuteBubble;
             minuteAmount = Math.floor(_amount/minuteBubble);
-          }
-        }
-      }
-    } } else {
-        remainder = _amount % tinyBubble;
-        tinyAmount = Math.floor(_amount/tinyBubble);
-        _amount = _amount - remainder;
-        remainder = _amount % minuteBubble;
-        minuteAmount = Math.floor(_amount/minuteBubble);
-      }
+            _amount = _amount - remainder;
+    }
+
 
     var data = [ largeAmount, mediumAmount, smallAmount, tinyAmount, smallAmount ]
     var sum = largeAmount+mediumAmount+smallAmount+tinyAmount+smallAmount
@@ -141,11 +181,11 @@ class Delegation extends React.Component {
     super(props);
      this.state = {
        bubbleStack: computeBubbles(parseInt(props.staking)).sum,
-       items: this.genItems( props.total, props.width, props.height,
-        computeBubbles(parseInt(props.positive)).sum+1,
-          computeBubbles(parseInt(props.neutral)).sum+1,
-            computeBubbles(parseInt(props.negative)).sum+1,
-              computeBubbles(parseInt(props.staking)).sum),
+       items: this.genItems( props.width, props.height,
+        computeBubbles(parseInt(props.positive)),
+          computeBubbles(parseInt(props.neutral)),
+            computeBubbles(parseInt(props.negative)),
+              computeBubbles(parseInt(props.staking))),
               bubbleState: 0 };
        this.colorScale = scaleOrdinal({
         range: this.colorSortation(
@@ -157,9 +197,8 @@ class Delegation extends React.Component {
         });
       }
 
-  genItems = (total, width, height, positive, neutral, negative, staking) =>
+  genItems = (width, height, positive, neutral, negative, staking) =>
     genCircles({
-      num: width < 360 ? 40 : computeBubbles(parseInt(total)),
       width: width,
       height: height,
       positive: positive,
