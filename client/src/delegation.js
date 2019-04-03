@@ -40,35 +40,11 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
       var operativeX = 0;
       var operativeY = 0;
       var counter = 0;
+      var option;
 
-      var radius = 25 - Math.random() * 20;
+      var radius = Math.floor(Math.random() * 10) + 5
 
-      if(i < positive.sum+1){
-        largeBubbles = positive.data[0];
-        mediumBubbles = positive.data[1];
-        smallBubbles = positive.data[2];
-        tinyBubbles = positive.data[3];
-        minuteBubbles = positive.data[4];
-        positiveCounter++;
-        counter = positiveCounter;
-      } else if(i >= positive.sum+1 && i < positive.sum+neutral.sum+2){
-        largeBubbles = neutral.data[0];
-        mediumBubbles = neutral.data[1];
-        smallBubbles = neutral.data[2];
-        tinyBubbles = neutral.data[3];
-        minuteBubbles = neutral.data[4];
-        neutralCounter++;
-        counter = neutralCounter;
-      } else if(i >= positive.sum+neutral.sum+2
-        && i < positive.sum+neutral.sum+negative.sum+3){
-        largeBubbles = negative.data[0];
-        mediumBubbles = negative.data[1];
-        smallBubbles = negative.data[2];
-        tinyBubbles = negative.data[3];
-        minuteBubbles = negative.data[4];
-        negativeCounter++;
-        counter = negativeCounter;
-      } else if( i >= positive.sum+neutral.sum+negative.sum+3){
+      if(i < staking.sum){
         largeBubbles = staking.data[0];
         mediumBubbles = staking.data[1];
         smallBubbles = staking.data[2];
@@ -76,6 +52,35 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         minuteBubbles = staking.data[4];
         stakingCounter++;
         counter = stakingCounter;
+        option = staking.sum;
+      } else if(i >= staking.sum && i < staking.sum+neutral.sum+1){
+        largeBubbles = neutral.data[0];
+        mediumBubbles = neutral.data[1];
+        smallBubbles = neutral.data[2];
+        tinyBubbles = neutral.data[3];
+        minuteBubbles = neutral.data[4];
+        neutralCounter++;
+        counter = neutralCounter;
+        option = positive.sum+1;
+      } else if(i >= staking.sum+neutral.sum+1
+        && i < staking.sum+neutral.sum+negative.sum+2){
+        largeBubbles = negative.data[0];
+        mediumBubbles = negative.data[1];
+        smallBubbles = negative.data[2];
+        tinyBubbles = negative.data[3];
+        minuteBubbles = negative.data[4];
+        negativeCounter++;
+        counter = negativeCounter;
+        option = negative.sum+1;
+      } else if( i >= staking.sum+neutral.sum+negative.sum+2){
+        largeBubbles = positive.data[0];
+        mediumBubbles = positive.data[1];
+        smallBubbles = positive.data[2];
+        tinyBubbles = positive.data[3];
+        minuteBubbles = positive.data[4];
+        positiveCounter++;
+        counter = positiveCounter;
+        option = positive.sum+1;
       }
 
       if(counter < largeBubbles){
@@ -88,34 +93,29 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         radius = 10;
       } else if(counter >= largeBubbles+mediumBubbles+smallBubbles
         && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
-        radius = 5;
+        radius = 7.5;
       } else if(counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
         && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
-        radius = 2;
+        radius = 5;
       }
 
 
-      if(i % 2 != 0) {
-        operativeY = radius ^ i
-        operativeX = i ^ counter;
-      } else {
-        operativeX = (-1) * i ^ radius;
-        operativeY = counter ^ i;
-      }
+      operativeY = radius/4 * counter;
+      operativeX = radius/4 * counter;
 
-      if(i < positive.sum+1){
-        xcord = 100 + operativeX;
-        ycord = 75 + operativeY;
-      } else if(i >= positive.sum+1 && i < positive.sum+neutral.sum+2){
-        xcord = 900;
-        ycord = 500 ;
-      } else if(i >= positive.sum+neutral.sum+2
-        && i < positive.sum+neutral.sum+negative.sum+3){
-        xcord = 150;
-        ycord = 500;
-      } else if( i >= positive.sum+neutral.sum+negative.sum+3){
+      if(i < staking.sum){
         xcord = 550;
         ycord = 250;
+      } else if(i >= staking.sum && i < positive.sum+neutral.sum+2){
+        xcord = 900;
+        ycord = 500 ;
+      } else if(i >= staking.sum+neutral.sum+2
+        && i < staking.sum+neutral.sum+negative.sum+3){
+        xcord = 200;
+        ycord = 500;
+      } else if( i >= staking.sum+neutral.sum+negative.sum+3){
+        xcord = 200;
+        ycord = 100
       }
 
 
@@ -123,8 +123,8 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         id: i,
         owner: d,
         radius,
-        x: Math.floor(xcord + (Math.floor(Math.random() * ( operativeX )))),
-        y: Math.floor(ycord + (Math.floor(Math.random() * ( operativeY  )))),
+        x: xcord + operativeX * Math.cos(2 * Math.PI * counter / radius),
+        y: ycord + operativeY * Math.sin(2 * Math.PI * counter / radius)
       };
     });
 }
@@ -183,10 +183,10 @@ class Delegation extends React.Component {
               bubbleState: 0 };
        this.colorScale = scaleOrdinal({
         range: this.colorSortation(
-          computeBubbles(parseInt(props.positive)).sum+1,
+          computeBubbles(parseInt(props.staking)).sum+1,
             computeBubbles(parseInt(props.neutral)).sum+1,
               computeBubbles(parseInt(props.negative)).sum+1,
-                computeBubbles(parseInt(props.staking)).sum),
+                computeBubbles(parseInt(props.positive)).sum),
         domain: this.state.items.map(d => d.id)
         });
       }
@@ -202,9 +202,9 @@ class Delegation extends React.Component {
   });
 
   colorSortation = (_positive, _neutral, _negative, _staking) => {
-  return(Array(_positive).fill(pos).concat(Array(_neutral).fill
+  return(Array(_positive).fill(stake).concat(Array(_neutral).fill
     (neut).concat(Array(_negative).fill(neg).concat(Array(_staking)
-    .fill(stake)))));
+    .fill(pos)))));
   }
 
   render() {
