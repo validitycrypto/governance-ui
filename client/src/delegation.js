@@ -5,7 +5,6 @@ import { Drag, raise } from '@vx/drag';
 
 import "./css/bubble.css";
 
-
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
 const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
 const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
@@ -30,19 +29,10 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
    return Array(num)
     .fill(1)
     .map((d, i) => {
-      var xcord;
-      var ycord;
-      var largeBubbles;
-      var mediumBubbles;
-      var smallBubbles;
-      var tinyBubbles;
-      var minuteBubbles;
-      var operativeX = 0;
-      var operativeY = 0;
-      var counter = 0;
-      var option;
-
+      var largeBubbles; var mediumBubbles; var smallBubbles; var tinyBubbles; var minuteBubbles;
       var radius = Math.floor(Math.random() * 10) + 5
+      var xcord; var ycord; var option;
+      var counter = 0;
 
       if(i < staking.sum){
         largeBubbles = staking.data[0];
@@ -99,20 +89,20 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         radius = 5;
       }
 
-      operativeY = radius/4 * counter;
-      operativeX = radius/4 * counter;
+      var operativeY = radius/2 * counter;
+      var operativeX = radius/2 * counter;
 
-      if(i <= staking.sum){
+      if(i < staking.sum){
         xcord = 550;
         ycord = 250;
-      } else if(i > staking.sum && i <= staking.sum+neutral.sum+1){
+      } else if(i >= staking.sum && i < staking.sum+neutral.sum+1){
         xcord = 900;
         ycord = 500 ;
-      } else if(i > staking.sum+neutral.sum+1
-        && i <= staking.sum+neutral.sum+negative.sum+2){
+      } else if(i >= staking.sum+neutral.sum+1
+        && i < staking.sum+neutral.sum+negative.sum+2){
         xcord = 200;
         ycord = 500;
-      } else if( i > staking.sum+neutral.sum+negative.sum+2){
+      } else if( i >= staking.sum+neutral.sum+negative.sum+2){
         xcord = 200;
         ycord = 100
       }
@@ -183,7 +173,7 @@ class Delegation extends React.Component {
             };
        this.colorScale = scaleOrdinal({
         range: this.colorSortation(
-          computeBubbles(parseInt(props.staking)).sum+1,
+          computeBubbles(parseInt(props.staking)).sum,
             computeBubbles(parseInt(props.neutral)).sum+1,
               computeBubbles(parseInt(props.negative)).sum+1,
                 computeBubbles(parseInt(props.positive)).sum+1),
@@ -263,7 +253,7 @@ class Delegation extends React.Component {
                     if(dx < -50 && dy < -37.5){
                       console.log("POSITIVE");
                       if(this.state.log == true){
-                        this.props.option(positiveVote)
+                        this.props.option(positiveVote, this.state.bubbleState+1, this.state.bubbleStack)
                         this.setState({
                           bubbleState: this.state.bubbleState+1,
                           votingOption: positiveVote,
@@ -273,7 +263,7 @@ class Delegation extends React.Component {
                     } else if(dx > 275 && dy > 150){
                       console.log("NEUTRAL");
                       if(this.state.log == true){
-                        this.props.option(neutralVote)
+                        this.props.option(neutralVote, this.state.bubbleState+1, this.state.bubbleStack)
                         this.setState({
                           bubbleState: this.state.bubbleState+1,
                           votingOption: neutralVote,
@@ -283,7 +273,7 @@ class Delegation extends React.Component {
                     } else if(dx < -200 && dy > 37.5){
                       console.log("NEGATIVE");
                       if(this.state.log == true){
-                        this.props.option(negativeVote)
+                        this.props.option(negativeVote, this.state.bubbleState+1, this.state.bubbleStack)
                         this.setState({
                           bubbleState: this.state.bubbleState+1,
                           votingOption: negativeVote,

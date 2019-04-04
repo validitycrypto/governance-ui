@@ -29,6 +29,9 @@ import { faEdit, faInfo, faBullseye, faIdCard, faCrosshairs, faBalanceScale, faS
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 
+import { fade } from '@material-ui/core/styles/colorManipulator';
+import Paper from '@material-ui/core/Paper';
+
 import Validation from "../build/contracts/communalValidation.json";
 import ERC20d from "../build/contracts/ERC20d.json";
 
@@ -63,6 +66,11 @@ const GlobalNavigation = () => (
     { key: 'settings', icon: cogIcon, label: 'settings' },
   ]} secondaryItems={[]} />
 );
+
+
+const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
+const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
+const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
 
 class App extends Component {
   state = {
@@ -334,9 +342,22 @@ class App extends Component {
     this.setState({ flags });
   }
 
-  defineOption = async(_option) => {
-    await this.setState({ option: _option })
-    this.addFlag();
+  defineOption = async(_option, _stack, _limit) => {
+    var optionString; var titleText;
+    if(_option === positiveVote){
+      titleText = "Positive vote detected"
+      optionString = "success";
+    } else if(_option === neutralVote){
+      titleText = "Neutral vote detected"
+      optionString = "warning";
+    } else if(_option === negativeVote){
+      titleText = "Negative vote detected"
+      optionString = "error";
+    } await this.setState({
+      optionString: optionString,
+      option: titleText,
+      bubbleState: _stack,
+      bubbleStack: _limit }, this.addFlag());
   }
 
   getPositive = async() => {
@@ -548,19 +569,24 @@ class App extends Component {
       {this.state.id}
       </div>
         <div className="eventStats">
-        <div className="eventName"><FontAwesomeIcon color="#6f0cff" icon={faInfo} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}</div>
-        <div className="eventType"><FontAwesomeIcon color="#6f0cff" icon={faInfo} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}</div>
-        <div className="eventPositive"><FontAwesomeIcon color="#6f0cff" icon={faCheck} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}</div>
-        <div className="eventNeutral">&nbsp;&nbsp;<FontAwesomeIcon color="#6f0cff" icon={faBalanceScale} size='1x'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}</div>
-        <div className="eventNegative"><FontAwesomeIcon color="#6f0cff" icon={faTimes} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}</div>
+        <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.75) }}>
+        &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}</Paper>
+        <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.75) }}>
+        &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}</Paper>
+        <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.75) }}>
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}</Paper>
+        <Paper className="eventNeutral" style={{ backgroundColor: fade('#000000', 0.75) }}>
+        &nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}</Paper>
+        <Paper className="eventNegative" style={{ backgroundColor: fade('#000000', 0.75) }}>
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}</Paper>
         </div>
-        <div className="eventBorder">
-        </div>
+        <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#000000', 0.75) }}>
+        </Paper>
 
         <div className="votingBubbles">
         {this.state.bubbleComponent}
@@ -572,11 +598,12 @@ class App extends Component {
                      <AutoDismissFlag
                      actions={[
                           { content: 'Ok', onClick: this.handleDismiss }]}
-                       appearance='warning'
-                       id={flagId}
-                       key={flagId}
-                       title={this.state.option}
-                       icon={<FontAwesomeIcon color="#000000" icon={faUser} size='lg'/>}
+                          appearance={this.state.optionString}
+                          id={flagId}
+                          key={flagId}
+                          title={this.state.option}
+                          description={`Your current delegation stack in this option is: ${this.state.bubbleState} out of ${this.state.bubbleStack}`}
+                          icon={<FontAwesomeIcon color="#000000" icon={faUser} size='lg'/>}
                      />
                    );
                  })}
