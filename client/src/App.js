@@ -255,24 +255,14 @@ class App extends Component {
     );
   };
 
-  getCommune = async() => {
-       var totalBubbles = parseFloat(this.state.eventNegative) + parseFloat(this.state.eventPositive)
-       + parseFloat(this.state.eventNeutral) + parseFloat(this.state.voteBal)
-       console.log(totalBubbles);
-       await this.setState({
-         pool: totalBubbles
-       })
-     }
-
   renderBubbles = async() => {
-    await this.getCommune();
     await this.setState({ bubbleComponent:
       <Delegation
         width={window.screen.width}
         height={window.screen.height}
-        total={this.state.pool}
         vote={this.voteEvent}
         option={this.defineOption}
+        pool={this.state.log}
         negative={parseInt(this.state.eventNegative)}
         positive={parseInt(this.state.eventPositive)}
         neutral={parseInt(this.state.eventNeutral)}
@@ -503,24 +493,20 @@ class App extends Component {
   }
 
   getLog = async () => {
+    var delegationLog = { ids: [] }
     return await this.state.token.events.Vote({ fromBlock: 0, toBlock: 'latest' },
     (error, eventResult) => {
     if (error) { console.log(error);
     } else {
-      var array = [[],[],[],[]];
-      for(var x = 0; x < eventResult.length; x++ ){
-          var event = JSON.stringify(eventResult[x].args.subject).replace(/["]+/g, '');
-          if(event === this.state.eventSubject){
-          var choice = this.state.web3.utils.toAscii(JSON.stringify(eventResult[x].args.choice).replace(/["]+/g, ''))
-          var id = JSON.stringify(eventResult[x].args.vID).replace(/["]+/g, '')
-          var weight = JSON.stringify(eventResult[x].args.weight).replace(/["]+/g, '')
-          array[0].push(id)
-          array[1].push(choice)
-          array[2].push(weight)
+      var activeEvent = JSON.stringify(eventResult.returnValues.subject).replace(/["]+/g, '');
+      if(activeEvent === this.state.eventSubject){
+        var choice = this.state.web3.utils.toAscii(JSON.stringify(eventResult.returnValues.choice).replace(/["]+/g, ''))
+        var identifier = JSON.stringify(eventResult.returnValues.vID).replace(/["]+/g, '')
+        var weight = JSON.stringify(eventResult.returnValues.weight).replace(/["]+/g, '')
+        delegationLog[identifier] = { choice, weight }
         }
-      }
-      this.setState({log: array});
-    }
+     }
+     this.setState({log: delegationLog});
   })
 }
 
@@ -569,28 +555,43 @@ class App extends Component {
       {this.state.id}
       </div>
         <div className="eventStats">
-        <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.75) }}>
+        <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
         &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}</Paper>
-        <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.75) }}>
+        <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.825) }}>
         &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}</Paper>
-        <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.75) }}>
+        <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.825) }}>
         &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}</Paper>
-        <Paper className="eventNeutral" style={{ backgroundColor: fade('#000000', 0.75) }}>
+        <Paper className="eventNeutral" style={{ backgroundColor: fade('#000000', 0.825) }}>
         &nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}</Paper>
-        <Paper className="eventNegative" style={{ backgroundColor: fade('#000000', 0.75) }}>
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
+        <Paper className="eventNegative" style={{ backgroundColor: fade('#000000', 0.825) }}>
+        &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}</Paper>
         </div>
-        <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#000000', 0.75) }}>
+        <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
         </Paper>
+
+        <Paper className="votingMetrics" style={{ backgroundColor: fade('#000000', 0.825) }}>
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCrosshairs} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
+        </Paper>
+
+
 
         <div className="votingBubbles">
         {this.state.bubbleComponent}
         </div>
+
+
 
            <FlagGroup>
                  {this.state.flags.map(flagId => {

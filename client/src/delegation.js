@@ -94,7 +94,7 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
 
       if(i < staking.sum){
         xcord = 550;
-        ycord = 250;
+        ycord = 350;
       } else if(i >= staking.sum && i < staking.sum+neutral.sum+1){
         xcord = 900;
         ycord = 500 ;
@@ -163,7 +163,7 @@ class Delegation extends React.Component {
     super(props);
      this.state = {
        bubbleStack: computeBubbles(parseInt(props.staking)).sum,
-       items: this.genItems( props.width, props.height,
+       items: this.genItems(props.width, props.height,
         computeBubbles(parseInt(props.positive)),
           computeBubbles(parseInt(props.neutral)),
             computeBubbles(parseInt(props.negative)),
