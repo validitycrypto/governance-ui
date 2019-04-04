@@ -22,7 +22,9 @@ import {
 } from '@atlaskit/navigation-next';
 import Button from '@atlaskit/button';
 import { Reset, Theme } from '@atlaskit/theme';
+import InfoIcon from '@atlaskit/icon/glyph/info';
 import Page, { Grid, GridColumn } from '@atlaskit/page';
+import { InlineDialog, Flag, AutoDismissFlag, FlagGroup } from '@atlaskit/flag'
 import { faEdit, faInfo, faBullseye, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
@@ -73,7 +75,8 @@ class App extends Component {
     toggle: true,
     pool: 0,
     choice: "0x506f736974697665000000000000000000000000000000000000000000000000",
-    bubbleComponent: <div/>
+    bubbleComponent: <div/>,
+    flags: []
   };
 
   initialiseData = async () => {
@@ -96,7 +99,6 @@ class App extends Component {
       await this.getLog();
       await this.getBalances();
       await this.renderBubbles();
-
   }
 
   refreshData = async () => {
@@ -262,6 +264,7 @@ class App extends Component {
         height={window.screen.height}
         total={this.state.pool}
         vote={this.voteEvent}
+        option={this.defineOption}
         negative={parseInt(this.state.eventNegative)}
         positive={parseInt(this.state.eventPositive)}
         neutral={parseInt(this.state.eventNeutral)}
@@ -317,6 +320,24 @@ class App extends Component {
     })
   }
 }
+
+  handleDismiss = () => {
+    this.setState(prevState => ({
+      flags: prevState.flags.slice(1),
+    }));
+  };
+
+  addFlag = () => {
+    const newFlagId = this.state.flags.length + 1;
+    const flags = this.state.flags.slice();
+    flags.splice(0, 0, newFlagId);
+    this.setState({ flags });
+  }
+
+  defineOption = async(_option) => {
+    await this.setState({ option: _option })
+    this.addFlag();
+  }
 
   getPositive = async() => {
     const stat = await this.state.token.methods.positiveVotes(this.state.id).call()
@@ -523,7 +544,6 @@ class App extends Component {
       </GridColumn>
       <GridColumn>
 
-
       <div className="validatingIdentifier">
       {this.state.id}
       </div>
@@ -545,6 +565,22 @@ class App extends Component {
         <div className="votingBubbles">
         {this.state.bubbleComponent}
         </div>
+
+           <FlagGroup>
+                 {this.state.flags.map(flagId => {
+                   return (
+                     <AutoDismissFlag
+                     actions={[
+                          { content: 'Ok', onClick: this.handleDismiss }]}
+                       appearance='warning'
+                       id={flagId}
+                       key={flagId}
+                       title={this.state.option}
+                       icon={<FontAwesomeIcon color="#000000" icon={faUser} size='lg'/>}
+                     />
+                   );
+                 })}
+           </FlagGroup>
 
          </GridColumn>
          </Grid>

@@ -99,25 +99,23 @@ function genCircles({ width, height, positive, neutral, negative, staking }) {
         radius = 5;
       }
 
-
       operativeY = radius/4 * counter;
       operativeX = radius/4 * counter;
 
-      if(i < staking.sum){
+      if(i <= staking.sum){
         xcord = 550;
         ycord = 250;
-      } else if(i >= staking.sum && i < positive.sum+neutral.sum+2){
+      } else if(i > staking.sum && i <= staking.sum+neutral.sum+1){
         xcord = 900;
         ycord = 500 ;
-      } else if(i >= staking.sum+neutral.sum+2
-        && i < staking.sum+neutral.sum+negative.sum+3){
+      } else if(i > staking.sum+neutral.sum+1
+        && i <= staking.sum+neutral.sum+negative.sum+2){
         xcord = 200;
         ycord = 500;
-      } else if( i >= staking.sum+neutral.sum+negative.sum+3){
+      } else if( i > staking.sum+neutral.sum+negative.sum+2){
         xcord = 200;
         ycord = 100
       }
-
 
      return {
         id: i,
@@ -180,13 +178,15 @@ class Delegation extends React.Component {
           computeBubbles(parseInt(props.neutral)),
             computeBubbles(parseInt(props.negative)),
               computeBubbles(parseInt(props.staking))),
-              bubbleState: 0 };
+              bubbleState: 0,
+
+            };
        this.colorScale = scaleOrdinal({
         range: this.colorSortation(
           computeBubbles(parseInt(props.staking)).sum+1,
             computeBubbles(parseInt(props.neutral)).sum+1,
               computeBubbles(parseInt(props.negative)).sum+1,
-                computeBubbles(parseInt(props.positive)).sum),
+                computeBubbles(parseInt(props.positive)).sum+1),
         domain: this.state.items.map(d => d.id)
         });
       }
@@ -260,9 +260,10 @@ class Delegation extends React.Component {
                     console.log("ID", d.id);
                     console.log("X", dx);
                     console.log("Y", dy);
-                    if(dx > 300 && dy < -150){
+                    if(dx < -50 && dy < -37.5){
                       console.log("POSITIVE");
                       if(this.state.log == true){
+                        this.props.option(positiveVote)
                         this.setState({
                           bubbleState: this.state.bubbleState+1,
                           votingOption: positiveVote,
@@ -272,15 +273,17 @@ class Delegation extends React.Component {
                     } else if(dx > 275 && dy > 150){
                       console.log("NEUTRAL");
                       if(this.state.log == true){
+                        this.props.option(neutralVote)
                         this.setState({
                           bubbleState: this.state.bubbleState+1,
                           votingOption: neutralVote,
                           log: false,
                         })
                       }
-                    } else if(dx < -200 && dy > 150){
+                    } else if(dx < -200 && dy > 37.5){
                       console.log("NEGATIVE");
                       if(this.state.log == true){
+                        this.props.option(negativeVote)
                         this.setState({
                           bubbleState: this.state.bubbleState+1,
                           votingOption: negativeVote,
