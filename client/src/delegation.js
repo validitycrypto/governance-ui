@@ -163,6 +163,7 @@ class Delegation extends React.Component {
     super(props);
      this.state = {
        bubbleStack: computeBubbles(parseInt(props.staking)).sum,
+       poolData: this.transcribeData(props.pool),
        items: this.genItems(props.width, props.height,
         computeBubbles(parseInt(props.positive)),
           computeBubbles(parseInt(props.neutral)),
@@ -195,6 +196,71 @@ class Delegation extends React.Component {
   return(Array(_positive).fill(stake).concat(Array(_neutral).fill
     (neut).concat(Array(_negative).fill(neg).concat(Array(_staking)
     .fill(pos)))));
+  }
+
+  transcribeData = async(_data) => {
+    var outputArray = []
+    await Object.entries(_data).forEach(async(x,y) => {
+      outputArray.push(await this.testGeneration(x[0], x[1].choice, x[1].weight))
+    })
+    outputArray = outputArray[0].concat(outputArray[1]).concat(outputArray[2])
+    this.setState({ items: outputArray })
+  }
+
+ testGeneration = async(_id, _option, _stack) => {
+   var totalBubbles = computeBubbles(_stack)
+   var counter = 0;
+     return Array(totalBubbles.sum)
+      .fill(1)
+      .map((d, i) => {
+        var largeBubbles; var mediumBubbles; var smallBubbles; var tinyBubbles; var minuteBubbles;
+        var radius = Math.floor(Math.random() * 10) + 5
+        var xcord; var ycord; var option;
+        largeBubbles = totalBubbles.data[0];
+        mediumBubbles = totalBubbles.data[1];
+        smallBubbles = totalBubbles.data[2];
+        tinyBubbles = totalBubbles.data[3];
+        minuteBubbles = totalBubbles.data[4];
+
+        if(_option === positiveVote){
+          xcord = 900;
+          ycord = 500;
+        } else if(_option === neutralVote){
+          xcord = 200;
+          ycord = 500;
+        } else if(_option === negativeVote){
+          xcord = 200;
+          ycord = 100
+        }
+
+        if(counter < largeBubbles){
+          radius = 15;
+        } else if(counter >= largeBubbles
+          && counter < largeBubbles+mediumBubbles){
+          radius = 12.5;
+        } else if(counter >= largeBubbles+mediumBubbles
+          && counter < largeBubbles+mediumBubbles+smallBubbles){
+          radius = 10;
+        } else if(counter >= largeBubbles+mediumBubbles+smallBubbles
+          && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
+          radius = 7.5;
+        } else if(counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
+          && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
+          radius = 5;
+        }
+
+        var operativeY = radius/2 * counter;
+        var operativeX = radius/2 * counter;
+        counter++;
+
+       return {
+          id: i,
+          owner: _id,
+          radius,
+          x: xcord + operativeX * Math.cos(2 * Math.PI * counter / radius),
+          y: ycord + operativeY * Math.sin(2 * Math.PI * counter / radius)
+        };
+      });
   }
 
   render() {
@@ -247,6 +313,7 @@ class Delegation extends React.Component {
                 dy,
               }) => {
                   if(isDragging && d.id > 2){
+                    console.log("OWNER", d.owner);
                     console.log("ID", d.id);
                     console.log("X", dx);
                     console.log("Y", dy);
