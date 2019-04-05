@@ -106,6 +106,7 @@ class App extends Component {
       await this.eventNeutral();
       await this.getLog();
       await this.getBalances();
+      await this.gatherMetrics();
       await this.renderBubbles();
   }
 
@@ -123,6 +124,7 @@ class App extends Component {
       await this.eventNegative();
       await this.eventNeutral();
       await this.getLog();
+      await this.gatherMetrics();
       await this.renderBubbles();
   }
 
@@ -258,16 +260,16 @@ class App extends Component {
   renderBubbles = async() => {
     await this.setState({ bubbleComponent:
       <Delegation
-        width={window.screen.width}
-        height={window.screen.height}
-        vote={this.voteEvent}
-        option={this.defineOption}
-        pool={this.state.log}
         negative={parseInt(this.state.eventNegative)}
         positive={parseInt(this.state.eventPositive)}
         neutral={parseInt(this.state.eventNeutral)}
-        staking={this.state.voteBal}
-        />
+        user={this.state.userMetrics}
+        height={window.screen.height}
+        width={window.screen.width}
+        option={this.defineOption}
+        pool={this.state.log}
+        vote={this.voteEvent}
+      />
     })
   }
 
@@ -289,7 +291,7 @@ class App extends Component {
 
   getBalances = async() => {
     const value = await this.state.token.methods.balanceOf(this.state.account).call();
-    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2), voteBal: parseFloat(value/decimal)/10000 })
+    await this.setState({ tokenBal: parseFloat(value/decimal).toFixed(2) })
     await this.state.web3.eth.getBalance(this.state.account,
       async(error, value) => {
         if(error){
@@ -299,6 +301,12 @@ class App extends Component {
           this.setState({ gasBal: value })
         }
       })
+  }
+
+  gatherMetrics = async() => {
+    var delegationWeight = parseInt(this.state.tokenBal/10000);
+    var rawMetrics = { id: this.state.id, weight: delegationWeight }
+    this.setState({ userMetrics: rawMetrics });
   }
 
   getvID = async() => {
@@ -493,14 +501,14 @@ class App extends Component {
   }
 
   getLog = async () => {
-    var delegationLog = { ids: [] }
+    var delegationLog = { }
     return await this.state.token.events.Vote({ fromBlock: 0, toBlock: 'latest' },
     (error, eventResult) => {
     if (error) { console.log(error);
     } else {
       var activeEvent = JSON.stringify(eventResult.returnValues.subject).replace(/["]+/g, '');
       if(activeEvent === this.state.eventSubject){
-        var choice = this.state.web3.utils.toAscii(JSON.stringify(eventResult.returnValues.choice).replace(/["]+/g, ''))
+        var choice = JSON.stringify(eventResult.returnValues.choice).replace(/["]+/g, '')
         var identifier = JSON.stringify(eventResult.returnValues.vID).replace(/["]+/g, '')
         var weight = JSON.stringify(eventResult.returnValues.weight).replace(/["]+/g, '')
         delegationLog[identifier] = { choice, weight }

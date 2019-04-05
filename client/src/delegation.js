@@ -20,103 +20,6 @@ var smallBubble =  500;
 var tinyBubble =  250;
 var minuteBubble = 100;
 
-function genCircles({ width, height, positive, neutral, negative, staking }) {
-  var num = positive.sum + 1 + neutral.sum + 1 + negative.sum + 1 + staking.sum;
-  var positiveCounter = 0;
-  var negativeCounter = 0;
-  var neutralCounter = 0;
-  var stakingCounter = 0;
-   return Array(num)
-    .fill(1)
-    .map((d, i) => {
-      var largeBubbles; var mediumBubbles; var smallBubbles; var tinyBubbles; var minuteBubbles;
-      var radius = Math.floor(Math.random() * 10) + 5
-      var xcord; var ycord; var option;
-      var counter = 0;
-
-      if(i < staking.sum){
-        largeBubbles = staking.data[0];
-        mediumBubbles = staking.data[1];
-        smallBubbles = staking.data[2];
-        tinyBubbles = staking.data[3];
-        minuteBubbles = staking.data[4];
-        stakingCounter++;
-        counter = stakingCounter;
-        option = staking.sum;
-      } else if(i >= staking.sum && i < staking.sum+neutral.sum+1){
-        largeBubbles = neutral.data[0];
-        mediumBubbles = neutral.data[1];
-        smallBubbles = neutral.data[2];
-        tinyBubbles = neutral.data[3];
-        minuteBubbles = neutral.data[4];
-        neutralCounter++;
-        counter = neutralCounter;
-        option = positive.sum+1;
-      } else if(i >= staking.sum+neutral.sum+1
-        && i < staking.sum+neutral.sum+negative.sum+2){
-        largeBubbles = negative.data[0];
-        mediumBubbles = negative.data[1];
-        smallBubbles = negative.data[2];
-        tinyBubbles = negative.data[3];
-        minuteBubbles = negative.data[4];
-        negativeCounter++;
-        counter = negativeCounter;
-        option = negative.sum+1;
-      } else if( i >= staking.sum+neutral.sum+negative.sum+2){
-        largeBubbles = positive.data[0];
-        mediumBubbles = positive.data[1];
-        smallBubbles = positive.data[2];
-        tinyBubbles = positive.data[3];
-        minuteBubbles = positive.data[4];
-        positiveCounter++;
-        counter = positiveCounter;
-        option = positive.sum+1;
-      }
-
-      if(counter < largeBubbles){
-        radius = 15;
-      } else if(counter >= largeBubbles
-        && counter < largeBubbles+mediumBubbles){
-        radius = 12.5;
-      } else if(counter >= largeBubbles+mediumBubbles
-        && counter < largeBubbles+mediumBubbles+smallBubbles){
-        radius = 10;
-      } else if(counter >= largeBubbles+mediumBubbles+smallBubbles
-        && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
-        radius = 7.5;
-      } else if(counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
-        && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
-        radius = 5;
-      }
-
-      var operativeY = radius/2 * counter;
-      var operativeX = radius/2 * counter;
-
-      if(i < staking.sum){
-        xcord = 550;
-        ycord = 350;
-      } else if(i >= staking.sum && i < staking.sum+neutral.sum+1){
-        xcord = 900;
-        ycord = 500 ;
-      } else if(i >= staking.sum+neutral.sum+1
-        && i < staking.sum+neutral.sum+negative.sum+2){
-        xcord = 200;
-        ycord = 500;
-      } else if( i >= staking.sum+neutral.sum+negative.sum+2){
-        xcord = 200;
-        ycord = 100
-      }
-
-     return {
-        id: i,
-        owner: d,
-        radius,
-        x: xcord + operativeX * Math.cos(2 * Math.PI * counter / radius),
-        y: ycord + operativeY * Math.sin(2 * Math.PI * counter / radius)
-      };
-    });
-}
-
 function computeBubbles(_amount) {
     var minuteAmount = 0;
     var mediumAmount = 0;
@@ -162,52 +65,37 @@ class Delegation extends React.Component {
   constructor(props) {
     super(props);
      this.state = {
-       bubbleStack: computeBubbles(parseInt(props.staking)).sum,
-       poolData: this.transcribeData(props.pool),
-       items: this.genItems(props.width, props.height,
-        computeBubbles(parseInt(props.positive)),
-          computeBubbles(parseInt(props.neutral)),
-            computeBubbles(parseInt(props.negative)),
-              computeBubbles(parseInt(props.staking))),
-              bubbleState: 0,
-
-            };
-       this.colorScale = scaleOrdinal({
-        range: this.colorSortation(
-          computeBubbles(parseInt(props.staking)).sum,
-            computeBubbles(parseInt(props.neutral)).sum+1,
-              computeBubbles(parseInt(props.negative)).sum+1,
-                computeBubbles(parseInt(props.positive)).sum+1),
+       bubbleStack: computeBubbles(props.user.weight).sum,
+       items: this.transcribeData(props.pool, props.user),
+       bubbleState: 0
+     }; this.colorScale = scaleOrdinal({
+       range: this.colorSortation(
+         computeBubbles(props.user.weight).sum,
+          computeBubbles(props.neutral).sum,
+           computeBubbles(props.negative).sum,
+            computeBubbles(props.positive).sum),
         domain: this.state.items.map(d => d.id)
-        });
-      }
-
-  genItems = (width, height, positive, neutral, negative, staking) =>
-    genCircles({
-      width: width,
-      height: height,
-      positive: positive,
-      neutral: neutral,
-      negative: negative,
-      staking: staking
-  });
-
-  colorSortation = (_positive, _neutral, _negative, _staking) => {
-  return(Array(_positive).fill(stake).concat(Array(_neutral).fill
-    (neut).concat(Array(_negative).fill(neg).concat(Array(_staking)
-    .fill(pos)))));
+     })
   }
 
-  transcribeData = async(_data) => {
-    var outputArray = []
-    await Object.entries(_data).forEach(async(x,y) => {
-      outputArray.push(await this.testGeneration(x[0], x[1].choice, x[1].weight))
-    })
-    outputArray = outputArray[0].concat(outputArray[1]).concat(outputArray[2])
-    this.setState({ items: outputArray })
+  colorSortation = (_stake, _neutral, _negative, _positive) => {
+    var colorIndexes = Array(_stake).fill(stake).concat(Array(_neutral).fill(neut)
+    .concat(Array(_negative).fill(neg).concat(Array(_positive).fill(pos))));
+    return colorIndexes;
   }
 
- testGeneration = async(_id, _option, _stack) => {
+  transcribeData = (_poolData, _userData) => {
+    var outputArray = []; var transcribeArray = []; var bubbleId = 0;
+    transcribeArray.push(this.testGeneration(_userData.id, "0x0", _userData.weight, bubbleId))
+    bubbleId = transcribeArray[0].length;
+    Object.entries(_poolData).forEach((data, index) => {
+      transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
+      bubbleId = bubbleId + transcribeArray[index].length;
+    }); transcribeArray.forEach((x,y) => outputArray = outputArray.concat(transcribeArray[y]))
+    return outputArray;
+  }
+
+ testGeneration = (_id, _option, _stack, _bubbleId) => {
    var totalBubbles = computeBubbles(_stack)
    var counter = 0;
      return Array(totalBubbles.sum)
@@ -231,6 +119,9 @@ class Delegation extends React.Component {
         } else if(_option === negativeVote){
           xcord = 200;
           ycord = 100
+        } else if(_option === "0x0"){
+          xcord = 550;
+          ycord = 350;
         }
 
         if(counter < largeBubbles){
@@ -254,7 +145,7 @@ class Delegation extends React.Component {
         counter++;
 
        return {
-          id: i,
+          id: i + _bubbleId,
           owner: _id,
           radius,
           x: xcord + operativeX * Math.cos(2 * Math.PI * counter / radius),
@@ -285,6 +176,8 @@ class Delegation extends React.Component {
                 await this.setState({
                   log: true
                 })
+                console.log("vID", d.owner);
+                console.log("Bubble ID", d.id);
                 console.log("Total Bubbles:", this.state.bubbleStack)
                 console.log("State Bubbles:", this.state.bubbleState)
                 if(this.state.bubbleStack == this.state.bubbleState){
@@ -312,11 +205,7 @@ class Delegation extends React.Component {
                 dx,
                 dy,
               }) => {
-                  if(isDragging && d.id > 2){
-                    console.log("OWNER", d.owner);
-                    console.log("ID", d.id);
-                    console.log("X", dx);
-                    console.log("Y", dy);
+                  if(isDragging){
                     if(dx < -50 && dy < -37.5){
                       console.log("POSITIVE");
                       if(this.state.log == true){
