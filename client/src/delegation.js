@@ -75,31 +75,33 @@ class Delegation extends React.Component {
         range: bubbleData.indexes
      })
   }
+  
   transcribeData = (_poolData, _userData) => {
     var outputArray = []; var transcribeArray = []; var colorArray = []; var bubbleId = 0;
     transcribeArray.push(this.testGeneration(_userData.id, "0x0", _userData.weight, bubbleId))
     colorArray = Array(transcribeArray[0].length).fill(stake);
-    if(this.props.positive == 1) {
-     bubbleId = transcribeArray[0].length;
+    bubbleId = transcribeArray[0].length;
+    if(this.props.positive == 0) {
      transcribeArray.push(this.dummyBubble(positiveVote, bubbleId))
      colorArray.push(pos);
-   } if(this.props.neutral == 1){
-     bubbleId = transcribeArray[0].length;
+     bubbleId++;
+   } if(this.props.neutral == 0){
      transcribeArray.push(this.dummyBubble(neutralVote, bubbleId))
-     colorArray.push(neut); bubbleId++;
-   } if(this.props.negative == 1){
-     bubbleId = transcribeArray[0].length;
+     colorArray.push(neut);
+     bubbleId++;
+   } if(this.props.negative == 0){
      transcribeArray.push(this.dummyBubble(negativeVote, bubbleId))
-     colorArray.push(neg); bubbleId++;
+     colorArray.push(neg);
+     bubbleId++;
    } Object.entries(_poolData).forEach((data, index) => {
-      bubbleId = bubbleId + transcribeArray[index].length;
-      transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
-      if(data[1].choice == positiveVote) this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
-      else if(data[1].choice == negativeVote) this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
-      else if(data[1].choice == neutralVote) this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
-    });transcribeArray.forEach((x,y) =>
+      if(data[1].choice != undefined){
+        transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
+        bubbleId = bubbleId + transcribeArray[index].length;
+        if(data[1].choice == positiveVote) this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
+        else if(data[1].choice == negativeVote) this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
+        else if(data[1].choice == neutralVote) this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
+   } }); transcribeArray.forEach((x,y) =>
      outputArray = outputArray.concat(transcribeArray[y]))
-     console.log(outputArray, colorArray)
      return { items: outputArray, indexes: colorArray };
   }
 

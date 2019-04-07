@@ -424,7 +424,6 @@ class App extends Component {
 
   eventPositive = async() => {
     var stat = await this.state.dapp.methods.eventPositive(this.state.eventSubject, this.state.round).call()
-    if(parseFloat(stat) == 0) stat = 1;
     await this.setState({
       eventPositive: stat
     })
@@ -432,7 +431,6 @@ class App extends Component {
 
   eventNegative = async() => {
     var stat = await this.state.dapp.methods.eventNegative(this.state.eventSubject, this.state.round).call()
-    if(parseFloat(stat) == 0) stat = 1;
     await this.setState({
       eventNegative: parseFloat(stat).toFixed(2)
     })
@@ -440,7 +438,6 @@ class App extends Component {
 
   eventNeutral = async() => {
     var stat = await this.state.dapp.methods.eventNeutral(this.state.eventSubject, this.state.round).call()
-    if(parseFloat(stat) == 0) stat = 1;
     await this.setState({
       eventNeutral: parseFloat(stat).toFixed(2)
     })
