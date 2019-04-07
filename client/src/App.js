@@ -305,6 +305,7 @@ class App extends Component {
 
   gatherMetrics = async() => {
     var delegationWeight = parseInt(this.state.tokenBal/10000);
+    if(this.state.stake === "False" || this.state.voted === "True") delegationWeight = 0;
     var rawMetrics = { id: this.state.id, weight: delegationWeight }
     this.setState({ voteBal: delegationWeight, userMetrics: rawMetrics });
   }

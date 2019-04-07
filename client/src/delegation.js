@@ -15,7 +15,7 @@ const pos = ['#0cff6d']
 const stake = ['#0cffe9']
 
 var largeBubble =  10000;
-var mediumBubble =  1000;
+var mediumBubble =  5000;
 var smallBubble =  500;
 var tinyBubble =  250;
 var minuteBubble = 100;
@@ -28,31 +28,28 @@ function computeBubbles(_amount) {
     var largeAmount = 0;
     var remainder;
 
+
     if(_amount >= largeBubble){
-      remainder = _amount % largeBubble;
-      largeAmount = Math.floor(_amount/largeBubble);
-      _amount = _amount - remainder;
-    }
-    if(_amount != 0){
-      remainder = _amount % mediumBubble;
-      mediumAmount = Math.floor(_amount/mediumBubble);
-      _amount = _amount - remainder;
-    }
-    if(_amount != 0){
-        remainder = _amount % smallBubble;
-        smallAmount = Math.floor(_amount/smallBubble);
-        _amount = _amount - remainder;
-    }
-    if(_amount != 0){
-          remainder = _amount % tinyBubble;
-          tinyAmount = Math.floor(_amount/tinyBubble);
-          _amount = _amount - remainder;
-   } if (_amount != 0) {
-            remainder = _amount % minuteBubble;
-            minuteAmount = Math.floor(_amount/minuteBubble);
-            _amount = _amount - remainder;
+      largeAmount = Math.floor(_amount / largeBubble);
+      _amount = _amount - (largeAmount*_amount);;
     }
 
+    if(_amount >= mediumBubble){
+      mediumAmount = Math.floor(_amount / mediumBubble);
+      _amount = _amount - (mediumAmount*_amount);
+    }
+
+    if(_amount >= smallBubble){
+        smallAmount = Math.floor(_amount / smallBubble);
+        _amount = _amount - (smallAmount*_amount);
+    }
+    if(_amount >= tinyBubble){
+          tinyAmount = Math.floor(_amount / tinyBubble);
+          _amount = _amount - tinyAmount;
+   } if (_amount >= minuteBubble) {
+            minuteAmount = Math.floor(_amount / minuteBubble);
+            _amount = _amount - (minuteAmount*_amount);
+    }
 
     var data = [ largeAmount, mediumAmount, smallAmount, tinyAmount, smallAmount ]
     var sum = largeAmount+mediumAmount+smallAmount+tinyAmount+smallAmount
@@ -75,7 +72,7 @@ class Delegation extends React.Component {
         range: bubbleData.indexes
      })
   }
-  
+
   transcribeData = (_poolData, _userData) => {
     var outputArray = []; var transcribeArray = []; var colorArray = []; var bubbleId = 0;
     transcribeArray.push(this.testGeneration(_userData.id, "0x0", _userData.weight, bubbleId))
@@ -95,8 +92,8 @@ class Delegation extends React.Component {
      bubbleId++;
    } Object.entries(_poolData).forEach((data, index) => {
       if(data[1].choice != undefined){
-        transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
         bubbleId = bubbleId + transcribeArray[index].length;
+        transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
         if(data[1].choice == positiveVote) this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == negativeVote) this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == neutralVote) this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
@@ -147,7 +144,7 @@ class Delegation extends React.Component {
         }
 
         if(counter < largeBubbles){
-          radius = 15;
+          radius = 17.5;
         } else if(counter >= largeBubbles
           && counter < largeBubbles+mediumBubbles){
           radius = 12.5;
@@ -162,8 +159,8 @@ class Delegation extends React.Component {
           radius = 5;
         }
 
-        var operativeY = radius/2 * counter;
-        var operativeX = radius/2 * counter;
+        var operativeY = (radius*2.5) * counter;
+        var operativeX = (radius*2.5) * counter;
         counter++;
 
        return {
