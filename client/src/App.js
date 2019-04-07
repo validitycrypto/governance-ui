@@ -306,7 +306,7 @@ class App extends Component {
   gatherMetrics = async() => {
     var delegationWeight = parseInt(this.state.tokenBal/10000);
     var rawMetrics = { id: this.state.id, weight: delegationWeight }
-    this.setState({ userMetrics: rawMetrics });
+    this.setState({ voteBal: delegationWeight, userMetrics: rawMetrics });
   }
 
   getvID = async() => {
@@ -423,21 +423,24 @@ class App extends Component {
   }
 
   eventPositive = async() => {
-    const stat = await this.state.dapp.methods.eventPositive(this.state.eventSubject, this.state.round).call()
+    var stat = await this.state.dapp.methods.eventPositive(this.state.eventSubject, this.state.round).call()
+    if(parseFloat(stat) == 0) stat = 1;
     await this.setState({
-      eventPositive: parseFloat(stat).toFixed(2)
+      eventPositive: stat
     })
   }
 
   eventNegative = async() => {
-    const stat = await this.state.dapp.methods.eventNegative(this.state.eventSubject, this.state.round).call()
+    var stat = await this.state.dapp.methods.eventNegative(this.state.eventSubject, this.state.round).call()
+    if(parseFloat(stat) == 0) stat = 1;
     await this.setState({
       eventNegative: parseFloat(stat).toFixed(2)
     })
   }
 
   eventNeutral = async() => {
-    const stat = await this.state.dapp.methods.eventNeutral(this.state.eventSubject, this.state.round).call()
+    var stat = await this.state.dapp.methods.eventNeutral(this.state.eventSubject, this.state.round).call()
+    if(parseFloat(stat) == 0) stat = 1;
     await this.setState({
       eventNeutral: parseFloat(stat).toFixed(2)
     })

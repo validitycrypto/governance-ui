@@ -15,7 +15,7 @@ const pos = ['#0cff6d']
 const stake = ['#0cffe9']
 
 var largeBubble =  10000;
-var mediumBubble =  2500;
+var mediumBubble =  1000;
 var smallBubble =  500;
 var tinyBubble =  250;
 var minuteBubble = 100;
@@ -64,40 +64,60 @@ function computeBubbles(_amount) {
 class Delegation extends React.Component {
   constructor(props) {
     super(props);
+    var bubbleData = this.transcribeData(props.pool, props.user)
      this.state = {
        bubbleStack: computeBubbles(props.user.weight).sum,
-       items: this.transcribeData(props.pool, props.user),
+       items: bubbleData.items,
        bubbleState: 0
-     }; this.colorScale = scaleOrdinal({
-       range: this.colorSortation(
-         computeBubbles(props.user.weight).sum,
-          computeBubbles(props.neutral).sum,
-           computeBubbles(props.negative).sum,
-            computeBubbles(props.positive).sum),
-        domain: this.state.items.map(d => d.id)
+     };
+     this.colorScale = scaleOrdinal({
+        domain: this.state.items.map(d => d.id),
+        range: bubbleData.indexes
      })
   }
-
-  colorSortation = (_stake, _neutral, _negative, _positive) => {
-    var colorIndexes = Array(_stake).fill(stake).concat(Array(_neutral).fill(neut)
-    .concat(Array(_negative).fill(neg).concat(Array(_positive).fill(pos))));
-    return colorIndexes;
+  transcribeData = (_poolData, _userData) => {
+    var outputArray = []; var transcribeArray = []; var colorArray = []; var bubbleId = 0;
+    transcribeArray.push(this.testGeneration(_userData.id, "0x0", _userData.weight, bubbleId))
+    colorArray = Array(transcribeArray[0].length).fill(stake);
+    if(this.props.positive == 1) {
+     bubbleId = transcribeArray[0].length;
+     transcribeArray.push(this.dummyBubble(positiveVote, bubbleId))
+     colorArray.push(pos);
+   } if(this.props.neutral == 1){
+     bubbleId = transcribeArray[0].length;
+     transcribeArray.push(this.dummyBubble(neutralVote, bubbleId))
+     colorArray.push(neut); bubbleId++;
+   } if(this.props.negative == 1){
+     bubbleId = transcribeArray[0].length;
+     transcribeArray.push(this.dummyBubble(negativeVote, bubbleId))
+     colorArray.push(neg); bubbleId++;
+   } Object.entries(_poolData).forEach((data, index) => {
+      bubbleId = bubbleId + transcribeArray[index].length;
+      transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
+      if(data[1].choice == positiveVote) this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
+      else if(data[1].choice == negativeVote) this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
+      else if(data[1].choice == neutralVote) this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
+    });transcribeArray.forEach((x,y) =>
+     outputArray = outputArray.concat(transcribeArray[y]))
+     console.log(outputArray, colorArray)
+     return { items: outputArray, indexes: colorArray };
   }
 
-  transcribeData = (_poolData, _userData) => {
-    var outputArray = []; var transcribeArray = []; var bubbleId = 0;
-    transcribeArray.push(this.testGeneration(_userData.id, "0x0", _userData.weight, bubbleId))
-    bubbleId = transcribeArray[0].length;
-    Object.entries(_poolData).forEach((data, index) => {
-      transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
-      bubbleId = bubbleId + transcribeArray[index].length;
-    }); transcribeArray.forEach((x,y) => outputArray = outputArray.concat(transcribeArray[y]))
-    return outputArray;
+  fillArray = (_array, _value, _amount) => {
+    for(var x = 0; x < _amount; x++){
+      _array.push(_value);
+    } return _array;
+  }
+
+  dummyBubble = (_choice, _id) => {
+    var returnArray = this.testGeneration("0x0", _choice, 0, _id);
+    return returnArray
   }
 
  testGeneration = (_id, _option, _stack, _bubbleId) => {
    var totalBubbles = computeBubbles(_stack)
    var counter = 0;
+   if(totalBubbles.sum == 0) totalBubbles.sum = 1;
      return Array(totalBubbles.sum)
       .fill(1)
       .map((d, i) => {
@@ -110,13 +130,13 @@ class Delegation extends React.Component {
         tinyBubbles = totalBubbles.data[3];
         minuteBubbles = totalBubbles.data[4];
 
-        if(_option === positiveVote){
+        if(_option === neutralVote){
           xcord = 900;
           ycord = 500;
-        } else if(_option === neutralVote){
+        } else if(_option === negativeVote){
           xcord = 200;
           ycord = 500;
-        } else if(_option === negativeVote){
+        } else if(_option === positiveVote){
           xcord = 200;
           ycord = 100
         } else if(_option === "0x0"){
