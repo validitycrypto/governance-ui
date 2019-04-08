@@ -2,6 +2,12 @@ import React from 'react';
 import { scaleOrdinal } from '@vx/scale';
 import { LinearGradient } from '@vx/gradient';
 import { Drag, raise } from '@vx/drag';
+import {
+  Spotlight,
+  SpotlightManager,
+  SpotlightTarget,
+  SpotlightTransition,
+} from '@atlaskit/onboarding';
 
 import "./css/bubble.css";
 
@@ -57,10 +63,12 @@ class Delegation extends React.Component {
   constructor(props) {
     super(props);
     var bubbleData = this.transcribeData(props.pool, props.user)
+    console.log(bubbleData)
      this.state = {
        bubbleStack: computeBubbles(props.user.weight).sum,
        items: bubbleData.items,
-       bubbleState: 0
+       bubbleState: 0,
+       active: false
      };
      this.colorScale = scaleOrdinal({
         domain: this.state.items.map(d => d.id),
@@ -92,6 +100,7 @@ class Delegation extends React.Component {
         if(data[1].choice == positiveVote) this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == negativeVote) this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == neutralVote) this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
+        bubbleId++;
    }}); transcribeArray.forEach((x,y) =>
      outputArray = outputArray.concat(transcribeArray[y]))
      return { items: outputArray, indexes: colorArray };
@@ -107,6 +116,7 @@ class Delegation extends React.Component {
     var returnArray = this.testGeneration("0x0", _choice, 0, _id);
     return returnArray
   }
+
 
  testGeneration = (_id, _option, _stack, _bubbleId) => {
    var totalBubbles = computeBubbles(_stack)
@@ -159,6 +169,8 @@ class Delegation extends React.Component {
        return {
           id: i + _bubbleId,
           owner: _id,
+          weight: _stack,
+          option: _option,
           radius,
           x: xcord + operativeX * Math.cos(2 * Math.PI * i / radius),
           y: ycord + operativeY * Math.sin(2 * Math.PI * i / radius)
@@ -169,7 +181,29 @@ class Delegation extends React.Component {
   render() {
     const { width, height } = this.props;
     return (
+      <SpotlightManager>
       <div className="Drag" style={{ touchAction: 'none' }}>
+        {this.state.active && (
+          <Spotlight
+            actions={[
+              {
+                onClick: () => this.setState({ active: false }),
+                text: 'Dismiss',
+              },
+            ]}
+            dialogPlacement="bottom left"
+            key={this.state.target}
+            target={this.state.target}
+            targetRadius={25}
+            dialogWidth={600}
+          >
+          <p>vID: <b>{this.state.voter}</b></p>
+          <br></br>
+          <p>Choice: <b>{this.state.option.substring(0, this.state.option.length - 35)}</b></p>
+          <br></br>
+          <p>Weight: <b>{this.state.weight}</b></p>
+          </Spotlight>
+        )}
         <svg width={width} height={height}>
           <LinearGradient id="stroke" from="#ff00a5" to="#ffc500" />
           <rect
@@ -252,6 +286,7 @@ class Delegation extends React.Component {
                 }
 
                 return (
+                  <SpotlightTarget name={d.id}>
                   <circle
                     key={`dot-${d.id}`}
                     cx={d.x}
@@ -266,6 +301,15 @@ class Delegation extends React.Component {
                     fillOpacity={0.75}
                     stroke={isDragging ? 'white' : 'black'}
                     strokeWidth={2}
+                    onMouseEnter={async () => {
+                      if(d.option != "0x0"){
+                      await this.setState({
+                        target: d.id,
+                        voter: d.owner,
+                        weight: d.weight,
+                        option: d.option })
+                      await this.setState({ active: true })
+                    }}}
                     onMouseMove={dragMove}
                     onMouseUp={dragEnd}
                     onMouseDown={dragStart}
@@ -273,12 +317,14 @@ class Delegation extends React.Component {
                     onTouchMove={dragMove}
                     onTouchEnd={dragEnd}
                   />
+                  </SpotlightTarget>
                 );
               }}
             </Drag>
           ))}
         </svg>
       </div>
+      </SpotlightManager>
     );
   }
 }
