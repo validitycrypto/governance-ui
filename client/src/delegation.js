@@ -16,39 +16,34 @@ const stake = ['#0cffe9']
 
 var largeBubble =  10000;
 var mediumBubble =  5000;
-var smallBubble =  500;
-var tinyBubble =  250;
+var smallBubble =  1000;
+var tinyBubble =  500;
 var minuteBubble = 100;
 
 function computeBubbles(_amount) {
-    var minuteAmount = 0;
-    var mediumAmount = 0;
-    var smallAmount = 0;
-    var tinyAmount = 0;
-    var largeAmount = 0;
-    var remainder;
-
+    var minuteAmount = 0; var mediumAmount = 0; var smallAmount = 0;
+    var tinyAmount = 0; var largeAmount = 0; var remainder;
 
     if(_amount >= largeBubble){
       largeAmount = Math.floor(_amount / largeBubble);
-      _amount = _amount - (largeAmount*_amount);;
-    }
-
-    if(_amount >= mediumBubble){
+      remainder = _amount / largeBubble % 1;
+      _amount = (remainder*largeBubble);
+    } if(_amount >= mediumBubble){
       mediumAmount = Math.floor(_amount / mediumBubble);
-      _amount = _amount - (mediumAmount*_amount);
-    }
-
-    if(_amount >= smallBubble){
-        smallAmount = Math.floor(_amount / smallBubble);
-        _amount = _amount - (smallAmount*_amount);
-    }
-    if(_amount >= tinyBubble){
-          tinyAmount = Math.floor(_amount / tinyBubble);
-          _amount = _amount - tinyAmount;
-   } if (_amount >= minuteBubble) {
-            minuteAmount = Math.floor(_amount / minuteBubble);
-            _amount = _amount - (minuteAmount*_amount);
+      remainder = _amount / mediumBubble % 1;
+      _amount = (remainder*mediumBubble);
+    } if(_amount >= smallBubble){
+      smallAmount = Math.floor(_amount / smallBubble);
+      remainder = _amount / smallBubble % 1;
+      _amount = (remainder*smallBubble);
+    } if(_amount >= tinyBubble){
+      tinyAmount = Math.floor(_amount / tinyBubble);
+      remainder = _amount / tinyBubble % 1;
+      _amount = (remainder*tinyBubble) - (tinyAmount*_amount);
+    } if (_amount >= minuteBubble) {
+      minuteAmount = Math.floor(_amount / minuteBubble);
+      remainder = _amount / minuteBubble % 1;
+      _amount = (remainder*minuteBubble);
     }
 
     var data = [ largeAmount, mediumAmount, smallAmount, tinyAmount, smallAmount ]
@@ -97,7 +92,7 @@ class Delegation extends React.Component {
         if(data[1].choice == positiveVote) this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == negativeVote) this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == neutralVote) this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
-   } }); transcribeArray.forEach((x,y) =>
+   }}); transcribeArray.forEach((x,y) =>
      outputArray = outputArray.concat(transcribeArray[y]))
      return { items: outputArray, indexes: colorArray };
   }
@@ -115,7 +110,6 @@ class Delegation extends React.Component {
 
  testGeneration = (_id, _option, _stack, _bubbleId) => {
    var totalBubbles = computeBubbles(_stack)
-   var counter = 0;
    if(totalBubbles.sum == 0) totalBubbles.sum = 1;
      return Array(totalBubbles.sum)
       .fill(1)
@@ -143,32 +137,31 @@ class Delegation extends React.Component {
           ycord = 350;
         }
 
-        if(counter < largeBubbles){
-          radius = 17.5;
-        } else if(counter >= largeBubbles
-          && counter < largeBubbles+mediumBubbles){
-          radius = 12.5;
-        } else if(counter >= largeBubbles+mediumBubbles
-          && counter < largeBubbles+mediumBubbles+smallBubbles){
+        if(i < largeBubbles){
+          radius = 20;
+        } else if(i >= largeBubbles
+          && i < largeBubbles+mediumBubbles){
+          radius = 15;
+        } else if(i >= largeBubbles+mediumBubbles
+          && i < largeBubbles+mediumBubbles+smallBubbles){
           radius = 10;
-        } else if(counter >= largeBubbles+mediumBubbles+smallBubbles
-          && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
-          radius = 7.5;
-        } else if(counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
-          && counter >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
+        } else if(i >= largeBubbles+mediumBubbles+smallBubbles
+          && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
           radius = 5;
+        } else if(i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
+          && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
+          radius = 1;
         }
 
-        var operativeY = (radius*2.5) * counter;
-        var operativeX = (radius*2.5) * counter;
-        counter++;
+        var operativeY = (radius) * i;
+        var operativeX = (radius) * i;
 
        return {
           id: i + _bubbleId,
           owner: _id,
           radius,
-          x: xcord + operativeX * Math.cos(2 * Math.PI * counter / radius),
-          y: ycord + operativeY * Math.sin(2 * Math.PI * counter / radius)
+          x: xcord + operativeX * Math.cos(2 * Math.PI * i / radius),
+          y: ycord + operativeY * Math.sin(2 * Math.PI * i / radius)
         };
       });
   }
