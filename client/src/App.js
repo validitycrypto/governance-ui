@@ -73,12 +73,12 @@ const neutralVote = "0x4e65757472616c0000000000000000000000000000000000000000000
 const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
 
 firebase.initializeApp({
-  apiKey: "AIzaSyBX9yoKTTg4a33ETJ0hydmWcmEPMBWYBhU",
-  authDomain: "validity-mvp.firebaseapp.com",
-  databaseURL: "https://validity-mvp.firebaseio.com",
-  projectId: "validity-mvp",
-  storageBucket: "validity-mvp.appspot.com",
-  messagingSenderId: "388843201152" });
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "" });
 const db = firebase.firestore()
 db.settings({ timestampsInSnapshots: true});
 
@@ -106,15 +106,15 @@ class App extends Component {
       await this.getNeutral();
       await this.getNegative();
       await this.getPositive();
-      await this.eventType();
+      await this.eventType(this.state.eventSubject, this.state.round);
       await this.getEvents();
       await this.getIdentity();
       await this.getTrust();
       await this.isStaking();
       await this.isVoted();
-      await this.eventPositive();
-      await this.eventNegative();
-      await this.eventNeutral();
+      await this.eventPositive(this.state.eventSubject, this.state.round);
+      await this.eventNegative(this.state.eventSubject, this.state.round);
+      await this.eventNeutral(this.state.eventSubject, this.state.round);
       await this.getLog();
       await this.getBalances();
       await this.gatherMetrics();
@@ -279,6 +279,14 @@ class App extends Component {
         <MenuSection>
           {({ className }) => (
             <div className={className}>
+            {this.state.pastEvents.map(data => (
+              <div>
+              <p>{data}</p>
+              <p>{this.state.pastData[data].positive}</p>
+              <p>{this.state.pastData[data].neutral}</p>
+              <p>{this.state.pastData[data].negative}</p>
+              </div>
+            ))}
             </div>
           )}
         </MenuSection>
@@ -454,32 +462,36 @@ class App extends Component {
     })
   }
 
-  eventPositive = async() => {
-    var stat = await this.state.dapp.methods.eventPositive(this.state.eventSubject, this.state.round).call()
+  eventPositive = async(_subject, _round) => {
+    var stat = await this.state.dapp.methods.eventPositive(_subject, _round).call()
     await this.setState({
       eventPositive: parseFloat(stat).toFixed(2)
     })
+    return stat;
   }
 
-  eventNegative = async() => {
-    var stat = await this.state.dapp.methods.eventNegative(this.state.eventSubject, this.state.round).call()
+  eventNegative = async(_subject, _round) => {
+    var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
     await this.setState({
       eventNegative: parseFloat(stat).toFixed(2)
     })
+    return stat;
   }
 
-  eventNeutral = async() => {
-    var stat = await this.state.dapp.methods.eventNeutral(this.state.eventSubject, this.state.round).call()
+  eventNeutral = async(_subject, _round) => {
+    var stat = await this.state.dapp.methods.eventNeutral(_subject, _round).call()
     await this.setState({
       eventNeutral: parseFloat(stat).toFixed(2)
     })
+    return stat;
   }
 
-  eventType = async() => {
-    const stat = await this.state.dapp.methods.eventType(this.state.eventSubject, this.state.round).call()
+  eventType = async(_subject, _round) => {
+    const stat = await this.state.dapp.methods.eventType(_subject, _round).call()
     await this.setState({
       eventType: this.state.web3.utils.toAscii(stat)
     })
+    return stat;
   }
 
   registerIdentity = async() => {
@@ -511,12 +523,20 @@ class App extends Component {
   }
 
   getPastEvents = async() => {
-      await db.collection("events").get().then((result) => {
-        var eventArray = [];
-        result.forEach(item => {
-          eventArray.push(item.data().eventHex)
+    var eventArray = {}; var pastArray = [];
+       await db.collection("events").get().then(async(result) => {
+        await result.forEach(async(item) => {
+          var eventSubject = item.data().eventHex
+          pastArray.push(await this.state.web3.utils.toAscii(eventSubject))
+          var dataEmbed = {
+              type: await this.state.web3.utils.toAscii(await this.eventType(eventSubject, 1)),
+              positive: await this.eventPositive(eventSubject, 1),
+              neutral: await this.eventNeutral(eventSubject, 1),
+              negative : await this.eventPositive(eventSubject, 1)
+            }
+            eventArray[await this.state.web3.utils.toAscii(eventSubject)] = dataEmbed
         })
-        console.log(eventArray)
+        await this.setState({ pastEvents: pastArray, pastData: eventArray })
       })
   }
 
