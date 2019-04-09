@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import firebase from 'firebase'
 
 import Delegation from './delegation'
 
@@ -67,10 +68,20 @@ const GlobalNavigation = () => (
   ]} secondaryItems={[]} />
 );
 
-
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
 const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
 const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
+
+firebase.initializeApp({
+  apiKey: "AIzaSyBX9yoKTTg4a33ETJ0hydmWcmEPMBWYBhU",
+  authDomain: "validity-mvp.firebaseapp.com",
+  databaseURL: "https://validity-mvp.firebaseio.com",
+  projectId: "validity-mvp",
+  storageBucket: "validity-mvp.appspot.com",
+  messagingSenderId: "388843201152" });
+const db = firebase.firestore()
+db.settings({ timestampsInSnapshots: true});
+
 
 class App extends Component {
   state = {
@@ -108,6 +119,8 @@ class App extends Component {
       await this.getBalances();
       await this.gatherMetrics();
       await this.renderBubbles();
+      await this.getEventImage();
+      await this.getPastEvents();
   }
 
   refreshData = async () => {
@@ -223,6 +236,7 @@ class App extends Component {
   };
 
   renderAdmin= () => {
+    if(this.state.account == "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"){
     return (
       <Fragment>
       <ContainerHeader
@@ -243,6 +257,7 @@ class App extends Component {
               <TextField onChange={this.logSubject} placeholder="Name"/>
               <TextField onChange={this.logTicker} placeholder="Ticker"/>
               <TextField onChange={this.logIndex} placeholder="Round"/>
+              <TextField onChange={this.logHTTP} placeholder="Image"/>
            <Button appearance="primary" className="subjectButton" onClick={this.createEvent}>
            Create
            </Button>
@@ -255,6 +270,21 @@ class App extends Component {
         </MenuSection>
       </Fragment>
     );
+  } else {
+    return (
+      <Fragment>
+      <ContainerHeader
+      text="&nbsp;&nbsp;Event database">
+      </ContainerHeader>
+        <MenuSection>
+          {({ className }) => (
+            <div className={className}>
+            </div>
+          )}
+        </MenuSection>
+      </Fragment>
+     )
+    }
   };
 
   renderBubbles = async() => {
@@ -288,6 +318,7 @@ class App extends Component {
   logType = (event) => { this.setState({ type: this.state.web3.utils.fromAscii(event.value) }) }
   logAddress = (event) =>  { this.setState({ recipent: event.target.value }) }
   logIndex = (event) => { this.setState({ index: event.target.value }) }
+  logHTTP = (event) => { this.setState({ httpSource: event.target.value }) }
 
   getBalances = async() => {
     const value = await this.state.token.methods.balanceOf(this.state.account).call();
@@ -426,7 +457,7 @@ class App extends Component {
   eventPositive = async() => {
     var stat = await this.state.dapp.methods.eventPositive(this.state.eventSubject, this.state.round).call()
     await this.setState({
-      eventPositive: stat
+      eventPositive: parseFloat(stat).toFixed(2)
     })
   }
 
@@ -451,13 +482,43 @@ class App extends Component {
     })
   }
 
-
   registerIdentity = async() => {
       var converge = this.state.web3.utils.fromAscii(this.state.nickname)
       await this.state.token.methods.setIdentity(converge)
       .send({ from: this.state.account, gas: 3725000})
       await await this.getIdentity();
     }
+
+  logEvent = async() => {
+    db.collection("events").add({ eventHex: this.state.subject })
+    db.collection(this.state.subject).add({
+        http: this.state.httpSource
+    }).then(function(docRef) {
+        console.log("Documentwritten with ID: ", docRef.id);
+    }).catch(function(error) {
+        console.error("Error adding document: ", error);
+    });
+  }
+
+  getEventImage = async() => {
+    await db.collection(this.state.eventSubject).get().then((result) => {
+      var imageSource;
+      result.forEach(item => {
+         imageSource = item.data().http;
+        })
+        this.setState({ eventImage: imageSource});
+    })
+  }
+
+  getPastEvents = async() => {
+      await db.collection("events").get().then((result) => {
+        var eventArray = [];
+        result.forEach(item => {
+          eventArray.push(item.data().eventHex)
+        })
+        console.log(eventArray)
+      })
+  }
 
   isStaking = async() => {
     const stat = await this.state.token.methods.isStaking(this.state.account).call()
@@ -482,6 +543,7 @@ class App extends Component {
   createEvent = async() => {
     await this.state.dapp.methods.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index)
     .send({from: this.state.account, gas: 3725000 })
+    await this.logEvent();
   }
 
   transferValidty = async() => {
@@ -491,7 +553,6 @@ class App extends Component {
     }
 
   voteEvent = async(_decision) => {
-    console.log(_decision)
       await this.state.dapp.methods.voteSubmit(_decision)
       .send({from: this.state.account, gas: 3725000 });
   }
@@ -581,6 +642,7 @@ class App extends Component {
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}</Paper>
         </div>
         <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
+        <img className="eventImage" src={this.state.eventImage} />
         </Paper>
 
         <Paper className="votingMetrics" style={{ backgroundColor: fade('#000000', 0.825) }}>
@@ -594,13 +656,9 @@ class App extends Component {
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
         </Paper>
 
-
-
         <div className="votingBubbles">
         {this.state.bubbleComponent}
         </div>
-
-
 
            <FlagGroup>
                  {this.state.flags.map(flagId => {

@@ -163,8 +163,8 @@ class Delegation extends React.Component {
           radius = 1;
         }
 
-        var operativeY = (radius) * i;
-        var operativeX = (radius) * i;
+        var operativeY = (radius*2) * i;
+        var operativeX = (radius*2) * i;
 
        return {
           id: i + _bubbleId,
