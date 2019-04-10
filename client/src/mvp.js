@@ -19,6 +19,7 @@ import {
   Item,
   ThemeProvider,
 } from '@atlaskit/navigation-next';
+import Avatar from '@atlaskit/avatar';
 import Button from '@atlaskit/button';
 import { Reset, Theme } from '@atlaskit/theme';
 import InfoIcon from '@atlaskit/icon/glyph/info';
@@ -30,6 +31,7 @@ import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import Paper from '@material-ui/core/Paper';
+import Convertor from 'hex2dec';
 
 import Validation from "./contracts/communalValidation.json";
 import ERC20d from "./contracts/ERC20d.json";
@@ -78,7 +80,6 @@ firebase.initializeApp({
   storageBucket: "",
   messagingSenderId: "" });
 const db = firebase.firestore()
-db.settings({ timestampsInSnapshots: true});
 
 
 class App extends Component {
@@ -93,7 +94,9 @@ class App extends Component {
     pool: 0,
     choice: "0x506f736974697665000000000000000000000000000000000000000000000000",
     bubbleComponent: <div/>,
-    flags: []
+    flags: [],
+    pastEvents: [],
+    pastData: {},
   };
 
   initialiseData = async () => {
@@ -104,38 +107,36 @@ class App extends Component {
       await this.getNeutral();
       await this.getNegative();
       await this.getPositive();
-      await this.eventType(this.state.eventSubject, this.state.round);
       await this.getEvents();
       await this.getIdentity();
       await this.getTrust();
       await this.isStaking();
       await this.isVoted();
+      await this.getLog();
+      await this.eventType(this.state.eventSubject, this.state.round);
       await this.eventPositive(this.state.eventSubject, this.state.round);
       await this.eventNegative(this.state.eventSubject, this.state.round);
       await this.eventNeutral(this.state.eventSubject, this.state.round);
-      await this.getLog();
       await this.getBalances();
       await this.gatherMetrics();
-      await this.renderBubbles();
       await this.getEventImage();
       await this.getPastEvents();
+      await this.renderBubbles();
   }
 
   refreshData = async () => {
+      await this.getLog();
+      await this.eventType(this.state.eventSubject, this.state.round);
+      await this.eventPositive(this.state.eventSubject, this.state.round);
+      await this.eventNegative(this.state.eventSubject, this.state.round);
+      await this.eventNeutral(this.state.eventSubject, this.state.round);
       await this.getBalances();
-      await this.getTotal();
-      await this.getNeutral();
-      await this.getNegative();
-      await this.getPositive();
-      await this.getEvents();
-      await this.getTrust();
       await this.isStaking();
       await this.isVoted();
-      await this.eventPositive();
-      await this.eventNegative();
-      await this.eventNeutral();
-      await this.getLog();
       await this.gatherMetrics();
+      await this.getEventImage();
+      await this.getPastEvents();
+      await this.getEventImage();
       await this.renderBubbles();
   }
 
@@ -191,7 +192,6 @@ class App extends Component {
               <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
 
-
               <TextField onChange={this.logIdentity} placeholder="Identity"/>
               <Button appearance="primary" className="addressButton" onClick={this.registerIdentity}>
                 Register
@@ -215,17 +215,14 @@ class App extends Component {
         <MenuSection>
           {({ className }) => (
             <div className={className}>
+            <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
+            <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
+            <br></br>
             <TextField onChange={this.logAddress} placeholder="Address"/>
             <TextField onChange={this.logAmount} placeholder="Amount"/>
               <Button appearance="primary" className="addressButton" onClick={this.transferValidty}>
                 Send VLDY
               </Button>
-              <br></br>
-              <br></br>
-              <br></br>
-              <br></br>
-              <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
-              <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
             </div>
           )}
         </MenuSection>
@@ -295,6 +292,7 @@ class App extends Component {
   };
 
   renderBubbles = async() => {
+    await this.setState({ bubbleComponent: <div/> })
     await this.setState({ bubbleComponent:
       <Delegation
         negative={parseInt(this.state.eventNegative)}
@@ -341,8 +339,9 @@ class App extends Component {
 
   gatherMetrics = async() => {
     var delegationWeight = parseInt(this.state.tokenBal/10000);
-    if(this.state.stake === "False" || this.state.voted === "True") delegationWeight = 0;
-    var rawMetrics = { id: this.state.id, weight: delegationWeight }
+    if(this.state.stake === "False" || this.state.voted === "True") {
+      delegationWeight = 0;
+    } var rawMetrics = { id: this.state.id, weight: delegationWeight }
     this.setState({ voteBal: delegationWeight, userMetrics: rawMetrics });
   }
 
@@ -353,16 +352,16 @@ class App extends Component {
     })
   }
 
-  timeTravel = async() => {
+ timeTravel = async() => {
     for(var x = 0 ; x < 100 ; x++){
-    this.state.web3.currentProvider.sendAsync({
-      jsonrpc: '2.0',
-      method: 'evm_mine',
-      params: [],
-      id: 0,
-    })
-  }
-}
+      this.state.web3.currentProvider.sendAsync({
+        jsonrpc: '2.0',
+        method: 'evm_mine',
+        params: [],
+        id: 0,
+      })
+    }
+ }
 
   handleDismiss = () => {
     this.setState(prevState => ({
@@ -463,42 +462,44 @@ class App extends Component {
     var stat = await this.state.dapp.methods.eventPositive(_subject, _round).call()
     await this.setState({
       eventPositive: parseFloat(stat).toFixed(2)
-    })
-    return stat;
+    });
+    return Convertor.hexToDec(stat._hex);
   }
 
   eventNegative = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
     await this.setState({
       eventNegative: parseFloat(stat).toFixed(2)
-    })
-    return stat;
+    }); return Convertor.hexToDec(stat._hex);
   }
 
   eventNeutral = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventNeutral(_subject, _round).call()
     await this.setState({
       eventNeutral: parseFloat(stat).toFixed(2)
-    })
-    return stat;
+    }); return Convertor.hexToDec(stat._hex);
   }
 
   eventType = async(_subject, _round) => {
     const stat = await this.state.dapp.methods.eventType(_subject, _round).call()
     await this.setState({
       eventType: this.state.web3.utils.toAscii(stat)
-    })
-    return stat;
+    }); return stat;
   }
 
   registerIdentity = async() => {
       var converge = this.state.web3.utils.fromAscii(this.state.nickname)
       await this.state.token.methods.setIdentity(converge)
-      .send({ from: this.state.account, gas: 3725000})
-      await await this.getIdentity();
+      .send({ from: this.state.account, gas: 3725000}, async(error, transactionHash) => {
+        if(error) { console.log(error)
+        } else if(transactionHash) {
+          await this.getIdentity()
+        }
+      })
     }
 
   logEvent = async() => {
+    console.log(this.state.httpSource, this.state.subject)
     db.collection("events").add({ eventHex: this.state.subject })
     db.collection(this.state.subject).add({
         http: this.state.httpSource
@@ -533,13 +534,14 @@ class App extends Component {
             }
             eventArray[await this.state.web3.utils.toAscii(eventSubject)] = dataEmbed
         })
+        console.log(pastArray, eventArray)
         await this.setState({ pastEvents: pastArray, pastData: eventArray })
       })
   }
 
   isStaking = async() => {
-    const stat = await this.state.token.methods.isStaking(this.state.account).call()
     var input;
+    const stat = await this.state.token.methods.isStaking(this.state.account).call()
     if(stat == true){ input = "True"
     } else if(stat == false){ input = "False"}
     await this.setState({
@@ -548,8 +550,8 @@ class App extends Component {
   }
 
   isVoted = async() => {
-    const stat = await this.state.dapp.methods.isVoted(this.state.account).call()
     var input;
+    const stat = await this.state.dapp.methods.isVoted(this.state.account).call()
     if(stat == true){ input = "True"
     } else if(stat == false){ input = "False"}
     await this.setState({
@@ -559,24 +561,43 @@ class App extends Component {
 
   createEvent = async() => {
     await this.state.dapp.methods.createEvent(this.state.subject, this.state.ticker, this.state.type, this.state.index)
-    .send({from: this.state.account, gas: 3725000 })
-    await this.logEvent();
+    .send({from: this.state.account, gas: 3725000 }, async(error, transactionHash) => {
+      if(error) { console.log(error)
+      } else if(transactionHash) {
+        await this.logEvent();
+        await this.refreshData();
+       }
+    })
   }
 
   transferValidty = async() => {
       await this.state.token.methods.transfer(this.state.recipent, this.state.amount)
-      .send({from: this.state.account, gas: 3725000 });
-      await this.getBalances();
+      .send({from: this.state.account, gas: 3725000 }, async(error, transactionHash) => {
+        if(error) { console.log(error)
+        } else if(transactionHash) {
+          await this.getBalances();
+         }
+      })
     }
 
   voteEvent = async(_decision) => {
       await this.state.dapp.methods.voteSubmit(_decision)
-      .send({from: this.state.account, gas: 3725000 });
+      .send({from: this.state.account, gas: 3725000 }, async(error, transactionHash) => {
+        if(error) { console.log(error)
+        } else if(transactionHash) {
+          await this.refreshData();
+        }
+      })
   }
 
   eventStake = async() => {
     await this.state.token.methods.toggleStake()
-    .send({from: this.state.account, gas: 3725000 });
+    .send({from: this.state.account, gas: 3725000 } , async(error, transactionHash) => {
+      if(error) { console.log(error)
+      } else if(transactionHash) {
+        await this.refreshData();
+       }
+    })
   }
 
   getLog = async () => {
@@ -589,7 +610,7 @@ class App extends Component {
       if(activeEvent === this.state.eventSubject){
         var choice = JSON.stringify(eventResult.returnValues.choice).replace(/["]+/g, '')
         var identifier = JSON.stringify(eventResult.returnValues.vID).replace(/["]+/g, '')
-        var weight = JSON.stringify(eventResult.returnValues.weight).replace(/["]+/g, '')
+        var weight = Convertor.hexToDec(JSON.stringify(eventResult.returnValues.weight._hex).replace(/["]+/g, ''))
         delegationLog[identifier] = { choice, weight }
         }
      }
@@ -599,9 +620,16 @@ class App extends Component {
 
   initialiseOwnership = async() => {
     await this.state.token.methods.adminControl(this.state.dapp.address)
-    .send({ from: this.state.account, gas: 3725000 })
-    await this.state.dapp.methods.initialiseAsset(this.state.token.address)
-    .send({ from: this.state.account, gas: 3725000 })
+    .send({ from: this.state.account, gas: 3725000 }, async(error, transactionHash) => {
+      if(error) { console.log(error)
+        } else if(transactionHash) {
+          await this.state.dapp.methods.initialiseAsset(this.state.token.address)
+          .send({ from: this.state.account, gas: 3725000 }, (error, transactionHash) => {
+            if(error) { console.log(error)
+            } else if(transactionHash) { }
+          })
+        }
+    })
   }
 
   render() {

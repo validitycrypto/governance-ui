@@ -95,12 +95,11 @@ class Delegation extends React.Component {
      bubbleId++;
    } Object.entries(_poolData).forEach((data, index) => {
       if(data[1].choice != undefined){
-        bubbleId = bubbleId + transcribeArray[index].length;
         transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
         if(data[1].choice == positiveVote) this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == negativeVote) this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == neutralVote) this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
-        bubbleId++;
+        bubbleId = bubbleId + transcribeArray[transcribeArray.length-1].length;
    }}); transcribeArray.forEach((x,y) =>
      outputArray = outputArray.concat(transcribeArray[y]))
      return { items: outputArray, indexes: colorArray };
@@ -133,34 +132,42 @@ class Delegation extends React.Component {
         tinyBubbles = totalBubbles.data[3];
         minuteBubbles = totalBubbles.data[4];
 
+        if(i < largeBubbles){
+          _stack = largeBubble;
+          radius = 20
+        } else if(i >= largeBubbles
+          && i < largeBubbles+mediumBubbles){
+          _stack = mediumBubble;
+          radius = 15
+        } else if(i >= largeBubbles+mediumBubbles
+          && i < largeBubbles+mediumBubbles+smallBubbles){
+          _stack = smallBubble;
+          radius = 10;
+        } else if(i >= largeBubbles+mediumBubbles+smallBubbles
+          && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
+          _stack = tinyBubble;
+          radius = 5;
+        } else if(i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
+          && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
+          _stack = mediumBubble;
+          radius = 1;
+        }
+
         if(_option === neutralVote){
+          if(this.props.neutral == 0) _stack = 0
           xcord = 900;
           ycord = 500;
         } else if(_option === negativeVote){
+          if(this.props.negative == 0) _stack = 0
           xcord = 200;
           ycord = 500;
         } else if(_option === positiveVote){
+          if(this.props.positive == 0) _stack = 0
           xcord = 200;
           ycord = 100
         } else if(_option === "0x0"){
           xcord = 550;
           ycord = 350;
-        }
-
-        if(i < largeBubbles){
-          radius = 20;
-        } else if(i >= largeBubbles
-          && i < largeBubbles+mediumBubbles){
-          radius = 15;
-        } else if(i >= largeBubbles+mediumBubbles
-          && i < largeBubbles+mediumBubbles+smallBubbles){
-          radius = 10;
-        } else if(i >= largeBubbles+mediumBubbles+smallBubbles
-          && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
-          radius = 5;
-        } else if(i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
-          && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
-          radius = 1;
         }
 
         var operativeY = (radius*2) * i;
