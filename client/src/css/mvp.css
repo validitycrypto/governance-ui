@@ -2,7 +2,6 @@
 
 body, html  {
 
-  height: 100%;
   margin: 0;
   padding: 0;
 }
@@ -14,6 +13,7 @@ table, thead, tbody, td, tr {
 
 .votingBubbles {
   position: absolute;
+  height: 100vh;
   padding: 5vw;
   left: 5vw;
   top: -5vh;
@@ -28,6 +28,19 @@ td, th {
 
 .logHeader {
   overflow-y: hidden;
+}
+
+.eventImage {
+  position: relative;
+  width: 8.5vw;
+  height: 8.5vw;
+  margin: 0 auto;
+  top: .5vh;
+  border: solid;
+  border-color: #0cff6f;
+  background-color: #0cff6f;
+  border-radius: 5vw;
+
 }
 
 .logBody {
@@ -159,28 +172,17 @@ td, th {
   transform: translateX(-15vw);
 }
 
-.statModal {
-  position: absolute;
-  width: 60vw;
-  right: 0;
-  left: 0;
+.votingMetrics {
+  position: fixed;
+  width: 42.5vw;
+  padding: 0.75vw;
+  bottom: 0vh;
+  right: -.5vw;
+  color: #0cff6f;
 }
 
-.voteModal {
-  background-color: rgba(30, 0, 189, 0.5);
-  position: absolute;
-  border-radius: 2.5vw;
-  border-style: solid;
-  border-color: #1e00bd;
-  border-width: 0.50vw;  font-size: 1.375vw;
-  width: 35vw;
-  height: 42.5vh;
-  top: 55vh;
-  left: 10vw;
-  color: white;
 
 
-}
 
 .votingStatus {
   position: relative;

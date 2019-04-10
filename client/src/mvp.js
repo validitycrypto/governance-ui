@@ -4,7 +4,6 @@ import firebase from 'firebase'
 import Delegation from './delegation'
 
 import TextField from '@atlaskit/field-text';
-import Toggle from 'react-toggle'
 import Select from '@atlaskit/select';
 import {
   GlobalNav,
@@ -17,7 +16,6 @@ import {
   settings,
   ContainerHeader,
   HeaderSection,
-  ItemAvatar,
   Item,
   ThemeProvider,
 } from '@atlaskit/navigation-next';
@@ -33,8 +31,8 @@ import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import Paper from '@material-ui/core/Paper';
 
-import Validation from "../build/contracts/communalValidation.json";
-import ERC20d from "../build/contracts/ERC20d.json";
+import Validation from "./contracts/communalValidation.json";
+import ERC20d from "./contracts/ERC20d.json";
 
 import getWeb3 from "./utils/getWeb3";
 
@@ -57,8 +55,8 @@ const identityIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faIdCard} clas
 const tokenIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTag} className="starIcon" size='1x'/>
 const ethIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faEthereum} className="starIcon" size='1x'/>
 const bullseyeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBullseye} className="starIcon" size='1x'/>
-
 const themeModes = { light, dark, settings };
+
 
 const GlobalNavigation = () => (
   <GlobalNav primaryItems={[
@@ -280,12 +278,13 @@ class App extends Component {
           {({ className }) => (
             <div className={className}>
             {this.state.pastEvents.map(data => (
-              <div>
-              <p>{data}</p>
+              <Paper style={{ padding: '.5vw', backgroundColor: fade('#ffffff', 0.125) }}>
+              <Item before={starIcon} text={data} subText={"3.5/10"}/>
+              <p>{this.state.pastData[data].type}</p>
               <p>{this.state.pastData[data].positive}</p>
               <p>{this.state.pastData[data].neutral}</p>
               <p>{this.state.pastData[data].negative}</p>
-              </div>
+              </Paper>
             ))}
             </div>
           )}
@@ -302,8 +301,6 @@ class App extends Component {
         positive={parseInt(this.state.eventPositive)}
         neutral={parseInt(this.state.eventNeutral)}
         user={this.state.userMetrics}
-        height={window.screen.height}
-        width={window.screen.width}
         option={this.defineOption}
         pool={this.state.log}
         vote={this.voteEvent}

@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 
 import "./addressSet.sol";
-import "./SafeMath.sol";
 import "./ERC20d.sol";
 
 contract communalValidation {
@@ -124,7 +123,6 @@ contract communalValidation {
         weightUsage = 10000;
       }
 
-      wager = wager.mul(weightUsage.div(100));
       stake = wager.div(VOTE);
   }
 
