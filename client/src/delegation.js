@@ -153,12 +153,17 @@ class Delegation extends React.Component {
           radius = 1;
         }
 
+        var operativeY = (radius*2) * i;
+        var operativeX = (radius*2) * i;
+
         if(_option === neutralVote){
           if(this.props.neutral == 0) _stack = 0
+          operativeY = operativeY * (-1);
           xcord = 900;
           ycord = 500;
         } else if(_option === negativeVote){
           if(this.props.negative == 0) _stack = 0
+          operativeY = operativeY * (-1);
           xcord = 200;
           ycord = 500;
         } else if(_option === positiveVote){
@@ -169,9 +174,6 @@ class Delegation extends React.Component {
           xcord = 550;
           ycord = 350;
         }
-
-        var operativeY = (radius*2) * i;
-        var operativeX = (radius*2) * i;
 
        return {
           id: i + _bubbleId,

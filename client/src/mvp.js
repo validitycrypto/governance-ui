@@ -19,13 +19,13 @@ import {
   Item,
   ThemeProvider,
 } from '@atlaskit/navigation-next';
-import Avatar from '@atlaskit/avatar';
+import Avatar, { AvatarItem } from '@atlaskit/avatar';
 import Button from '@atlaskit/button';
 import { Reset, Theme } from '@atlaskit/theme';
 import InfoIcon from '@atlaskit/icon/glyph/info';
 import Page, { Grid, GridColumn } from '@atlaskit/page';
 import { InlineDialog, Flag, AutoDismissFlag, FlagGroup } from '@atlaskit/flag'
-import { faEdit, faInfo, faBullseye, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faInfo, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 
@@ -72,13 +72,14 @@ const negativeVote = "0x4e656761746976650000000000000000000000000000000000000000
 const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
 const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
 
+
 firebase.initializeApp({
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "" });
+  apiKey: "AIzaSyBX9yoKTTg4a33ETJ0hydmWcmEPMBWYBhU",
+  authDomain: "validity-mvp.firebaseapp.com",
+  databaseURL: "https://validity-mvp.firebaseio.com",
+  projectId: "validity-mvp",
+  storageBucket: "validity-mvp.appspot.com",
+  messagingSenderId: "388843201152" });
 const db = firebase.firestore()
 
 
@@ -119,7 +120,7 @@ class App extends Component {
       await this.eventNeutral(this.state.eventSubject, this.state.round);
       await this.getBalances();
       await this.gatherMetrics();
-      await this.getEventImage();
+      await this.getEventImage(this.state.eventSubject);
       await this.getPastEvents();
       await this.renderBubbles();
   }
@@ -134,9 +135,8 @@ class App extends Component {
       await this.isStaking();
       await this.isVoted();
       await this.gatherMetrics();
-      await this.getEventImage();
+      await this.getEventImage(this.state.eventSubject);
       await this.getPastEvents();
-      await this.getEventImage();
       await this.renderBubbles();
   }
 
@@ -275,13 +275,16 @@ class App extends Component {
           {({ className }) => (
             <div className={className}>
             {this.state.pastEvents.map(data => (
-              <Paper style={{ padding: '.5vw', backgroundColor: fade('#ffffff', 0.125) }}>
-              <Item before={starIcon} text={data} subText={"3.5/10"}/>
-              <p>{this.state.pastData[data].type}</p>
-              <p>{this.state.pastData[data].positive}</p>
-              <p>{this.state.pastData[data].neutral}</p>
-              <p>{this.state.pastData[data].negative}</p>
-              </Paper>
+              <div><br></br>
+              <Paper style={{ padding: '1vw', backgroundColor: fade('#ffffff', 0.125) }}>
+              <div className="databaseLogo"><Avatar src={this.state.pastData[data].image} /></div>
+              <div className="databaseName"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='1x'/>&nbsp;&nbsp;&nbsp;{data}</div>
+              <div className="databaseType"><FontAwesomeIcon color="#0cff6f" icon={faCoins} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
+              <div className="databasePositive"><FontAwesomeIcon color="#0cff6f" icon={faCheck} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
+              <div className="databaseNegative"><FontAwesomeIcon color="#0cff6f" icon={faTimes} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
+              <div className="databaseNeutral"><FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].neutral} </div>
+              <div className="databaseRating"><FontAwesomeIcon color="#0cff6f" icon={faStar} size='1x'/>&nbsp;&nbsp;&nbsp;5.5 </div>
+              </Paper></div>
             ))}
             </div>
           )}
@@ -445,6 +448,7 @@ class App extends Component {
 
   getEvent = async() => {
     const stat = await this.state.dapp.methods.currentEvent.call()
+    console.log(this.state.web3.utils.toAscii(stat))
     await this.setState({
       eventSubject: stat,
       eventDecode: this.state.web3.utils.toAscii(stat)
@@ -461,35 +465,53 @@ class App extends Component {
   eventPositive = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventPositive(_subject, _round).call()
     await this.setState({
-      eventPositive: parseFloat(stat).toFixed(2)
+      eventPositive: Convertor.hexToDec(stat._hex)
     });
-    return Convertor.hexToDec(stat._hex);
+  }
+
+  pastPositive = async(_subject, _round) => {
+  var stat = await this.state.dapp.methods.eventPositive(_subject, _round).call()
+    return Convertor.hexToDec(stat._hex)
   }
 
   eventNegative = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
     await this.setState({
-      eventNegative: parseFloat(stat).toFixed(2)
-    }); return Convertor.hexToDec(stat._hex);
+      eventNegative: Convertor.hexToDec(stat._hex)
+    });
+  }
+
+  pastNegatitve = async(_subject, _round) => {
+  var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
+    return Convertor.hexToDec(stat._hex);
   }
 
   eventNeutral = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventNeutral(_subject, _round).call()
     await this.setState({
-      eventNeutral: parseFloat(stat).toFixed(2)
-    }); return Convertor.hexToDec(stat._hex);
+      eventNeutral: Convertor.hexToDec(stat._hex)
+    });
+  }
+
+  pastNeutral = async(_subject, _round) => {
+  var stat = await this.state.dapp.methods.eventNeutral(_subject, _round).call()
+    return Convertor.hexToDec(stat._hex);
   }
 
   eventType = async(_subject, _round) => {
     const stat = await this.state.dapp.methods.eventType(_subject, _round).call()
     await this.setState({
       eventType: this.state.web3.utils.toAscii(stat)
-    }); return stat;
+    });
+  }
+
+  pastType = async(_subject, _round) => {
+    const stat = await this.state.dapp.methods.eventType(_subject, _round).call()
+    return stat;
   }
 
   registerIdentity = async() => {
-      var converge = this.state.web3.utils.fromAscii(this.state.nickname)
-      await this.state.token.methods.setIdentity(converge)
+      await this.state.token.methods.setIdentity(this.state.nickname)
       .send({ from: this.state.account, gas: 3725000}, async(error, transactionHash) => {
         if(error) { console.log(error)
         } else if(transactionHash) {
@@ -510,31 +532,45 @@ class App extends Component {
     });
   }
 
-  getEventImage = async() => {
-    await db.collection(this.state.eventSubject).get().then((result) => {
+  getEventImage = async(_subject) => {
+    await db.collection(_subject).orderBy("http", 'desc').get().then((result) => {
+      var imageSource;
+      result.forEach(item =>
+         imageSource = item.data().http)
+        this.setState({ eventImage: imageSource});
+    })
+  }
+
+  getPastImage = async(_subject) => {
+    return await db.collection(_subject).orderBy("http", 'desc').limit(1).get()
+    .then((result) => {
       var imageSource;
       result.forEach(item => {
          imageSource = item.data().http;
         })
-        this.setState({ eventImage: imageSource});
+        return imageSource;
     })
   }
+
 
   getPastEvents = async() => {
     var eventArray = {}; var pastArray = [];
        await db.collection("events").get().then(async(result) => {
         await result.forEach(async(item) => {
           var eventSubject = item.data().eventHex
-          pastArray.push(await this.state.web3.utils.toAscii(eventSubject))
+          var convertedValue = await this.state.web3.utils.toAscii(eventSubject)
+          if(eventSubject != undefined){
+          pastArray.push(convertedValue)
           var dataEmbed = {
-              type: await this.state.web3.utils.toAscii(await this.eventType(eventSubject, 1)),
-              positive: await this.eventPositive(eventSubject, 1),
-              neutral: await this.eventNeutral(eventSubject, 1),
-              negative : await this.eventPositive(eventSubject, 1)
+              image: await this.getPastImage(eventSubject),
+              type: await this.state.web3.utils.toAscii(await this.pastType(eventSubject, 1)),
+              positive: await this.pastPositive(eventSubject, 1),
+              neutral: await this.pastNeutral(eventSubject, 1),
+              negative : await this.pastNegatitve(eventSubject, 1)
             }
-            eventArray[await this.state.web3.utils.toAscii(eventSubject)] = dataEmbed
+            eventArray[convertedValue] = dataEmbed
+          }
         })
-        console.log(pastArray, eventArray)
         await this.setState({ pastEvents: pastArray, pastData: eventArray })
       })
   }
@@ -674,7 +710,7 @@ class App extends Component {
         &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}</Paper>
         <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.825) }}>
-        &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCoins} size='lg'/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}</Paper>
         <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.825) }}>
         &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
