@@ -1,30 +1,27 @@
+// Core
 import React from 'react';
-import { scaleOrdinal } from '@vx/scale';
-import { LinearGradient } from '@vx/gradient';
-import { Drag, raise } from '@vx/drag';
-import {
-  Spotlight,
-  SpotlightManager,
-  SpotlightTarget,
-  SpotlightTransition,
-} from '@atlaskit/onboarding';
 
-import "./css/bubble.css";
+// UX
+import { Spotlight, SpotlightManager, SpotlightTarget, SpotlightTransition } from '@atlaskit/onboarding';
 
+// VX
+import { scaleOrdinal } from '@vx/scale'
+import { LinearGradient } from '@vx/gradient'
+import { Drag, raise } from '@vx/drag'
+
+// Voting standards
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
 const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
 const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
-
 const neg = ['#ff0c9e']
 const neut = ['#ff6f0c']
 const pos = ['#0cff6d']
 const stake = ['#0cffe9']
-
-var largeBubble =  10000;
-var mediumBubble =  5000;
-var smallBubble =  1000;
-var tinyBubble =  500;
-var minuteBubble = 100;
+const largeBubble =  10000;
+const mediumBubble =  5000;
+const smallBubble =  1000;
+const tinyBubble =  500;
+const minuteBubble = 100;
 
 function computeBubbles(_amount) {
     var minuteAmount = 0; var mediumAmount = 0; var smallAmount = 0;
@@ -63,14 +60,12 @@ class Delegation extends React.Component {
   constructor(props) {
     super(props);
     var bubbleData = this.transcribeData(props.pool, props.user)
-    console.log(bubbleData)
      this.state = {
        bubbleStack: computeBubbles(props.user.weight).sum,
        items: bubbleData.items,
        bubbleState: 0,
        active: false
-     };
-     this.colorScale = scaleOrdinal({
+     }; this.colorScale = scaleOrdinal({
         domain: this.state.items.map(d => d.id),
         range: bubbleData.indexes
      })
@@ -115,7 +110,6 @@ class Delegation extends React.Component {
     var returnArray = this.testGeneration("0x0", _choice, 0, _id);
     return returnArray
   }
-
 
  testGeneration = (_id, _option, _stack, _bubbleId) => {
    var totalBubbles = computeBubbles(_stack)
@@ -193,35 +187,22 @@ class Delegation extends React.Component {
       <div className="Drag" style={{ touchAction: 'none' }}>
         {this.state.active && (
           <Spotlight
-            actions={[
-              {
-                onClick: () => this.setState({ active: false }),
-                text: 'Dismiss',
-              },
-            ]}
+            actions={[{ onClick: () => this.setState({ active: false }), text: 'Dismiss'}]}
             dialogPlacement="bottom left"
-            key={this.state.target}
             target={this.state.target}
+            key={this.state.target}
             targetRadius={25}
-            dialogWidth={600}
-          >
-          <p>vID: <b>{this.state.voter}</b></p>
-          <br></br>
-          <p>Choice: <b>{this.state.option.substring(0, this.state.option.length - 35)}</b></p>
-          <br></br>
-          <p>Weight: <b>{this.state.weight}</b></p>
-          </Spotlight>
-        )}
-        <svg width={window.screen.width} height={window.screen.height*0.75}>
+            dialogWidth={600}>
+              <p>vID: <b>{this.state.voter}</b></p>
+              <br></br>
+              <p>Choice: <b>{this.state.option.substring(0, this.state.option.length - 35)}</b></p>
+              <br></br>
+              <p>Weight: <b>{this.state.weight}</b></p>
+          </Spotlight>)}
+          <svg width={window.screen.width} height={window.screen.height*0.75}>
           <LinearGradient id="stroke" from="#ff00a5" to="#ffc500" />
-          <rect
-            fill="transparent"
-            width={window.screen.width}
-            height={window.screen.height*0.75}
-            rx={14}
-          />
-          {
-            this.state.items.map((d, i) => (
+          <rect fill="transparent" width={window.screen.width} height={window.screen.height*0.75} rx={14}/>
+          {this.state.items.map((d, i) => (
             <Drag
               key={`${d.id}`}
               width={window.screen.width}
@@ -239,11 +220,6 @@ class Delegation extends React.Component {
                 }
               }}
               onDragStart={() => {
-                // svg follows the painter model
-                // so we need to move the data item
-                // to end of the array for it to be drawn
-                // "on top of" the other data items
-
                 this.setState((state, props) => {
                   return {
                     items: raise(state.items, i)

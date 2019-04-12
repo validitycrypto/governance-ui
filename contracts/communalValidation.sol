@@ -63,6 +63,10 @@ contract communalValidation {
       return _event[_live][_round]._delegates.contains(_voter);
   }
 
+  function eventTicker(bytes32 _entity, uint _index) public view returns (bytes32 ticker) {
+      ticker = _event[_entity][_index]._ticker;
+  }
+
   function eventType(bytes32 _entity, uint _index) public view returns (bytes32 class) {
       class = _event[_entity][_index]._type;
   }
@@ -91,7 +95,7 @@ contract communalValidation {
   function voteSubmit(bytes32 _choice) _delegateCheck(msg.sender) public {
       _event[_live][_round]._delegates.insert(msg.sender);
       bytes memory id = _VLDY.getvID(msg.sender);
-      uint weight = votingWeight(id, msg.sender);
+      uint weight = votingWeight(msg.sender);
 
       if(_choice == POS) {
         _event[_live][_round]._positive = bytes32(eventPositive(_live, _round).add(weight));
@@ -102,27 +106,13 @@ contract communalValidation {
       }
 
       _VLDY.delegationEvent(id, _live, _choice, weight);
-      _VLDY.delegationReward(id, msg.sender, VOTE);
       _VLDY.increaseTrust(id);
   }
 
-  function votingWeight(bytes _id, address _voter) public view returns (uint stake) {
+  function votingWeight(address _voter) public view returns (uint stake) {
       require(_VLDY.balanceOf(_voter) >= VOTE);
 
       uint wager = _VLDY.balanceOf(_voter);
-      uint trust = _VLDY.trustLevel(_id);
-      uint weightUsage;
-
-      if(trust == 0){
-        weightUsage = 2500;
-      } else if(trust > 0) {
-        weightUsage = 5000;
-      } else if(trust > 5) {
-        weightUsage = 7500;
-      } else if(trust > 10) {
-        weightUsage = 10000;
-      }
-
       stake = wager.div(VOTE);
   }
 

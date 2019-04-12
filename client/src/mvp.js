@@ -1,65 +1,61 @@
+// Core
 import React, { Component, Fragment } from 'react';
+import getWeb3 from "./utils/getWeb3"
 import firebase from 'firebase'
 
-import Delegation from './delegation'
-
-import TextField from '@atlaskit/field-text';
-import Select from '@atlaskit/select';
-import {
-  GlobalNav,
-  LayoutManager,
-  NavigationProvider,
-  MenuSection,
-  SkeletonContainerView,
-  light,
-  dark,
-  settings,
-  ContainerHeader,
-  HeaderSection,
-  Item,
-  ThemeProvider,
-} from '@atlaskit/navigation-next';
-import Avatar, { AvatarItem } from '@atlaskit/avatar';
-import Button from '@atlaskit/button';
-import { Reset, Theme } from '@atlaskit/theme';
-import InfoIcon from '@atlaskit/icon/glyph/info';
-import Page, { Grid, GridColumn } from '@atlaskit/page';
-import { InlineDialog, Flag, AutoDismissFlag, FlagGroup } from '@atlaskit/flag'
-import { faEdit, faInfo, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEthereum } from '@fortawesome/free-brands-svg-icons'
-
-import { fade } from '@material-ui/core/styles/colorManipulator';
-import Paper from '@material-ui/core/Paper';
-import Convertor from 'hex2dec';
-
+// Solc
 import Validation from "./contracts/communalValidation.json";
 import ERC20d from "./contracts/ERC20d.json";
 
-import getWeb3 from "./utils/getWeb3";
+// UX
+import { GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, light, dark, settings, ContainerHeader, HeaderSection, Item, ThemeProvider } from '@atlaskit/navigation-next';
+import { faEdit, faInfo, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
+import { InlineDialog, Flag, AutoDismissFlag, FlagGroup } from '@atlaskit/flag'
+import { fade } from '@material-ui/core/styles/colorManipulator'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEthereum } from '@fortawesome/free-brands-svg-icons'
+import Page, { Grid, GridColumn } from '@atlaskit/page'
+import Avatar, { AvatarItem } from '@atlaskit/avatar'
+import InfoIcon from '@atlaskit/icon/glyph/info'
+import { Reset, Theme } from '@atlaskit/theme'
+import TextField from '@atlaskit/field-text'
+import Paper from '@material-ui/core/Paper'
+import Select from '@atlaskit/select'
+import Button from '@atlaskit/button'
 
-import "react-toggle/style.css" // for ES6 modules
-import "./css/mvp.css";
+// External Components
+import Delegation from './delegation'
 
-const decimal = Math.pow(10,18);
+// Utils
+import Convertor from 'hex2dec'
 
-const userIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faUser} size='lg'/>
+// CSS
+import "react-toggle/style.css"
+import "./css/mvp.css"
 
-const cogIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCog} size='lg'/>
-const walletIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
-const neutralIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
-const positiveIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCheck} className="positiveIcon" size='lg'/>
-const negativeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTimes} className="neutralIcon" size='lg'/>
+// Preset Icons
 const crosshairsIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCrosshairs} className="eventsIcon" size='1x'/>
-const starIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faStar} className="starIcon" size='1x'/>
+const positiveIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCheck} className="positiveIcon" size='lg'/>
+const bullseyeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBullseye} className="starIcon" size='1x'/>
+const negativeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTimes} className="neutralIcon" size='lg'/>
 const trustIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faShieldAlt} className="starIcon" size='1x'/>
 const identityIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faIdCard} className="starIcon" size='1x'/>
-const tokenIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTag} className="starIcon" size='1x'/>
 const ethIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faEthereum} className="starIcon" size='1x'/>
-const bullseyeIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBullseye} className="starIcon" size='1x'/>
+const tokenIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faTag} className="starIcon" size='1x'/>
+const starIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faStar} className="starIcon" size='1x'/>
+const neutralIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
+const walletIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
+const userIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faUser} size='lg'/>
+const cogIcon = () => <FontAwesomeIcon color="#0cff6f" icon={faCog} size='lg'/>
+
+// Standards
+const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
+const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
+const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
+const decimal = Math.pow(10,18)
+
+// Components
 const themeModes = { light, dark, settings };
-
-
 const GlobalNavigation = () => (
   <GlobalNav primaryItems={[
     { key: 'market', icon: userIcon, label: 'Stats' },
@@ -68,36 +64,30 @@ const GlobalNavigation = () => (
   ]} secondaryItems={[]} />
 );
 
-const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
-const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
-const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
-
-
 firebase.initializeApp({
-  apiKey: "AIzaSyBX9yoKTTg4a33ETJ0hydmWcmEPMBWYBhU",
-  authDomain: "validity-mvp.firebaseapp.com",
-  databaseURL: "https://validity-mvp.firebaseio.com",
-  projectId: "validity-mvp",
-  storageBucket: "validity-mvp.appspot.com",
-  messagingSenderId: "388843201152" });
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "" });
 const db = firebase.firestore()
 
-
 class App extends Component {
+
   state = {
-    web3: null,
+    bubbleComponent: <div/>,
+    log: [[],[],[],[]],
+    themeMode: 'dark',
+    pastEvents: [],
+    pastData: {},
+    toggle: true,
     account: null,
     token: null ,
     dapp: null,
-    log: [[],[],[],[]],
-    themeMode: 'dark',
-    toggle: true,
-    pool: 0,
-    choice: "0x506f736974697665000000000000000000000000000000000000000000000000",
-    bubbleComponent: <div/>,
+    web3: null,
     flags: [],
-    pastEvents: [],
-    pastData: {},
+    pool: 0,
   };
 
   initialiseData = async () => {
@@ -470,7 +460,7 @@ class App extends Component {
   }
 
   pastPositive = async(_subject, _round) => {
-  var stat = await this.state.dapp.methods.eventPositive(_subject, _round).call()
+    var stat = await this.state.dapp.methods.eventPositive(_subject, _round).call()
     return Convertor.hexToDec(stat._hex)
   }
 
@@ -482,7 +472,7 @@ class App extends Component {
   }
 
   pastNegatitve = async(_subject, _round) => {
-  var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
+    var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
     return Convertor.hexToDec(stat._hex);
   }
 
@@ -521,7 +511,6 @@ class App extends Component {
     }
 
   logEvent = async() => {
-    console.log(this.state.httpSource, this.state.subject)
     db.collection("events").add({ eventHex: this.state.subject })
     db.collection(this.state.subject).add({
         http: this.state.httpSource
@@ -536,7 +525,7 @@ class App extends Component {
     await db.collection(_subject).orderBy("http", 'desc').get().then((result) => {
       var imageSource;
       result.forEach(item =>
-         imageSource = item.data().http)
+        imageSource = item.data().http)
         this.setState({ eventImage: imageSource});
     })
   }
@@ -547,11 +536,9 @@ class App extends Component {
       var imageSource;
       result.forEach(item => {
          imageSource = item.data().http;
-        })
-        return imageSource;
+       }); return imageSource;
     })
   }
-
 
   getPastEvents = async() => {
     var eventArray = {}; var pastArray = [];
@@ -683,8 +670,7 @@ class App extends Component {
           theme={theme => ({
             ...theme,
             mode: themeModes[themeMode],
-          })}
-        >
+          })}>
         <LayoutManager
           globalNavigation={() =>  (
             <GlobalNav primaryItems={[
@@ -695,69 +681,66 @@ class App extends Component {
           )}
           productNavigation={renderer}
         >
-        <div/>
+          <div/>
         </LayoutManager>
       </ThemeProvider>
       </NavigationProvider>
       </GridColumn>
       <GridColumn>
-
-      <div className="validatingIdentifier">
-      {this.state.id}
-      </div>
+        <div className="validatingIdentifier">
+          {this.state.id}
+        </div>
         <div className="eventStats">
-        <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
-        &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}</Paper>
-        <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.825) }}>
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCoins} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}</Paper>
-        <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.825) }}>
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}</Paper>
-        <Paper className="eventNeutral" style={{ backgroundColor: fade('#000000', 0.825) }}>
-        &nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}</Paper>
-        <Paper className="eventNegative" style={{ backgroundColor: fade('#000000', 0.825) }}>
-        &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}</Paper>
+          <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
+            &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}
+          </Paper>
+          <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.825) }}>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCoins} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}
+          </Paper>
+          <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.825) }}>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCheck} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}
+          </Paper>
+          <Paper className="eventNeutral" style={{ backgroundColor: fade('#000000', 0.825) }}>
+            &nbsp;<FontAwesomeIcon color="#0cff6f" icon={faBalanceScale} size='1x'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}
+         </Paper>
+         <Paper className="eventNegative" style={{ backgroundColor: fade('#000000', 0.825) }}>
+            &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faTimes} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
+         </Paper>
         </div>
         <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
-        <img className="eventImage" src={this.state.eventImage} />
+          <img className="eventImage" src={this.state.eventImage} />
         </Paper>
-
         <Paper className="votingMetrics" style={{ backgroundColor: fade('#000000', 0.825) }}>
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCrosshairs} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
+            &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCrosshairs} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWeightHanging} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
         </Paper>
-
         <div className="votingBubbles">
-        {this.state.bubbleComponent}
+          {this.state.bubbleComponent}
         </div>
-
-           <FlagGroup>
-                 {this.state.flags.map(flagId => {
-                   return (
-                     <AutoDismissFlag
-                     actions={[
-                          { content: 'Ok', onClick: this.handleDismiss }]}
-                          appearance={this.state.optionString}
-                          id={flagId}
-                          key={flagId}
-                          title={this.state.option}
-                          description={`Your current delegation stack in this option is: ${this.state.bubbleState} out of ${this.state.bubbleStack}`}
-                          icon={<FontAwesomeIcon color="#000000" icon={faUser} size='lg'/>}
-                     />
-                   );
-                 })}
+        <FlagGroup>
+         {this.state.flags.map(flagId => {
+           return (
+             <AutoDismissFlag
+              description={`Your current delegation stack in this option is: ${this.state.bubbleState} out of ${this.state.bubbleStack}`}
+              icon={<FontAwesomeIcon color="#000000" icon={faUser} size='lg'/>}
+              actions={[{ content: 'Ok', onClick: this.handleDismiss }]}
+              appearance={this.state.optionString}
+              title={this.state.option}
+              id={flagId}
+              key={flagId}
+            /> )})}
            </FlagGroup>
-
          </GridColumn>
          </Grid>
       </div>
