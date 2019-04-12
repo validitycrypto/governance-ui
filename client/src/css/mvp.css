@@ -32,10 +32,10 @@ td, th {
 
 .eventImage {
   position: relative;
-  width: 8.5vw;
-  height: 8.5vw;
+  width: 8.875vw;
+  height: 8.875vw;
   margin: 0 auto;
-  top: .5vh;
+  top: .15vh;
   border: solid;
   border-color: #0cff6f;
   background-color: #0cff6f;
@@ -79,7 +79,7 @@ td, th {
 .validatingIdentifier {
   position: absolute;
   writing-mode: tb-rl;
-  font-size: 1vw;
+  font-size: 1.125vw;
   left: 2vw;
   top: 25vh;
   color: #0cff6f;
@@ -99,7 +99,7 @@ td, th {
 .eventStats {
   position: absolute;
   top: 25vh;
-  left: 96.75vw;
+  left: 95.875vw;
   font-size: 1.25vw;
   width: 25vw;
   z-index: 999;
@@ -122,28 +122,43 @@ td, th {
 .eventType {
   position: relative;
   padding: 0.5vw;
+  top: 5vh;
+  color: #0cff6f;
+  transform: translateX(0px);
+
+}
+
+.eventTicker {
+  position: relative;
+  padding: 0.5vw;
   top: 2.5vh;
   color: #0cff6f;
   transform: translateX(0px);
 
 }
 
+
+.eventTicker:hover {
+  transform: translateX(-15vw);
+
+}
+
+
 .databaseLogo {
   position: relative;
-  top: .5vh;
 }
 
 .databaseName {
   position: relative;
   font-size: 1.25vw;
   top: -5vh;
-  left: 5vw;
+  left: 4vw;
 }
 
 .databaseType {
   position: relative;
   top: -3.75vh;
-  left: 4.75vw;
+  left: 3.5vw;
   font-size: 1.25vw;
 }
 
@@ -151,28 +166,29 @@ td, th {
   position: relative;
   font-size: 1.25vw;
   top: -1.75vh;
+  left: .5vw;
 }
 
 .databaseNeutral {
   position: relative;
   font-size: 1.25vw;
   top: -2.25vh;
-  left: 3.5vw;
+  left: .25vw;
 }
 
 .databaseNegative {
   position: relative;
   font-size: 1.25vw;
-  top: -3.9vh;
-  left: 8vw;
+  top: 4.25vh;
+  left: .5vw;
 }
 
 
 .databaseRating {
 position: relative;
 font-size: 1.25vw;
-top: 0.25vh;
-left: 8.25vw;
+top: -.25vh;
+left: 10vw;
 }
 
 .eventType:hover {
@@ -183,7 +199,7 @@ left: 8.25vw;
 .eventPositive {
   padding: 0.5vw;
   position: relative;
-  top: 5vh;
+  top: 7.5vh;
   color: #0cff6f;
   transform: translateX(0px);
 
@@ -196,7 +212,7 @@ left: 8.25vw;
 
 .eventNeutral {
   position: relative;
-  top: 7.5vh;
+  top: 10vh;
   padding: 0.75vw;
   color: #0cff6f;
   transform: translateX(0px);
@@ -210,7 +226,7 @@ left: 8.25vw;
   position: relative;
   padding: 0.5vw;
   color: #0cff6f;
-  top: 10vh;
+  top: 12.5vh;
   transform: translateX(0px);
 }
 
@@ -302,8 +318,8 @@ left: 8.25vw;
 
 .addressButton {
   position: relative;
-  top: 25px;
-  left: 67.5px;
+  top: 2.175vh;
+  left: 6.75vw;
 }
 
 
@@ -317,8 +333,8 @@ left: 8.25vw;
 
 .stakeButton {
   position: absolute;
-  top: 60vh;
-  left: 7.5vw;
+  top: 50vh;
+  left: 1.25vw;
 }
 
 .ownerButton {

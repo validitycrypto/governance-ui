@@ -9,7 +9,7 @@ import ERC20d from "./contracts/ERC20d.json";
 
 // UX
 import { GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, light, dark, settings, ContainerHeader, HeaderSection, Item, ThemeProvider } from '@atlaskit/navigation-next';
-import { faEdit, faInfo, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
+import { faStreetView, faEdit, faInfo, faShareAlt, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
 import { InlineDialog, Flag, AutoDismissFlag, FlagGroup } from '@atlaskit/flag'
 import { fade } from '@material-ui/core/styles/colorManipulator'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -91,43 +91,46 @@ class App extends Component {
   };
 
   initialiseData = async () => {
-      await this.getEvent();
-      await this.getRound();
-      await this.getvID();
-      await this.getTotal();
-      await this.getNeutral();
-      await this.getNegative();
-      await this.getPositive();
-      await this.getEvents();
-      await this.getIdentity();
-      await this.getTrust();
-      await this.isStaking();
-      await this.isVoted();
-      await this.getLog();
-      await this.eventType(this.state.eventSubject, this.state.round);
-      await this.eventPositive(this.state.eventSubject, this.state.round);
-      await this.eventNegative(this.state.eventSubject, this.state.round);
-      await this.eventNeutral(this.state.eventSubject, this.state.round);
-      await this.getBalances();
-      await this.gatherMetrics();
-      await this.getEventImage(this.state.eventSubject);
-      await this.getPastEvents();
-      await this.renderBubbles();
+      await this.vxDimensions()
+      await this.getEvent()
+      await this.getRound()
+      await this.getvID()
+      await this.getTotal()
+      await this.getNeutral()
+      await this.getNegative()
+      await this.getPositive()
+      await this.getEvents()
+      await this.getIdentity()
+      await this.getTrust()
+      await this.isStaking()
+      await this.isVoted()
+      await this.getLog()
+      await this.eventTicker(this.state.eventSubject, this.state.round)
+      await this.eventType(this.state.eventSubject, this.state.round)
+      await this.eventPositive(this.state.eventSubject, this.state.round)
+      await this.eventNegative(this.state.eventSubject, this.state.round)
+      await this.eventNeutral(this.state.eventSubject, this.state.round)
+      await this.getBalances()
+      await this.gatherMetrics()
+      await this.getEventImage(this.state.eventSubject)
+      await this.getPastEvents()
+      await this.renderBubbles()
   }
 
   refreshData = async () => {
-      await this.getLog();
-      await this.eventType(this.state.eventSubject, this.state.round);
-      await this.eventPositive(this.state.eventSubject, this.state.round);
-      await this.eventNegative(this.state.eventSubject, this.state.round);
-      await this.eventNeutral(this.state.eventSubject, this.state.round);
-      await this.getBalances();
-      await this.isStaking();
-      await this.isVoted();
-      await this.gatherMetrics();
-      await this.getEventImage(this.state.eventSubject);
-      await this.getPastEvents();
-      await this.renderBubbles();
+      await this.getLog()
+      await this.eventType(this.state.eventSubject, this.state.round)
+      await this.eventTicker(this.state.eventSubject, this.state.round)
+      await this.eventPositive(this.state.eventSubject, this.state.round)
+      await this.eventNegative(this.state.eventSubject, this.state.round)
+      await this.eventNeutral(this.state.eventSubject, this.state.round)
+      await this.getBalances()
+      await this.isStaking()
+      await this.isVoted()
+      await this.gatherMetrics()
+      await this.getEventImage(this.state.eventSubject)
+      await this.getPastEvents()
+      await this.renderBubbles()
   }
 
   componentDidMount = async () => {
@@ -208,10 +211,11 @@ class App extends Component {
             <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
             <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
             <br></br>
+            Transfer Validity
             <TextField onChange={this.logAddress} placeholder="Address"/>
             <TextField onChange={this.logAmount} placeholder="Amount"/>
               <Button appearance="primary" className="addressButton" onClick={this.transferValidty}>
-                Send VLDY
+                Transfer
               </Button>
             </div>
           )}
@@ -268,7 +272,7 @@ class App extends Component {
               <div><br></br>
               <Paper style={{ padding: '1vw', backgroundColor: fade('#ffffff', 0.125) }}>
               <div className="databaseLogo"><Avatar src={this.state.pastData[data].image} /></div>
-              <div className="databaseName"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='1x'/>&nbsp;&nbsp;&nbsp;{data}</div>
+              <div className="databaseName"><FontAwesomeIcon color="#0cff6f" icon={faInfo} size='1x'/>&nbsp;&nbsp;&nbsp;{data} ({this.state.pastData[data].ticker})</div>
               <div className="databaseType"><FontAwesomeIcon color="#0cff6f" icon={faCoins} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
               <div className="databasePositive"><FontAwesomeIcon color="#0cff6f" icon={faCheck} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
               <div className="databaseNegative"><FontAwesomeIcon color="#0cff6f" icon={faTimes} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
@@ -292,6 +296,8 @@ class App extends Component {
         positive={parseInt(this.state.eventPositive)}
         neutral={parseInt(this.state.eventNeutral)}
         user={this.state.userMetrics}
+        height={this.state.vxHeight}
+        width={this.state.vxWidth}
         option={this.defineOption}
         pool={this.state.log}
         vote={this.voteEvent}
@@ -302,6 +308,20 @@ class App extends Component {
   renderSkeleton = () => {
     return <SkeletonContainerView />;
   };
+
+  vxDimensions = async() => {
+    var dimensionHeight;  var dimensionWidth;
+    if(window.innerHeight > 720){
+      dimensionHeight = window.screen.height * 0.95;
+      dimensionWidth = window.screen.width;
+    } else {
+      dimensionHeight = window.screen.height * 0.85;
+      dimensionWidth = window.screen.width;
+    } await this.setState({
+      vxHeight: dimensionHeight,
+      vxWidth: dimensionWidth
+    })
+  }
 
   handleShowContainerChange = () => {
     this.setState({ shouldShowContainer: !this.state.shouldShowContainer });
@@ -464,6 +484,18 @@ class App extends Component {
     return Convertor.hexToDec(stat._hex)
   }
 
+  eventTicker = async(_subject, _round) => {
+    var stat = await this.state.dapp.methods.eventTicker(_subject, _round).call()
+    await this.setState({
+      eventTicker: this.state.web3.utils.toAscii(stat)
+    });
+  }
+
+  pastTicker = async(_subject, _round) => {
+    var stat = await this.state.dapp.methods.eventTicker(_subject, _round).call()
+    return this.state.web3.utils.toAscii(stat);
+  }
+
   eventNegative = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
     await this.setState({
@@ -549,6 +581,7 @@ class App extends Component {
           if(eventSubject != undefined){
           pastArray.push(convertedValue)
           var dataEmbed = {
+              ticker: await this.pastTicker(eventSubject, 1),
               image: await this.getPastImage(eventSubject),
               type: await this.state.web3.utils.toAscii(await this.pastType(eventSubject, 1)),
               positive: await this.pastPositive(eventSubject, 1),
@@ -695,6 +728,10 @@ class App extends Component {
             &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faInfo} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}
           </Paper>
+          <Paper className="eventTicker" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faShareAlt} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ticker: {this.state.eventTicker}
+          </Paper>
           <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.825) }}>
             &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCoins} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}
@@ -716,7 +753,7 @@ class App extends Component {
           <img className="eventImage" src={this.state.eventImage} />
         </Paper>
         <Paper className="votingMetrics" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faWallet} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faStreetView} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             &nbsp;&nbsp;<FontAwesomeIcon color="#0cff6f" icon={faCrosshairs} size='lg'/>

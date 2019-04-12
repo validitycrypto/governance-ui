@@ -182,6 +182,9 @@ class Delegation extends React.Component {
   }
 
   render() {
+
+    const { height, width } = this.props
+
     return (
       <SpotlightManager>
       <div className="Drag" style={{ touchAction: 'none' }}>
@@ -199,14 +202,14 @@ class Delegation extends React.Component {
               <br></br>
               <p>Weight: <b>{this.state.weight}</b></p>
           </Spotlight>)}
-          <svg width={window.screen.width} height={window.screen.height*0.75}>
+          <svg width={width} height={height}>
           <LinearGradient id="stroke" from="#ff00a5" to="#ffc500" />
-          <rect fill="transparent" width={window.screen.width} height={window.screen.height*0.75} rx={14}/>
+          <rect fill="transparent" width={width} height={height} rx={14}/>
           {this.state.items.map((d, i) => (
             <Drag
               key={`${d.id}`}
-              width={window.screen.width}
-              height={window.screen.height*0.75}
+              width={width}
+              height={height}
               onDragEnd={async() => {
                 await this.setState({
                   log: true
