@@ -21,11 +21,12 @@ const largeBubble =  10000;
 const mediumBubble =  5000;
 const smallBubble =  1000;
 const tinyBubble =  500;
-const minuteBubble = 100;
+const minuteBubble = 5;
 
 function computeBubbles(_amount) {
     var minuteAmount = 0; var mediumAmount = 0; var smallAmount = 0;
     var tinyAmount = 0; var largeAmount = 0; var remainder;
+
 
     if(_amount >= largeBubble){
       largeAmount = Math.floor(_amount / largeBubble);
@@ -42,15 +43,15 @@ function computeBubbles(_amount) {
     } if(_amount >= tinyBubble){
       tinyAmount = Math.floor(_amount / tinyBubble);
       remainder = _amount / tinyBubble % 1;
-      _amount = (remainder*tinyBubble) - (tinyAmount*_amount);
+      _amount = (remainder*tinyBubble);
     } if (_amount >= minuteBubble) {
       minuteAmount = Math.floor(_amount / minuteBubble);
       remainder = _amount / minuteBubble % 1;
       _amount = (remainder*minuteBubble);
     }
 
-    var data = [ largeAmount, mediumAmount, smallAmount, tinyAmount, smallAmount ]
-    var sum = largeAmount+mediumAmount+smallAmount+tinyAmount+smallAmount
+    var data = [ largeAmount, mediumAmount, smallAmount, tinyAmount, smallAmount, minuteAmount ]
+    var sum = largeAmount+mediumAmount+smallAmount+tinyAmount+smallAmount+minuteAmount
     var output = { sum: sum, data: data }
     return output;
   }
@@ -143,12 +144,26 @@ class Delegation extends React.Component {
           radius = 5;
         } else if(i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
           && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
-          _stack = mediumBubble;
+          _stack = minuteBubble;
           radius = 1;
         }
 
-        var operativeY = (radius*2) * i;
-        var operativeX = (radius*2) * i;
+        var operativeY = (6) * radius;
+        var operativeX = (6) * radius;
+
+        if(radius <= 5 && _option != "0x0"){
+          operativeX = (i/2) * radius
+          operativeY = (i/2) * radius
+          if(_option === positiveVote){
+            operativeX = (i) * radius*2
+            operativeY = (i) * radius*2
+          } if(i % 2 == 0){
+            operativeY = operativeY * (-1);
+          } else {
+              operativeX = operativeX * (-1);
+          }
+
+        }
 
         if(_option === neutralVote){
           if(this.props.neutral == 0) _stack = 0
@@ -175,8 +190,8 @@ class Delegation extends React.Component {
           weight: _stack,
           option: _option,
           radius,
-          x: xcord + operativeX * Math.cos(2 * Math.PI * i / radius),
-          y: ycord + operativeY * Math.sin(2 * Math.PI * i / radius)
+          x: xcord + operativeX * Math.cos(4 * Math.PI * i / radius),
+          y: ycord + operativeY * Math.sin(4 * Math.PI * i / radius)
         };
       });
   }

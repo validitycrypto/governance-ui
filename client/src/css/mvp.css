@@ -79,7 +79,7 @@ td, th {
 .validatingIdentifier {
   position: absolute;
   writing-mode: tb-rl;
-  font-size: 1.125vw;
+  font-size: 1.075vw;
   left: 2vw;
   top: 25vh;
   color: #0cff6f;
@@ -94,7 +94,10 @@ td, th {
     top: 3.5vh;
 }
 
-
+.transferButton {
+  position: relative;
+  top: 5vh;
+}
 
 .eventStats {
   position: absolute;
@@ -316,12 +319,16 @@ left: 10vw;
   left: 100px;
 }
 
-.addressButton {
+.transactionalOperatives {
   position: relative;
-  top: 2.175vh;
-  left: 6.75vw;
+  top: 5vh;
 }
 
+.stakeButton {
+  position: absolute;
+  left: 8vw;
+
+}
 
 .voteButton {
   position: absolute;
@@ -329,12 +336,6 @@ left: 10vw;
   left: 20vw;
   font-size: 1.25vw;
 
-}
-
-.stakeButton {
-  position: absolute;
-  top: 50vh;
-  left: 1.25vw;
 }
 
 .ownerButton {
@@ -349,4 +350,14 @@ left: 10vw;
   color: white;
   font-size: 25px;
   top: 3.5px;
+}
+
+
+@media screen and (min-width: 1000px) and (min-height: 750px) {
+
+  .validatingIdentifier {
+    font-size: 1.25vw;
+    top: 22vh;
+  }
+
 }

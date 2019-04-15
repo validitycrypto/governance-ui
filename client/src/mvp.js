@@ -186,12 +186,14 @@ class App extends Component {
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
 
               <TextField onChange={this.logIdentity} placeholder="Identity"/>
-              <Button appearance="primary" className="addressButton" onClick={this.registerIdentity}>
-                Register
-              </Button>
-              <Button appearance="warning" className="stakeButton" onClick={this.eventStake}>
-                Stake
-              </Button>
+              <div className="transactionalOperatives">
+                <Button appearance="primary" className="addressButton" onClick={this.registerIdentity}>
+                  Register
+                  </Button>
+                  <Button appearance="warning" className="stakeButton" onClick={this.eventStake}>
+                  Stake
+                  </Button>
+                </div>
             </div>
           )}
         </MenuSection>
@@ -214,7 +216,7 @@ class App extends Component {
             Transfer Validity
             <TextField onChange={this.logAddress} placeholder="Address"/>
             <TextField onChange={this.logAmount} placeholder="Amount"/>
-              <Button appearance="primary" className="addressButton" onClick={this.transferValidty}>
+              <Button appearance="primary" className="transferButton" onClick={this.transferValidty}>
                 Transfer
               </Button>
             </div>
