@@ -37,8 +37,8 @@ td, th {
   margin: 0 auto;
   top: .15vh;
   border: solid;
-  border-color: #0cff6f;
-  background-color: #0cff6f;
+  border-color: #9d5aff;
+  background-color: #9d5aff;
   border-radius: 5vw;
 
 }
@@ -79,10 +79,10 @@ td, th {
 .validatingIdentifier {
   position: absolute;
   writing-mode: tb-rl;
-  font-size: 1.075vw;
+  font-size: 1.0vw;
   left: 2vw;
   top: 25vh;
-  color: #0cff6f;
+  color: #9d5aff;
   z-index: 333;
 }
 
@@ -112,7 +112,7 @@ td, th {
   padding: 0.5vw;
   position: relative;
   padding: 0.5vw;
-  color: #0cff6f;
+  color: #ffffff;
   transform: translateX(0px);
 
 }
@@ -126,7 +126,7 @@ td, th {
   position: relative;
   padding: 0.5vw;
   top: 5vh;
-  color: #0cff6f;
+  color: #ffffff;
   transform: translateX(0px);
 
 }
@@ -135,7 +135,7 @@ td, th {
   position: relative;
   padding: 0.5vw;
   top: 2.5vh;
-  color: #0cff6f;
+  color: #ffffff;
   transform: translateX(0px);
 
 }
@@ -203,7 +203,7 @@ left: 10vw;
   padding: 0.5vw;
   position: relative;
   top: 7.5vh;
-  color: #0cff6f;
+  color: #ffffff;
   transform: translateX(0px);
 
 }
@@ -217,7 +217,7 @@ left: 10vw;
   position: relative;
   top: 10vh;
   padding: 0.75vw;
-  color: #0cff6f;
+  color: #ffffff;
   transform: translateX(0px);
 }
 
@@ -228,7 +228,7 @@ left: 10vw;
 .eventNegative {
   position: relative;
   padding: 0.5vw;
-  color: #0cff6f;
+  color: #ffffff;
   top: 12.5vh;
   transform: translateX(0px);
 }
@@ -243,7 +243,7 @@ left: 10vw;
   padding: 0.75vw;
   bottom: 0vh;
   right: -.5vw;
-  color: #0cff6f;
+  color: #ffffff;
 }
 
 
@@ -273,7 +273,7 @@ left: 10vw;
 }
 
 .positiveValue {
-  color: #0cff6f;
+  color: #ffffff;
   font-weight: bold;
 }
 

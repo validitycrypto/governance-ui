@@ -9,19 +9,21 @@ import { scaleOrdinal } from '@vx/scale'
 import { LinearGradient } from '@vx/gradient'
 import { Drag, raise } from '@vx/drag'
 
+import './css/bubble.css'
+
 // Voting standards
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
 const neutralVote = "0x4e65757472616c00000000000000000000000000000000000000000000000000"
 const positiveVote = "0x506f736974697665000000000000000000000000000000000000000000000000"
 const neg = ['#ff0c9e']
-const neut = ['#ff6f0c']
+const neut = ['#0cbbff']
 const pos = ['#0cff6d']
-const stake = ['#0cffe9']
+const stake = ['#8633ff']
 const largeBubble =  10000;
 const mediumBubble =  5000;
 const smallBubble =  1000;
 const tinyBubble =  500;
-const minuteBubble = 5;
+const minuteBubble = 10;
 
 function computeBubbles(_amount) {
     var minuteAmount = 0; var mediumAmount = 0; var smallAmount = 0;
@@ -74,7 +76,7 @@ class Delegation extends React.Component {
 
   transcribeData = (_poolData, _userData) => {
     var outputArray = []; var transcribeArray = []; var colorArray = []; var bubbleId = 0;
-    transcribeArray.push(this.testGeneration(_userData.id, "0x0", _userData.weight, bubbleId))
+    transcribeArray.push(this.testGeneration(_userData.id, _userData.identity, "0x0", _userData.weight, bubbleId, _userData))
     colorArray = Array(transcribeArray[0].length).fill(stake);
     bubbleId = transcribeArray[0].length;
     if(this.props.positive == 0) {
@@ -91,7 +93,7 @@ class Delegation extends React.Component {
      bubbleId++;
    } Object.entries(_poolData).forEach((data, index) => {
       if(data[1].choice != undefined){
-        transcribeArray.push(this.testGeneration(data[0], data[1].choice, data[1].weight, bubbleId))
+        transcribeArray.push(this.testGeneration(data[0], data[1].identity, data[1].choice, data[1].weight, bubbleId, data[1]))
         if(data[1].choice == positiveVote) this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == negativeVote) this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
         else if(data[1].choice == neutralVote) this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
@@ -107,12 +109,11 @@ class Delegation extends React.Component {
     } return _array;
   }
 
-  dummyBubble = (_choice, _id) => {
-    var returnArray = this.testGeneration("0x0", _choice, 0, _id);
-    return returnArray
+  dummyBubble = (_choice, _id, _identity) => {
+    return this.testGeneration("0x0", "NA", _choice, 0, _id, { blockNumber: 0, transactionHash: 0 });
   }
 
- testGeneration = (_id, _option, _stack, _bubbleId) => {
+ testGeneration = (_id, _identity, _option, _stack, _bubbleId, _metaData) => {
    var totalBubbles = computeBubbles(_stack)
    if(totalBubbles.sum == 0) totalBubbles.sum = 1;
      return Array(totalBubbles.sum)
@@ -151,13 +152,10 @@ class Delegation extends React.Component {
         var operativeY = (6) * radius;
         var operativeX = (6) * radius;
 
-        if(radius <= 5 && _option != "0x0"){
+        if(radius <= 5){
           operativeX = (i/2) * radius
           operativeY = (i/2) * radius
-          if(_option === positiveVote){
-            operativeX = (i) * radius*2
-            operativeY = (i) * radius*2
-          } if(i % 2 == 0){
+          if(i % 2 == 0){
             operativeY = operativeY * (-1);
           } else {
               operativeX = operativeX * (-1);
@@ -187,8 +185,11 @@ class Delegation extends React.Component {
        return {
           id: i + _bubbleId,
           owner: _id,
+          identity: _identity,
           weight: _stack,
           option: _option,
+          block: _metaData.blockNumber,
+          tx: _metaData.transactionHash,
           radius,
           x: xcord + operativeX * Math.cos(4 * Math.PI * i / radius),
           y: ycord + operativeY * Math.sin(4 * Math.PI * i / radius)
@@ -209,13 +210,20 @@ class Delegation extends React.Component {
             dialogPlacement="bottom left"
             target={this.state.target}
             key={this.state.target}
+            heading={`Bubble ${this.state.target}`}
             targetRadius={25}
             dialogWidth={600}>
-              <p>vID: <b>{this.state.voter}</b></p>
+              <p className="bubbleHash">Transaction: <b>{this.state.tx}</b></p>
+              <br></br>
+              <p className="bubbleId">vID: <b>{this.state.voter}</b></p>
               <br></br>
               <p>Choice: <b>{this.state.option.substring(0, this.state.option.length - 35)}</b></p>
               <br></br>
               <p>Weight: <b>{this.state.weight}</b></p>
+              <br></br>
+              <p className="bubbleIdentity">Identity: <b>{this.state.identity}</b></p>
+              <br></br>
+              <p className="bubbleBlock">Block: <b>{this.state.block}</b></p>
           </Spotlight>)}
           <svg width={width} height={height}>
           <LinearGradient id="stroke" from="#ff00a5" to="#ffc500" />
@@ -309,8 +317,13 @@ class Delegation extends React.Component {
                         target: d.id,
                         voter: d.owner,
                         weight: d.weight,
-                        option: d.option })
-                      await this.setState({ active: true })
+                        option: d.option,
+                        identity: d.identity,
+                        block: d.block,
+                        tx: d.tx })
+                      await this.setState({
+                        active: true
+                      })
                     }}}
                     onMouseMove={dragMove}
                     onMouseUp={dragEnd}
