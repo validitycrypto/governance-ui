@@ -465,6 +465,10 @@ class App extends Component {
     return await this.state.web3.utils.toAscii(stat);
   }
 
+  getAddress = async(_id) => {
+    return await this.state.token.methods.getAddress(_id).call()
+  }
+
   getEvent = async() => {
     const stat = await this.state.dapp.methods.currentEvent.call()
     console.log(this.state.web3.utils.toAscii(stat))
@@ -679,7 +683,8 @@ class App extends Component {
         var identifier = JSON.stringify(eventResult.returnValues.vID).replace(/["]+/g, '')
         var weight = Convertor.hexToDec(JSON.stringify(eventResult.returnValues.weight._hex).replace(/["]+/g, ''))
         var identity = await this.findIdentity(identifier)
-        delegationLog[identifier] = { transactionHash, blockNumber, identity, choice, weight }
+        var address = await this.getAddress(identifier)
+        delegationLog[identifier] = { address, transactionHash, blockNumber, identity, choice, weight }
         }
      }
      this.setState({log: delegationLog});

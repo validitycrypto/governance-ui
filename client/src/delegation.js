@@ -3,6 +3,8 @@ import React from 'react';
 
 // UX
 import { Spotlight, SpotlightManager, SpotlightTarget, SpotlightTransition } from '@atlaskit/onboarding';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCube, faLayerGroup, faStreetView, faEdit, faInfo, faShareAlt, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
 
 // VX
 import { scaleOrdinal } from '@vx/scale'
@@ -52,8 +54,8 @@ function computeBubbles(_amount) {
       _amount = (remainder*minuteBubble);
     }
 
-    var data = [ largeAmount, mediumAmount, smallAmount, tinyAmount, smallAmount, minuteAmount ]
-    var sum = largeAmount+mediumAmount+smallAmount+tinyAmount+smallAmount+minuteAmount
+    var data = [ largeAmount, mediumAmount, smallAmount, tinyAmount, minuteAmount ]
+    var sum = largeAmount+mediumAmount+smallAmount+tinyAmount+minuteAmount
     var output = { sum: sum, data: data }
     return output;
   }
@@ -121,7 +123,7 @@ class Delegation extends React.Component {
       .map((d, i) => {
         var largeBubbles; var mediumBubbles; var smallBubbles; var tinyBubbles; var minuteBubbles;
         var radius = Math.floor(Math.random() * 10) + 5
-        var xcord; var ycord; var option;
+        var xcord; var ycord; var option; var bubbleWeight = 0;
         largeBubbles = totalBubbles.data[0];
         mediumBubbles = totalBubbles.data[1];
         smallBubbles = totalBubbles.data[2];
@@ -129,24 +131,23 @@ class Delegation extends React.Component {
         minuteBubbles = totalBubbles.data[4];
 
         if(i < largeBubbles){
-          _stack = largeBubble;
+          bubbleWeight = largeBubble;
           radius = 20
         } else if(i >= largeBubbles
           && i < largeBubbles+mediumBubbles){
-          _stack = mediumBubble;
+          bubbleWeight = mediumBubble;
           radius = 15
         } else if(i >= largeBubbles+mediumBubbles
           && i < largeBubbles+mediumBubbles+smallBubbles){
-          _stack = smallBubble;
+          bubbleWeight = smallBubble;
           radius = 10;
         } else if(i >= largeBubbles+mediumBubbles+smallBubbles
-          && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
-          _stack = tinyBubble;
+          && i < largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
+          bubbleWeight = tinyBubble;
+          radius = 7.5;
+        } else if(i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles) {
+          bubbleWeight = minuteBubble;
           radius = 5;
-        } else if(i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles
-          && i >= largeBubbles+mediumBubbles+smallBubbles+tinyBubbles+minuteBubbles) {
-          _stack = minuteBubble;
-          radius = 1;
         }
 
         var operativeY = (6) * radius;
@@ -158,23 +159,22 @@ class Delegation extends React.Component {
           if(i % 2 == 0){
             operativeY = operativeY * (-1);
           } else {
-              operativeX = operativeX * (-1);
+            operativeX = operativeX * (-1);
           }
-
         }
 
         if(_option === neutralVote){
-          if(this.props.neutral == 0) _stack = 0
+          if(this.props.neutral == 0) bubbleWeight = 0
           operativeY = operativeY * (-1);
           xcord = 900;
           ycord = 500;
         } else if(_option === negativeVote){
-          if(this.props.negative == 0) _stack = 0
+          if(this.props.negative == 0) bubbleWeight = 0
           operativeY = operativeY * (-1);
           xcord = 200;
           ycord = 500;
         } else if(_option === positiveVote){
-          if(this.props.positive == 0) _stack = 0
+          if(this.props.positive == 0) bubbleWeight = 0
           xcord = 200;
           ycord = 100
         } else if(_option === "0x0"){
@@ -183,14 +183,17 @@ class Delegation extends React.Component {
         }
 
        return {
-          id: i + _bubbleId,
+          radius,
           owner: _id,
-          identity: _identity,
-          weight: _stack,
+          total: _stack,
           option: _option,
+          id: i + _bubbleId,
+          identity: _identity,
+          weight: bubbleWeight,
+          account: _metaData.address,
           block: _metaData.blockNumber,
           tx: _metaData.transactionHash,
-          radius,
+          percent: (bubbleWeight/_stack * 100).toFixed(2),
           x: xcord + operativeX * Math.cos(4 * Math.PI * i / radius),
           y: ycord + operativeY * Math.sin(4 * Math.PI * i / radius)
         };
@@ -212,18 +215,18 @@ class Delegation extends React.Component {
             key={this.state.target}
             heading={`Bubble ${this.state.target}`}
             targetRadius={25}
-            dialogWidth={600}>
-              <p className="bubbleHash">Transaction: <b>{this.state.tx}</b></p>
-              <br></br>
-              <p className="bubbleId">vID: <b>{this.state.voter}</b></p>
-              <br></br>
-              <p>Choice: <b>{this.state.option.substring(0, this.state.option.length - 35)}</b></p>
-              <br></br>
-              <p>Weight: <b>{this.state.weight}</b></p>
-              <br></br>
+            dialogWidth={600}
+            >
+              <img className="bubbleIdenticon" src={this.state.accountImage}/>
+              <p className="bubbleAccount"><FontAwesomeIcon color="#ffffff" icon={faUser} className="starIcon" size='1x'/>&nbsp;&nbsp;Account: <b>{this.state.account}</b> </p>
+              <p className="bubbleChoice"><FontAwesomeIcon color="#ffffff" icon={faStar} className="starIcon" size='1x'/>&nbsp;&nbsp;Choice: <b>{this.state.option.substring(0, this.state.option.length - 47)}</b></p>
+              <p className="bubblePercent"><FontAwesomeIcon color="#ffffff" icon={faLayerGroup} className="starIcon" size='1x'/>&nbsp;&nbsp;Percentage Weight: <b>{this.state.percentage} %</b></p>
+              <p className="bubbleTotal"><FontAwesomeIcon color="#ffffff" icon={faBalanceScale} className="starIcon" size='1x'/>&nbsp;&nbsp;Total Weight: <b>{this.state.total}</b></p>
+              <p className="bubbleWeight"><FontAwesomeIcon color="#ffffff" icon={faWeightHanging} className="starIcon" size='1x'/>&nbsp;&nbsp;Weight: <b>{this.state.weight}</b></p>
               <p className="bubbleIdentity">Identity: <b>{this.state.identity}</b></p>
-              <br></br>
-              <p className="bubbleBlock">Block: <b>{this.state.block}</b></p>
+              <p className="bubbleBlock"><FontAwesomeIcon color="#ffffff" icon={faCube} className="starIcon" size='1x'/>&nbsp;&nbsp;Block: <b>{this.state.block}</b></p>
+              <p className="bubbleId">vID: <b>{this.state.voter}</b></p>
+              <p className="bubbleHash">Transaction: <b>{this.state.tx}</b></p>
           </Spotlight>)}
           <svg width={width} height={height}>
           <LinearGradient id="stroke" from="#ff00a5" to="#ffc500" />
@@ -314,12 +317,16 @@ class Delegation extends React.Component {
                     onMouseEnter={async () => {
                       if(d.option != "0x0"){
                       await this.setState({
+                        accountImage: `https://eth.vanity.show/${d.account}`,
+                        account: d.account,
                         target: d.id,
                         voter: d.owner,
                         weight: d.weight,
                         option: d.option,
                         identity: d.identity,
                         block: d.block,
+                        percentage: d.percent,
+                        total: d.total,
                         tx: d.tx })
                       await this.setState({
                         active: true
