@@ -279,7 +279,7 @@ class App extends Component {
               <div className="databasePositive"><FontAwesomeIcon color="#9d5aff" icon={faCheck} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
               <div className="databaseNegative"><FontAwesomeIcon color="#9d5aff" icon={faTimes} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
               <div className="databaseNeutral"><FontAwesomeIcon color="#9d5aff" icon={faBalanceScale} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].neutral} </div>
-              <div className="databaseRating"><FontAwesomeIcon color="#9d5aff" icon={faStar} size='1x'/>&nbsp;&nbsp;&nbsp;5.5 </div>
+              <div className="databaseRating"><FontAwesomeIcon color="#9d5aff" icon={faStar} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].rating}</div>
               </Paper></div>
             ))}
             </div>
@@ -462,7 +462,10 @@ class App extends Component {
 
   findIdentity = async(_id) => {
     const stat = await this.state.token.methods.getIdentity(_id).call()
-    return await this.state.web3.utils.toAscii(stat);
+    var parse = await this.state.web3.utils.toAscii(stat);
+    var blank = await this.state.web3.utils.fromAscii("");
+    if(stat === blank) parse = "Validator"
+    return parse
   }
 
   getAddress = async(_id) => {
@@ -592,16 +595,24 @@ class App extends Component {
           var eventSubject = item.data().eventHex
           var convertedValue = await this.state.web3.utils.toAscii(eventSubject)
           if(eventSubject != undefined){
-          pastArray.push(convertedValue)
+          var eventType = await this.state.web3.utils.toAscii(await this.pastType(eventSubject, 1))
+          var eventTicker = await this.pastTicker(eventSubject, 1)
+          var eventImage = await this.getPastImage(eventSubject)
+          var eventPositive = await this.pastPositive(eventSubject, 1)
+          var eventNegative = await this.pastNegatitve(eventSubject, 1)
+          var eventNeutral = await this.pastNeutral(eventSubject, 1)
+          var eventTotal = (parseInt(eventPositive) + parseInt(eventNeutral))/(parseInt(eventPositive) + parseInt(eventNegative) + parseInt(eventNeutral)) * 10
           var dataEmbed = {
-              ticker: await this.pastTicker(eventSubject, 1),
-              image: await this.getPastImage(eventSubject),
-              type: await this.state.web3.utils.toAscii(await this.pastType(eventSubject, 1)),
-              positive: await this.pastPositive(eventSubject, 1),
-              neutral: await this.pastNeutral(eventSubject, 1),
-              negative : await this.pastNegatitve(eventSubject, 1)
+              ticker: eventTicker,
+              image: eventImage,
+              type: eventType,
+              positive: eventPositive,
+              neutral: eventNeutral,
+              negative : eventNegative,
+              rating: eventTotal.toFixed(2)
             }
             eventArray[convertedValue] = dataEmbed
+            pastArray.push(convertedValue)
           }
         })
         await this.setState({ pastEvents: pastArray, pastData: eventArray })

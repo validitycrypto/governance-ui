@@ -218,13 +218,13 @@ class Delegation extends React.Component {
             dialogWidth={600}
             >
               <img className="bubbleIdenticon" src={this.state.accountImage}/>
-              <p className="bubbleAccount"><FontAwesomeIcon color="#ffffff" icon={faUser} className="starIcon" size='1x'/>&nbsp;&nbsp;Account: <b>{this.state.account}</b> </p>
-              <p className="bubbleChoice"><FontAwesomeIcon color="#ffffff" icon={faStar} className="starIcon" size='1x'/>&nbsp;&nbsp;Choice: <b>{this.state.option.substring(0, this.state.option.length - 47)}</b></p>
-              <p className="bubblePercent"><FontAwesomeIcon color="#ffffff" icon={faLayerGroup} className="starIcon" size='1x'/>&nbsp;&nbsp;Percentage Weight: <b>{this.state.percentage} %</b></p>
+              <p className="bubbleAccount">&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faUser} className="starIcon" size='1x'/>&nbsp;&nbsp;Account: <b>{this.state.account}</b> </p>
+              <p className="bubbleChoice">&nbsp;<FontAwesomeIcon color="#ffffff" icon={faStar} className="starIcon" size='1x'/>&nbsp;&nbsp;Choice: <b>{this.state.option.substring(0, this.state.option.length - 47)}</b></p>
+              <p className="bubblePercent">&nbsp;<FontAwesomeIcon color="#ffffff" icon={faLayerGroup} className="starIcon" size='1x'/>&nbsp;&nbsp;Percentage Weight: <b>{this.state.percentage} %</b></p>
               <p className="bubbleTotal"><FontAwesomeIcon color="#ffffff" icon={faBalanceScale} className="starIcon" size='1x'/>&nbsp;&nbsp;Total Weight: <b>{this.state.total}</b></p>
-              <p className="bubbleWeight"><FontAwesomeIcon color="#ffffff" icon={faWeightHanging} className="starIcon" size='1x'/>&nbsp;&nbsp;Weight: <b>{this.state.weight}</b></p>
+              <p className="bubbleWeight">&nbsp;<FontAwesomeIcon color="#ffffff" icon={faWeightHanging} className="starIcon" size='1x'/>&nbsp;&nbsp;Weight: <b>{this.state.weight}</b></p>
               <p className="bubbleIdentity">Identity: <b>{this.state.identity}</b></p>
-              <p className="bubbleBlock"><FontAwesomeIcon color="#ffffff" icon={faCube} className="starIcon" size='1x'/>&nbsp;&nbsp;Block: <b>{this.state.block}</b></p>
+              <p className="bubbleBlock">&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCube} className="starIcon" size='1x'/>&nbsp;&nbsp;Block: <b>{this.state.block}</b></p>
               <p className="bubbleId">vID: <b>{this.state.voter}</b></p>
               <p className="bubbleHash">Transaction: <b>{this.state.tx}</b></p>
           </Spotlight>)}

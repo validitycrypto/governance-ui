@@ -149,6 +149,7 @@ td, th {
 
 .databaseLogo {
   position: relative;
+  top: .75vh;
 }
 
 .databaseName {
@@ -190,8 +191,8 @@ td, th {
 .databaseRating {
 position: relative;
 font-size: 1.25vw;
-top: -.25vh;
-left: 10vw;
+top: -.5vh;
+left: 9vw;
 }
 
 .eventType:hover {
