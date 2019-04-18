@@ -122,8 +122,8 @@ class Delegation extends React.Component {
       .fill(1)
       .map((d, i) => {
         var largeBubbles; var mediumBubbles; var smallBubbles; var tinyBubbles; var minuteBubbles;
+        var xcord; var ycord; var option; var bubbleWeight = 0; var bubbleOption;
         var radius = Math.floor(Math.random() * 10) + 5
-        var xcord; var ycord; var option; var bubbleWeight = 0;
         largeBubbles = totalBubbles.data[0];
         mediumBubbles = totalBubbles.data[1];
         smallBubbles = totalBubbles.data[2];
@@ -165,21 +165,25 @@ class Delegation extends React.Component {
 
         if(_option === neutralVote){
           if(this.props.neutral == 0) bubbleWeight = 0
-          operativeY = operativeY * (-1);
-          xcord = 900;
-          ycord = 500;
+          bubbleOption = this.props.neutral
+          operativeY = operativeY * (-1)
+          xcord = 900
+          ycord = window.screen.height*0.75;
         } else if(_option === negativeVote){
           if(this.props.negative == 0) bubbleWeight = 0
-          operativeY = operativeY * (-1);
-          xcord = 200;
-          ycord = 500;
+          bubbleOption = this.props.negative
+          operativeY = operativeY * (-1)
+          xcord = 200
+          ycord = window.screen.height*0.75;
         } else if(_option === positiveVote){
           if(this.props.positive == 0) bubbleWeight = 0
+          bubbleOption = this.props.positive
           xcord = 200;
           ycord = 100
         } else if(_option === "0x0"){
-          xcord = 550;
-          ycord = 350;
+          bubbleOption = _stack
+          xcord = window.screen.width*0.45;
+          ycord = window.screen.height*0.5;
         }
 
        return {
@@ -194,6 +198,7 @@ class Delegation extends React.Component {
           block: _metaData.blockNumber,
           tx: _metaData.transactionHash,
           percent: (bubbleWeight/_stack * 100).toFixed(2),
+          totalPercent: (bubbleWeight/bubbleOption * 100).toFixed(2),
           x: xcord + operativeX * Math.cos(4 * Math.PI * i / radius),
           y: ycord + operativeY * Math.sin(4 * Math.PI * i / radius)
         };
@@ -215,12 +220,11 @@ class Delegation extends React.Component {
             key={this.state.target}
             heading={`Bubble ${this.state.target}`}
             targetRadius={25}
-            dialogWidth={600}
-            >
+            dialogWidth={600}>
               <img className="bubbleIdenticon" src={this.state.accountImage}/>
               <p className="bubbleAccount">&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faUser} className="starIcon" size='1x'/>&nbsp;&nbsp;Account: <b>{this.state.account}</b> </p>
+              <p className="bubblePercent">&nbsp;<FontAwesomeIcon color="#ffffff" icon={faLayerGroup} className="starIcon" size='1x'/>&nbsp;&nbsp;Weight Percentage: <b>{this.state.percentage} %</b> &nbsp;&nbsp;&nbsp;&nbsp;Total Percentage: <b>{this.state.totalPercent} %</b> </p>
               <p className="bubbleChoice">&nbsp;<FontAwesomeIcon color="#ffffff" icon={faStar} className="starIcon" size='1x'/>&nbsp;&nbsp;Choice: <b>{this.state.option.substring(0, this.state.option.length - 47)}</b></p>
-              <p className="bubblePercent">&nbsp;<FontAwesomeIcon color="#ffffff" icon={faLayerGroup} className="starIcon" size='1x'/>&nbsp;&nbsp;Percentage Weight: <b>{this.state.percentage} %</b></p>
               <p className="bubbleTotal"><FontAwesomeIcon color="#ffffff" icon={faBalanceScale} className="starIcon" size='1x'/>&nbsp;&nbsp;Total Weight: <b>{this.state.total}</b></p>
               <p className="bubbleWeight">&nbsp;<FontAwesomeIcon color="#ffffff" icon={faWeightHanging} className="starIcon" size='1x'/>&nbsp;&nbsp;Weight: <b>{this.state.weight}</b></p>
               <p className="bubbleIdentity">Identity: <b>{this.state.identity}</b></p>
@@ -238,18 +242,16 @@ class Delegation extends React.Component {
               height={height}
               onDragEnd={async() => {
                 await this.setState({
-                  log: true
-                })
-                console.log("vID", d.owner);
-                console.log("Bubble ID", d.id);
-                console.log("Total Bubbles:", this.state.bubbleStack)
-                console.log("State Bubbles:", this.state.bubbleState)
-                if(this.state.bubbleStack == this.state.bubbleState){
+                  log: false
+                }); if(this.state.bubbleStack == this.state.bubbleState
+                   && this.state.bubbleStack != 0){
                   await this.props.vote(this.state.votingOption)
                 }
               }}
-              onDragStart={() => {
-                this.setState((state, props) => {
+              onDragStart={async() => {
+                await this.setState({
+                  log: true
+                }); this.setState((state, props) => {
                   return {
                     items: raise(state.items, i)
                   };
@@ -265,8 +267,7 @@ class Delegation extends React.Component {
                 dy,
               }) => {
                   if(isDragging){
-                    if(dx < -50 && dy < -37.5){
-                      console.log("POSITIVE");
+                    if(dx < -75 && dy < -57.5){
                       if(this.state.log == true){
                         this.props.option(positiveVote, this.state.bubbleState+1, this.state.bubbleStack)
                         this.setState({
@@ -275,8 +276,7 @@ class Delegation extends React.Component {
                           log: false,
                         })
                       }
-                    } else if(dx > 275 && dy > 150){
-                      console.log("NEUTRAL");
+                    } else if(dx > 250 && dy > 125){
                       if(this.state.log == true){
                         this.props.option(neutralVote, this.state.bubbleState+1, this.state.bubbleStack)
                         this.setState({
@@ -286,7 +286,6 @@ class Delegation extends React.Component {
                         })
                       }
                     } else if(dx < -200 && dy > 37.5){
-                      console.log("NEGATIVE");
                       if(this.state.log == true){
                         this.props.option(negativeVote, this.state.bubbleState+1, this.state.bubbleStack)
                         this.setState({
@@ -314,9 +313,9 @@ class Delegation extends React.Component {
                     fillOpacity={0.75}
                     stroke={isDragging ? 'white' : 'black'}
                     strokeWidth={2}
-                    onMouseEnter={async () => {
+                    onMouseOver={() => {
                       if(d.option != "0x0"){
-                      await this.setState({
+                       this.setState({
                         accountImage: `https://eth.vanity.show/${d.account}`,
                         account: d.account,
                         target: d.id,
@@ -326,9 +325,10 @@ class Delegation extends React.Component {
                         identity: d.identity,
                         block: d.block,
                         percentage: d.percent,
+                        totalPercent: d.totalPercent,
                         total: d.total,
                         tx: d.tx })
-                      await this.setState({
+                       this.setState({
                         active: true
                       })
                     }}}

@@ -37,8 +37,8 @@ td, th {
   margin: 0 auto;
   top: .15vh;
   border: solid;
-  border-color: #9d5aff;
-  background-color: #9d5aff;
+  border-color: #815aff;
+  background-color: #ffffff;
   border-radius: 5vw;
 
 }
@@ -82,7 +82,7 @@ td, th {
   font-size: 1.0vw;
   left: 2vw;
   top: 25vh;
-  color: #9d5aff;
+  color: #815aff;
   z-index: 333;
 }
 
@@ -96,7 +96,7 @@ td, th {
 
 .transferButton {
   position: relative;
-  top: 5vh;
+  top: 2.5vh;
 }
 
 .eventStats {
@@ -322,7 +322,7 @@ left: 9vw;
 
 .transactionalOperatives {
   position: relative;
-  top: 5vh;
+  top: 2.5vh;
 }
 
 .stakeButton {

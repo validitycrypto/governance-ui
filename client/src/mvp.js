@@ -34,19 +34,19 @@ import "react-toggle/style.css"
 import "./css/mvp.css"
 
 // Preset Icons
-const crosshairsIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faCrosshairs} className="eventsIcon" size='1x'/>
-const positiveIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faCheck} className="positiveIcon" size='lg'/>
-const bullseyeIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faBullseye} className="starIcon" size='1x'/>
-const negativeIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faTimes} className="neutralIcon" size='lg'/>
-const trustIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faShieldAlt} className="starIcon" size='1x'/>
-const identityIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faIdCard} className="starIcon" size='1x'/>
-const ethIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faEthereum} className="starIcon" size='1x'/>
-const tokenIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faTag} className="starIcon" size='1x'/>
-const starIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faStar} className="starIcon" size='1x'/>
-const neutralIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faBalanceScale} size='1x'/>
-const walletIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faWallet} size='lg'/>
-const userIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faUser} size='lg'/>
-const cogIcon = () => <FontAwesomeIcon color="#9d5aff" icon={faCog} size='lg'/>
+const crosshairsIcon = () => <FontAwesomeIcon color="#815aff" icon={faCrosshairs} className="eventsIcon" size='1x'/>
+const positiveIcon = () => <FontAwesomeIcon color="#815aff" icon={faCheck} className="positiveIcon" size='lg'/>
+const bullseyeIcon = () => <FontAwesomeIcon color="#815aff" icon={faBullseye} className="starIcon" size='1x'/>
+const negativeIcon = () => <FontAwesomeIcon color="#815aff" icon={faTimes} className="neutralIcon" size='lg'/>
+const trustIcon = () => <FontAwesomeIcon color="#815aff" icon={faShieldAlt} className="starIcon" size='1x'/>
+const identityIcon = () => <FontAwesomeIcon color="#815aff" icon={faIdCard} className="starIcon" size='1x'/>
+const ethIcon = () => <FontAwesomeIcon color="#815aff" icon={faEthereum} className="starIcon" size='1x'/>
+const tokenIcon = () => <FontAwesomeIcon color="#815aff" icon={faTag} className="starIcon" size='1x'/>
+const starIcon = () => <FontAwesomeIcon color="#815aff" icon={faStar} className="starIcon" size='1x'/>
+const neutralIcon = () => <FontAwesomeIcon color="#815aff" icon={faBalanceScale} size='1x'/>
+const walletIcon = () => <FontAwesomeIcon color="#815aff" icon={faWallet} size='lg'/>
+const userIcon = () => <FontAwesomeIcon color="#815aff" icon={faUser} size='lg'/>
+const cogIcon = () => <FontAwesomeIcon color="#815aff" icon={faCog} size='lg'/>
 
 // Standards
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
@@ -119,6 +119,15 @@ class App extends Component {
 
   refreshData = async () => {
       await this.getLog()
+      await this.getEvent()
+      await this.getRound()
+      await this.getvID()
+      await this.getTotal()
+      await this.getNeutral()
+      await this.getNegative()
+      await this.getPositive()
+      await this.getEvents()
+      await this.getIdentity()
       await this.eventType(this.state.eventSubject, this.state.round)
       await this.eventTicker(this.state.eventSubject, this.state.round)
       await this.eventPositive(this.state.eventSubject, this.state.round)
@@ -184,13 +193,14 @@ class App extends Component {
               <Item before={positiveIcon} text={this.state.positive} subText="Positive" />
               <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
-
+              <br></br>
+              Register Identity
               <TextField onChange={this.logIdentity} placeholder="Identity"/>
               <div className="transactionalOperatives">
                 <Button appearance="primary" className="addressButton" onClick={this.registerIdentity}>
                   Register
                   </Button>
-                  <Button appearance="warning" className="stakeButton" onClick={this.eventStake}>
+                  <Button appearance="help" className="stakeButton" onClick={this.eventStake}>
                   Stake
                   </Button>
                 </div>
@@ -274,12 +284,12 @@ class App extends Component {
               <div><br></br>
               <Paper style={{ padding: '1vw', backgroundColor: fade('#ffffff', 0.125) }}>
               <div className="databaseLogo"><Avatar src={this.state.pastData[data].image} /></div>
-              <div className="databaseName"><FontAwesomeIcon color="#9d5aff" icon={faInfo} size='1x'/>&nbsp;&nbsp;&nbsp;{data} ({this.state.pastData[data].ticker})</div>
-              <div className="databaseType"><FontAwesomeIcon color="#9d5aff" icon={faCoins} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
-              <div className="databasePositive"><FontAwesomeIcon color="#9d5aff" icon={faCheck} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
-              <div className="databaseNegative"><FontAwesomeIcon color="#9d5aff" icon={faTimes} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
-              <div className="databaseNeutral"><FontAwesomeIcon color="#9d5aff" icon={faBalanceScale} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].neutral} </div>
-              <div className="databaseRating"><FontAwesomeIcon color="#9d5aff" icon={faStar} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].rating}</div>
+              <div className="databaseName"><FontAwesomeIcon color="#815aff" icon={faInfo} size='1x'/>&nbsp;&nbsp;&nbsp;{data} ({this.state.pastData[data].ticker})</div>
+              <div className="databaseType"><FontAwesomeIcon color="#815aff" icon={faCoins} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
+              <div className="databasePositive"><FontAwesomeIcon color="#815aff" icon={faCheck} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
+              <div className="databaseNegative"><FontAwesomeIcon color="#815aff" icon={faTimes} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
+              <div className="databaseNeutral"><FontAwesomeIcon color="#815aff" icon={faBalanceScale} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].neutral} </div>
+              <div className="databaseRating"><FontAwesomeIcon color="#815aff" icon={faStar} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].rating}</div>
               </Paper></div>
             ))}
             </div>
@@ -370,7 +380,7 @@ class App extends Component {
 
  timeTravel = async() => {
     for(var x = 0 ; x < 100 ; x++){
-      this.state.web3.currentProvider.sendAsync({
+      this.state.web3.currentProvider.send({
         jsonrpc: '2.0',
         method: 'evm_mine',
         params: [],
@@ -476,8 +486,8 @@ class App extends Component {
     const stat = await this.state.dapp.methods.currentEvent.call()
     console.log(this.state.web3.utils.toAscii(stat))
     await this.setState({
-      eventSubject: stat,
-      eventDecode: this.state.web3.utils.toAscii(stat)
+      eventDecode: this.state.web3.utils.toAscii(stat),
+      eventSubject: stat
     })
   }
 
@@ -601,7 +611,7 @@ class App extends Component {
           var eventPositive = await this.pastPositive(eventSubject, 1)
           var eventNegative = await this.pastNegatitve(eventSubject, 1)
           var eventNeutral = await this.pastNeutral(eventSubject, 1)
-          var eventTotal = (parseInt(eventPositive) + parseInt(eventNeutral))/(parseInt(eventPositive) + parseInt(eventNegative) + parseInt(eventNeutral)) * 10
+          var eventTotal = parseInt(eventPositive)/(parseInt(eventPositive) + parseInt(eventNegative) + parseInt(eventNeutral)) * 10
           var dataEmbed = {
               ticker: eventTicker,
               image: eventImage,
@@ -753,27 +763,27 @@ class App extends Component {
         </div>
         <div className="eventStats">
           <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#9d5aff" icon={faInfo} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faInfo} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}
           </Paper>
           <Paper className="eventTicker" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#9d5aff" icon={faShareAlt} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faShareAlt} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ticker: {this.state.eventTicker}
           </Paper>
           <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#9d5aff" icon={faCoins} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faCoins} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}
           </Paper>
           <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#9d5aff" icon={faCheck} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faCheck} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}
           </Paper>
           <Paper className="eventNeutral" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;<FontAwesomeIcon color="#9d5aff" icon={faBalanceScale} size='1x'/>
+            &nbsp;<FontAwesomeIcon color="#815aff" icon={faBalanceScale} size='1x'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}
          </Paper>
          <Paper className="eventNegative" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#9d5aff" icon={faTimes} size='lg'/>
+            &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faTimes} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
          </Paper>
         </div>
@@ -781,13 +791,13 @@ class App extends Component {
           <img className="eventImage" src={this.state.eventImage} />
         </Paper>
         <Paper className="votingMetrics" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#9d5aff" icon={faStreetView} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faStreetView} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;<FontAwesomeIcon color="#9d5aff" icon={faCrosshairs} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faCrosshairs} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;<FontAwesomeIcon color="#9d5aff" icon={faWeightHanging} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faWeightHanging} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
         </Paper>
         <div className="votingBubbles">

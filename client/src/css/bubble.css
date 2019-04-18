@@ -1,14 +1,14 @@
 .bubbleId {
   position: relative;
   font-size: 0.9vw;
-  top: 4.5vh;
+  top: 4.25vh;
 
 }
 
 .bubbleHash {
   position: relative;
   font-size: 0.85vw;
-  top: 6vh;
+  top: 5vh;
 }
 
 .bubbleIdenticon {
@@ -22,12 +22,13 @@
   float: right;
 }
 
-.bubbleChoice {
+.bubblePercent {
   position: relative;
   top: .75vh;
+  left: .125vw;
 }
 
-.bubblePercent {
+.bubbleChoice {
   position: relative;
   top: 1.25vh;
 }
@@ -35,6 +36,7 @@
 .bubbleTotal {
   position: relative;
   top: 1.75vh;
+  left: .125vw;
 }
 
 .bubbleWeight {
