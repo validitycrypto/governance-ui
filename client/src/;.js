@@ -78,7 +78,7 @@ class Delegation extends React.Component {
 
   transcribeData = (_poolData, _userData) => {
     var outputArray = []; var transcribeArray = []; var colorArray = []; var bubbleId = 0; var positiveId = 0; var negativeId = 0; var neutralId = 0;
-    transcribeArray.push(this.testGeneration(_userData.id, _userData.identity, "0x0", _userData.weight, bubbleId, computeBubbles(_userData.weight).sum, _userData))
+    transcribeArray.push(this.testGeneration(_userData.id, _userData.identity, "0x0", _userData.weight, bubbleId, _userData))
     colorArray = Array(transcribeArray[0].length).fill(stake);
     bubbleId = transcribeArray[0].length;
     if(this.props.positive == 0) {
@@ -97,21 +97,16 @@ class Delegation extends React.Component {
      negativeId++;
      bubbleId++;
    } Object.entries(_poolData).forEach((data, index) => {
-     var optionId;
       if(data[1].choice != undefined){
         if(data[1].choice == positiveVote){
           this.fillArray(colorArray, pos, computeBubbles(data[1].weight).sum)
-          positiveId = positiveId + computeBubbles(data[1].weight).sum
-          optionId = positiveId;
+          positiveId++;
         } else if(data[1].choice == negativeVote){
           this.fillArray(colorArray, neg, computeBubbles(data[1].weight).sum)
-          negativeId = negativeId + computeBubbles(data[1].weight).sum
-          optionId = negativeId;
+          negativeId++;l
         } else if(data[1].choice == neutralVote) {
           this.fillArray(colorArray, neut, computeBubbles(data[1].weight).sum)
-          neutralId = neutralId + computeBubbles(data[1].weight).sum
-          optionId = neutralId;
-        } transcribeArray.push(this.testGeneration(data[0], data[1].identity, data[1].choice, data[1].weight, bubbleId, optionId, data[1]))
+        } transcribeArray.push(this.testGeneration(data[0], data[1].identity, data[1].choice, data[1].weight, bubbleId, data[1]))
         bubbleId = bubbleId + transcribeArray[transcribeArray.length-1].length;
    }}); transcribeArray.forEach((x,y) =>
      outputArray = outputArray.concat(transcribeArray[y]))
@@ -125,10 +120,10 @@ class Delegation extends React.Component {
   }
 
   dummyBubble = (_choice, _id, _identity) => {
-    return this.testGeneration("0x0", "NA", _choice, 0, _id, 1, { blockNumber: 0, transactionHash: 0 });
+    return this.testGeneration("0x0", "NA", _choice, 0, _id, { blockNumber: 0, transactionHash: 0 });
   }
 
- testGeneration = (_id, _identity, _option, _stack, _bubbleId, _optionId, _metaData) => {
+ testGeneration = (_id, _identity, _option, _stack, _bubbleId, _metaData) => {
    var totalBubbles = computeBubbles(_stack)
    if(totalBubbles.sum == 0) totalBubbles.sum = 1;
      return Array(totalBubbles.sum)
@@ -167,8 +162,8 @@ class Delegation extends React.Component {
         var operativeX = (6) * radius;
 
         if(radius <= 5){
-          operativeX = (i * (_optionId/(radius*2))) + 5
-          operativeY = (i * (_optionId/(radius*2))) + 5
+          operativeX = (i * _bubbleId/radius)
+          operativeY = (i * _bubbleId/radius)
           if(i % 2 == 0){
             operativeY = operativeY * (-1);
           } else {
@@ -212,8 +207,8 @@ class Delegation extends React.Component {
           tx: _metaData.transactionHash,
           percent: (bubbleWeight/_stack * 100).toFixed(2),
           totalPercent: (bubbleWeight/bubbleOption * 100).toFixed(2),
-          x: xcord + operativeX * Math.cos(4 * Math.PI * i / radius),
-          y: ycord + operativeY * Math.sin(4 * Math.PI * i / radius)
+          x: xcord + operativeX * Math.cos(4 * Math.PI * (_bubbleId + i) / radius),
+          y: ycord + operativeY * Math.sin(4 * Math.PI * (_bubbleId + i) / radius)
         };
       });
   }
