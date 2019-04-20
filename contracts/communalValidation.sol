@@ -106,6 +106,8 @@ contract communalValidation {
       }
 
       _VLDY.delegationEvent(id, _live, _choice, weight);
+      _VLDY.delegationReward(id, msg.sender, VOTE);
+
   }
 
   function votingWeight(address _voter) public view returns (uint stake) {
