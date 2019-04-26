@@ -1,14 +1,14 @@
 .bubbleId {
   position: relative;
-  font-size: 0.9vw;
-  top: 4.25vh;
+  font-size: 0.75vw;
+  height: 7.5vh;
+  top: 5vh;
 
 }
 
 .bubbleHash {
   position: relative;
-  font-size: 0.85vw;
-  top: 5vh;
+  font-size: 0.75vw;
 }
 
 .bubbleIdenticon {

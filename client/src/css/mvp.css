@@ -35,8 +35,8 @@ td, th {
   width: 8.875vw;
   height: 8.875vw;
   margin: 0 auto;
-  top: .15vh;
   border: solid;
+  border-width: solid;
   border-color: #815aff;
   background-color: #ffffff;
   border-radius: 5vw;
@@ -80,7 +80,7 @@ td, th {
   position: absolute;
   writing-mode: tb-rl;
   font-size: 1.0vw;
-  left: 2vw;
+  left: 25px;
   top: 25vh;
   color: #815aff;
   z-index: 333;
@@ -88,10 +88,10 @@ td, th {
 
 .eventBorder {
     position: absolute;
-    height: 10vw;
-    width: 10vw;
+    height: 9.75vw;
+    width: 9.75vw;
     left: 87.5vw;
-    top: 3.5vh;
+    top: 2.5vh;
 }
 
 .transferButton {
@@ -360,5 +360,11 @@ left: 9vw;
     font-size: 1.25vw;
     top: 22vh;
   }
+
+}
+
+@media screen and (min-width: 750px) and (min-height: 750px) {
+
+
 
 }

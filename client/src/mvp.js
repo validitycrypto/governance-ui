@@ -692,10 +692,9 @@ class App extends Component {
 
   getLog = async () => {
     var delegationLog = { }
-    return await this.state.token.events.Vote({ fromBlock: 0, toBlock: 'latest' },
-    async(error, eventResult) => {
-    if (error) { console.log(error);
-    } else {
+    await this.state.token.events.Vote({ fromBlock: 0, toBlock: 'latest'}, (event,error) => { })
+    .on('data', async(eventResult) => {
+      console.log(eventResult);
       var activeEvent = JSON.stringify(eventResult.returnValues.subject).replace(/["]+/g, '');
       var blockNumber = JSON.stringify(eventResult.blockNumber).replace(/["]+/g, '');
       var transactionHash = JSON.stringify(eventResult.transactionHash).replace(/["]+/g, '');
@@ -706,10 +705,11 @@ class App extends Component {
         var identity = await this.findIdentity(identifier)
         var address = await this.getAddress(identifier)
         delegationLog[identifier] = { address, transactionHash, blockNumber, identity, choice, weight }
+        await this.setState({log: delegationLog}, this.refreshData());
         }
-     }
-     this.setState({log: delegationLog});
-  })
+    }).on('changed', (event) => {
+        // remove event from local database
+    }).on('error', console.error);
 }
 
   initialiseOwnership = async() => {

@@ -167,8 +167,13 @@ class Delegation extends React.Component {
         var operativeX = (6) * radius;
 
         if(radius <= 5){
+          if(i < 25){
           operativeX = (i * (_optionId/(radius*2))) + 5
           operativeY = (i * (_optionId/(radius*2))) + 5
+        } else {
+          operativeX = (i/3 * (_optionId/(radius*2))) + 10
+          operativeY = (i/3 * (_optionId/(radius*2))) + 10
+        }
           if(i % 2 == 0){
             operativeY = operativeY * (-1);
           } else {
