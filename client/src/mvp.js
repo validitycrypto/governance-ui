@@ -65,12 +65,14 @@ const GlobalNavigation = () => (
 );
 
 firebase.initializeApp({
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "" });
+    apiKey: "AIzaSyBX9yoKTTg4a33ETJ0hydmWcmEPMBWYBhU",
+    authDomain: "validity-mvp.firebaseapp.com",
+    databaseURL: "https://validity-mvp.firebaseio.com",
+    projectId: "validity-mvp",
+    storageBucket: "validity-mvp.appspot.com",
+    messagingSenderId: "388843201152",
+    appId: "1:388843201152:web:192e3cfcec60b81b"
+  });
 const db = firebase.firestore()
 
 class App extends Component {
