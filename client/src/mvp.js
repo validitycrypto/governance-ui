@@ -8,7 +8,7 @@ import Validation from "./contracts/communalValidation.json";
 import ERC20d from "./contracts/ERC20d.json";
 
 // UX
-import { GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, light, dark, settings, ContainerHeader, HeaderSection, Item, ThemeProvider } from '@atlaskit/navigation-next';
+import { GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, light, dark, settings, ContainerHeader, HeaderSection, Item, ThemeProvider, modeGenerator } from '@atlaskit/navigation-next';
 import { faStreetView, faEdit, faInfo, faShareAlt, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
 import { InlineDialog, Flag, AutoDismissFlag, FlagGroup } from '@atlaskit/flag'
 import { fade } from '@material-ui/core/styles/colorManipulator'
@@ -22,6 +22,7 @@ import TextField from '@atlaskit/field-text'
 import Paper from '@material-ui/core/Paper'
 import Select from '@atlaskit/select'
 import Button from '@atlaskit/button'
+import { colors } from '@atlaskit/theme';
 
 // External Components
 import Delegation from './delegation'
@@ -34,19 +35,19 @@ import "react-toggle/style.css"
 import "./css/mvp.css"
 
 // Preset Icons
-const crosshairsIcon = () => <FontAwesomeIcon color="#815aff" icon={faCrosshairs} className="eventsIcon" size='1x'/>
-const positiveIcon = () => <FontAwesomeIcon color="#815aff" icon={faCheck} className="positiveIcon" size='lg'/>
-const bullseyeIcon = () => <FontAwesomeIcon color="#815aff" icon={faBullseye} className="starIcon" size='1x'/>
-const negativeIcon = () => <FontAwesomeIcon color="#815aff" icon={faTimes} className="neutralIcon" size='lg'/>
-const trustIcon = () => <FontAwesomeIcon color="#815aff" icon={faShieldAlt} className="starIcon" size='1x'/>
-const identityIcon = () => <FontAwesomeIcon color="#815aff" icon={faIdCard} className="starIcon" size='1x'/>
-const ethIcon = () => <FontAwesomeIcon color="#815aff" icon={faEthereum} className="starIcon" size='1x'/>
-const tokenIcon = () => <FontAwesomeIcon color="#815aff" icon={faTag} className="starIcon" size='1x'/>
-const starIcon = () => <FontAwesomeIcon color="#815aff" icon={faStar} className="starIcon" size='1x'/>
-const neutralIcon = () => <FontAwesomeIcon color="#815aff" icon={faBalanceScale} size='1x'/>
-const walletIcon = () => <FontAwesomeIcon color="#815aff" icon={faWallet} size='lg'/>
-const userIcon = () => <FontAwesomeIcon color="#815aff" icon={faUser} size='lg'/>
-const cogIcon = () => <FontAwesomeIcon color="#815aff" icon={faCog} size='lg'/>
+const crosshairsIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCrosshairs} className="eventsIcon" size='1x'/>
+const positiveIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCheck} className="positiveIcon" size='lg'/>
+const bullseyeIcon = () => <FontAwesomeIcon color="#ffffff" icon={faBullseye} className="starIcon" size='1x'/>
+const negativeIcon = () => <FontAwesomeIcon color="#ffffff" icon={faTimes} className="neutralIcon" size='lg'/>
+const trustIcon = () => <FontAwesomeIcon color="#ffffff" icon={faShieldAlt} className="starIcon" size='1x'/>
+const identityIcon = () => <FontAwesomeIcon color="#ffffff" icon={faIdCard} className="starIcon" size='1x'/>
+const ethIcon = () => <FontAwesomeIcon color="#ffffff" icon={faEthereum} className="starIcon" size='1x'/>
+const tokenIcon = () => <FontAwesomeIcon color="#ffffff" icon={faTag} className="starIcon" size='1x'/>
+const starIcon = () => <FontAwesomeIcon color="#ffffff" icon={faStar} className="starIcon" size='1x'/>
+const neutralIcon = () => <FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size='1x'/>
+const walletIcon = () => <FontAwesomeIcon color="#ffffff" icon={faWallet} size='lg'/>
+const userIcon = () => <FontAwesomeIcon color="#ffffff" icon={faUser} size='lg'/>
+const cogIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCog} size='lg'/>
 
 // Standards
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
@@ -63,6 +64,14 @@ const GlobalNavigation = () => (
     { key: 'settings', icon: cogIcon, label: 'settings' },
   ]} secondaryItems={[]} />
 );
+
+const customThemeMode = modeGenerator({
+  product: {
+    text: '#ffffff',
+    background: '#815aff',
+  },
+});
+
 
 firebase.initializeApp({
     apiKey: "AIzaSyBX9yoKTTg4a33ETJ0hydmWcmEPMBWYBhU",
@@ -286,12 +295,12 @@ class App extends Component {
               <div><br></br>
               <Paper style={{ padding: '1vw', backgroundColor: fade('#ffffff', 0.125) }}>
               <div className="databaseLogo"><Avatar src={this.state.pastData[data].image} /></div>
-              <div className="databaseName"><FontAwesomeIcon color="#815aff" icon={faInfo} size='1x'/>&nbsp;&nbsp;&nbsp;{data} ({this.state.pastData[data].ticker})</div>
-              <div className="databaseType"><FontAwesomeIcon color="#815aff" icon={faCoins} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
-              <div className="databasePositive"><FontAwesomeIcon color="#815aff" icon={faCheck} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
-              <div className="databaseNegative"><FontAwesomeIcon color="#815aff" icon={faTimes} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
-              <div className="databaseNeutral"><FontAwesomeIcon color="#815aff" icon={faBalanceScale} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].neutral} </div>
-              <div className="databaseRating"><FontAwesomeIcon color="#815aff" icon={faStar} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].rating}</div>
+              <div className="databaseName"><FontAwesomeIcon color="#ffffff" icon={faInfo} size='1x'/>&nbsp;&nbsp;&nbsp;{data} ({this.state.pastData[data].ticker})</div>
+              <div className="databaseType"><FontAwesomeIcon color="#ffffff" icon={faCoins} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
+              <div className="databasePositive"><FontAwesomeIcon color="#ffffff" icon={faCheck} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
+              <div className="databaseNegative"><FontAwesomeIcon color="#ffffff" icon={faTimes} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
+              <div className="databaseNeutral"><FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].neutral} </div>
+              <div className="databaseRating"><FontAwesomeIcon color="#ffffff" icon={faStar} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].rating}</div>
               </Paper></div>
             ))}
             </div>
@@ -742,7 +751,7 @@ class App extends Component {
         <ThemeProvider
           theme={theme => ({
             ...theme,
-            mode: themeModes[themeMode],
+            mode: customThemeMode,
           })}>
         <LayoutManager
           globalNavigation={() =>  (
@@ -765,41 +774,41 @@ class App extends Component {
         </div>
         <div className="eventStats">
           <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faInfo} size='lg'/>
+            &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faInfo} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}
           </Paper>
           <Paper className="eventTicker" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faShareAlt} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faShareAlt} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ticker: {this.state.eventTicker}
           </Paper>
           <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faCoins} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCoins} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}
           </Paper>
           <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faCheck} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCheck} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}
           </Paper>
           <Paper className="eventNeutral" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;<FontAwesomeIcon color="#815aff" icon={faBalanceScale} size='1x'/>
+            &nbsp;<FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size='1x'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}
          </Paper>
          <Paper className="eventNegative" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faTimes} size='lg'/>
+            &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faTimes} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
          </Paper>
         </div>
         <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
           <img className="eventImage" src={this.state.eventImage} />
         </Paper>
-        <Paper className="votingMetrics" style={{ backgroundColor: fade('#000000', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faStreetView} size='lg'/>
+        <Paper className="votingMetrics" style={{ backgroundColor: fade('#815aff', 0.825) }}>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faStreetView} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faCrosshairs} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCrosshairs} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;<FontAwesomeIcon color="#815aff" icon={faWeightHanging} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faWeightHanging} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
         </Paper>
         <div className="votingBubbles">
