@@ -4,8 +4,18 @@ body, html  {
 
   margin: 0;
   padding: 0;
+
 }
 
+.App {
+  position: absolute;
+  top: -87.5vh;
+}
+
+.delegationPanel {
+  top: 10vh;
+  padding: 2.5vw;
+}
 
 table, thead, tbody, td, tr {
 
@@ -16,7 +26,7 @@ table, thead, tbody, td, tr {
   height: 100vh;
   padding: 5vw;
   left: 5vw;
-  top: -5vh;
+  top: -20vh;
 
 }
 

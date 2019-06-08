@@ -1,6 +1,5 @@
 // Core
 import React, { Component, Fragment } from 'react';
-import getWeb3 from "./utils/getWeb3"
 import firebase from 'firebase'
 
 // Solc
@@ -84,22 +83,24 @@ firebase.initializeApp({
   });
 const db = firebase.firestore()
 
-class App extends Component {
-
-  state = {
-    bubbleComponent: <div/>,
-    log: [[],[],[],[]],
-    themeMode: 'dark',
-    pastEvents: [],
-    pastData: {},
-    toggle: true,
-    account: null,
-    token: null ,
-    dapp: null,
-    web3: null,
-    flags: [],
-    pool: 0,
-  };
+class Mvp extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      bubbleComponent: <div/>,
+      web3: this.props.web3,
+      log: [[],[],[],[]],
+      themeMode: 'dark',
+      pastEvents: [],
+      pastData: {},
+      toggle: true,
+      account: null,
+      token: null ,
+      dapp: null,
+      flags: [],
+      pool: 0,
+    };
+  }
 
   initialiseData = async () => {
       await this.vxDimensions()
@@ -154,26 +155,25 @@ class App extends Component {
   }
 
   componentDidMount = async () => {
-      const web = await getWeb3()
-      const accounts = await web.eth.getAccounts();
-      const networkId = await web.eth.net.getId();
+      const accounts = await this.state.web3.eth.getAccounts();
+      const networkId = await this.state.web3.eth.net.getId();
       const tokenContract = ERC20d.networks[networkId];
       const validationContract = Validation.networks[networkId];
-      const instance1 = new web.eth.Contract(
+      const instance1 = new this.state.web3.eth.Contract(
               ERC20d.abi,
               tokenContract && tokenContract.address,
             );
-      const instance2 = new web.eth.Contract(
+      const instance2 = new this.state.web3.eth.Contract(
              Validation.abi,
              validationContract && validationContract.address,
              );
-      instance1.setProvider(web.currentProvider)
-      instance2.setProvider(web.currentProvider)
+      instance1.setProvider(this.state.web3.currentProvider)
+      instance2.setProvider(this.state.web3.currentProvider)
       await this.setState({
         account: accounts[0],
           token: instance1,
-           dapp: instance2,
-           web3: web });
+           dapp: instance2
+         });
       await this.initialiseData()
   };
 
@@ -196,7 +196,7 @@ class App extends Component {
       </ContainerHeader>
         <MenuSection>
           {({ className }) => (
-            <div className={className}>
+            <div className="delegationPanel">
               <Item before={identityIcon} text={this.state.identity} subText="Identity" />
               <Item before={crosshairsIcon} text={this.state.events} subText="Events" />
               <Item before={starIcon} text={this.state.total} subText="Total" />
@@ -230,7 +230,7 @@ class App extends Component {
       </ContainerHeader>
         <MenuSection>
           {({ className }) => (
-            <div className={className}>
+            <div className="delegationPanel">
             <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
             <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
             <br></br>
@@ -256,7 +256,7 @@ class App extends Component {
       </ContainerHeader>
         <MenuSection>
           {({ className }) => (
-            <div className={className}>
+            <div className="delegationPanel">
             <Select className="subjectType" onChange={this.logType}
                 options={[
                   { label: 'dApp', value: "dApp"  },
@@ -290,7 +290,7 @@ class App extends Component {
       </ContainerHeader>
         <MenuSection>
           {({ className }) => (
-            <div className={className}>
+            <div className="delegationPanel">
             {this.state.pastEvents.map(data => (
               <div><br></br>
               <Paper style={{ padding: '1vw', backgroundColor: fade('#ffffff', 0.125) }}>
@@ -705,7 +705,6 @@ class App extends Component {
     var delegationLog = { }
     await this.state.token.events.Vote({ fromBlock: 0, toBlock: 'latest'}, (event,error) => { })
     .on('data', async(eventResult) => {
-      console.log(eventResult);
       var activeEvent = JSON.stringify(eventResult.returnValues.subject).replace(/["]+/g, '');
       var blockNumber = JSON.stringify(eventResult.blockNumber).replace(/["]+/g, '');
       var transactionHash = JSON.stringify(eventResult.transactionHash).replace(/["]+/g, '');
@@ -745,8 +744,6 @@ class App extends Component {
 
     return (
       <div className="App">
-      <Grid layout="fluid">
-        <GridColumn>
         <NavigationProvider>
         <ThemeProvider
           theme={theme => ({
@@ -756,6 +753,7 @@ class App extends Component {
         <LayoutManager
           globalNavigation={() =>  (
             <GlobalNav primaryItems={[
+              { key: 'blank', icon: userIcon, label: 'Stats' },
               { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true , wallet: false, admin: false }) },
               { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false , wallet: true, admin: false }) },
               { key: 'settings', icon: bullseyeIcon, label: 'settings' , onClick: () => this.setState({ toggle: false , wallet: false, admin: true }) },
@@ -763,42 +761,39 @@ class App extends Component {
           )}
           productNavigation={renderer}
         >
-          <div/>
         </LayoutManager>
       </ThemeProvider>
       </NavigationProvider>
-      </GridColumn>
-      <GridColumn>
-        <div className="validatingIdentifier">
+      <div className="validatingIdentifier">
           {this.state.id}
         </div>
         <div className="eventStats">
-          <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
+          <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
             &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faInfo} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}
           </Paper>
-          <Paper className="eventTicker" style={{ padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
+          <Paper className="eventTicker" style={{ padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faShareAlt} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ticker: {this.state.eventTicker}
           </Paper>
-          <Paper className="eventType" style={{ backgroundColor: fade('#000000', 0.825) }}>
+          <Paper className="eventType" style={{ backgroundColor: fade('#815aff', 0.825) }}>
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCoins} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}
           </Paper>
-          <Paper className="eventPositive" style={{ backgroundColor: fade('#000000', 0.825) }}>
+          <Paper className="eventPositive" style={{ backgroundColor: fade('#815aff', 0.825) }}>
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCheck} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}
           </Paper>
-          <Paper className="eventNeutral" style={{ backgroundColor: fade('#000000', 0.825) }}>
+          <Paper className="eventNeutral" style={{ backgroundColor: fade('#815aff', 0.825) }}>
             &nbsp;<FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size='1x'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}
          </Paper>
-         <Paper className="eventNegative" style={{ backgroundColor: fade('#000000', 0.825) }}>
+         <Paper className="eventNegative" style={{ backgroundColor: fade('#815aff', 0.825) }}>
             &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faTimes} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
          </Paper>
         </div>
-        <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#000000', 0.825) }}>
+        <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
           <img className="eventImage" src={this.state.eventImage} />
         </Paper>
         <Paper className="votingMetrics" style={{ backgroundColor: fade('#815aff', 0.825) }}>
@@ -819,7 +814,7 @@ class App extends Component {
            return (
              <AutoDismissFlag
               description={`Your current delegation stack in this option is: ${this.state.bubbleState} out of ${this.state.bubbleStack}`}
-              icon={<FontAwesomeIcon color="#000000" icon={faUser} size='lg'/>}
+              icon={<FontAwesomeIcon color="#815aff" icon={faUser} size='lg'/>}
               actions={[{ content: 'Ok', onClick: this.handleDismiss }]}
               appearance={this.state.optionString}
               title={this.state.option}
@@ -827,11 +822,9 @@ class App extends Component {
               key={flagId}
             /> )})}
            </FlagGroup>
-         </GridColumn>
-         </Grid>
       </div>
     );
   }
 }
 
-export default App;
+export default Mvp;
