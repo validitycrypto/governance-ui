@@ -172,8 +172,7 @@ class Mvp extends Component {
       await this.setState({
         account: accounts[0],
           token: instance1,
-           dapp: instance2
-         });
+           dapp: instance2 });
       await this.initialiseData()
   };
 
@@ -715,7 +714,7 @@ class Mvp extends Component {
         var identity = await this.findIdentity(identifier)
         var address = await this.getAddress(identifier)
         delegationLog[identifier] = { address, transactionHash, blockNumber, identity, choice, weight }
-        await this.setState({log: delegationLog}, this.refreshData());
+        await this.setState({log: delegationLog});
         }
     }).on('changed', (event) => {
         // remove event from local database
@@ -764,9 +763,6 @@ class Mvp extends Component {
         </LayoutManager>
       </ThemeProvider>
       </NavigationProvider>
-      <div className="validatingIdentifier">
-          {this.state.id}
-        </div>
         <div className="eventStats">
           <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
             &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faInfo} size='lg'/>
@@ -796,7 +792,7 @@ class Mvp extends Component {
         <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
           <img className="eventImage" src={this.state.eventImage} />
         </Paper>
-        <Paper className="votingMetrics" style={{ backgroundColor: fade('#815aff', 0.825) }}>
+        <div className="votingMetrics">
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faStreetView} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -805,7 +801,7 @@ class Mvp extends Component {
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faWeightHanging} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
-        </Paper>
+        </div>
         <div className="votingBubbles">
           {this.state.bubbleComponent}
         </div>
