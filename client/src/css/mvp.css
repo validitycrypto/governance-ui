@@ -1,8 +1,28 @@
 
 
 body, html  {
+  font-family: apple-sf;
   margin: 0;
   padding: 0;
+}
+
+.errorModal {
+  position: absolute;
+  z-index: 999999999;
+  font-weight: bold;
+  text-align: center;
+  margin: auto 0;
+  font-size: 3vw;
+  top: -75vh;
+  left: 0;
+  right: 0;
+}
+
+.errorLogo {
+  font-size: 25vw;
+  position: relative;
+  padding-bottom: 2.5vw;
+
 }
 
 .App {

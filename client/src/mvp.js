@@ -155,6 +155,8 @@ class Mvp extends Component {
   }
 
   componentDidMount = async () => {
+
+    if(this.state.web3 != false){
       const accounts = await this.state.web3.eth.getAccounts();
       const networkId = await this.state.web3.eth.net.getId();
       const tokenContract = ERC20d.networks[networkId];
@@ -171,9 +173,11 @@ class Mvp extends Component {
       instance2.setProvider(this.state.web3.currentProvider)
       await this.setState({
         account: accounts[0],
+        network: networkId,
           token: instance1,
            dapp: instance2 });
       await this.initialiseData()
+    }
   };
 
 
@@ -740,7 +744,21 @@ class Mvp extends Component {
     const renderer = shouldRenderSkeleton
       ? this.renderSkeleton
       : this.renderSidebar;
-
+      if(!this.props.web3){
+        return(
+          <div className="errorModal">
+          <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faTimes}/></p>
+          <p>Metamask is not detected</p>
+          </div>
+        )
+      } else if(this.state.network != 4447){
+        return(
+        <div className="errorModal">
+        <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faEthereum}/></p>
+        <p>Incorrect Network</p>
+        </div>
+        )
+      }  else {
     return (
       <div className="App">
         <NavigationProvider>
@@ -819,7 +837,8 @@ class Mvp extends Component {
             /> )})}
            </FlagGroup>
       </div>
-    );
+      );
+    }
   }
 }
 
