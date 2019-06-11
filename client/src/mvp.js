@@ -7,8 +7,9 @@ import Validation from "./contracts/communalValidation.json";
 import ERC20d from "./contracts/ERC20d.json";
 
 // UX
-import { GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, light, dark, settings, ContainerHeader, HeaderSection, Item, ThemeProvider, modeGenerator } from '@atlaskit/navigation-next';
+import {UIControllerSubscriber,  GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, light, dark, settings, ContainerHeader, HeaderSection, Item, ThemeProvider, modeGenerator } from '@atlaskit/navigation-next';
 import { faStreetView, faEdit, faInfo, faShareAlt, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
+import { Spotlight, SpotlightManager, SpotlightTarget, SpotlightTransition } from '@atlaskit/onboarding';
 import { InlineDialog, Flag, AutoDismissFlag, FlagGroup } from '@atlaskit/flag'
 import { fade } from '@material-ui/core/styles/colorManipulator'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -46,6 +47,7 @@ const starIcon = () => <FontAwesomeIcon color="#ffffff" icon={faStar} className=
 const neutralIcon = () => <FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size='1x'/>
 const walletIcon = () => <FontAwesomeIcon color="#ffffff" icon={faWallet} size='lg'/>
 const userIcon = () => <FontAwesomeIcon color="#ffffff" icon={faUser} size='lg'/>
+const blankIcon = () => <svg style={{height: "5vh"}}/>
 const cogIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCog} size='lg'/>
 
 // Standards
@@ -87,8 +89,12 @@ class Mvp extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      network: this.props.network,
       bubbleComponent: <div/>,
       web3: this.props.web3,
+      onboardTarget: null,
+      demoTarget: null,
+      onboardIndex: 0,
       log: [[],[],[],[]],
       themeMode: 'dark',
       pastEvents: [],
@@ -158,9 +164,8 @@ class Mvp extends Component {
 
     if(this.state.web3 != false){
       const accounts = await this.state.web3.eth.getAccounts();
-      const networkId = await this.state.web3.eth.net.getId();
-      const tokenContract = ERC20d.networks[networkId];
-      const validationContract = Validation.networks[networkId];
+      const tokenContract = ERC20d.networks[this.state.network];
+      const validationContract = Validation.networks[this.state.network];
       const instance1 = new this.state.web3.eth.Contract(
               ERC20d.abi,
               tokenContract && tokenContract.address,
@@ -173,7 +178,6 @@ class Mvp extends Component {
       instance2.setProvider(this.state.web3.currentProvider)
       await this.setState({
         account: accounts[0],
-        network: networkId,
           token: instance1,
            dapp: instance2 });
       await this.initialiseData()
@@ -214,9 +218,9 @@ class Mvp extends Component {
                 <Button appearance="primary" className="addressButton" onClick={this.registerIdentity}>
                   Register
                   </Button>
-                  <Button appearance="help" className="stakeButton" onClick={this.eventStake}>
-                  Stake
-                  </Button>
+                    <Button appearance="help" className="stakeButton" onClick={this.eventStake}>
+                      Stake
+                    </Button>
                 </div>
             </div>
           )}
@@ -234,8 +238,8 @@ class Mvp extends Component {
         <MenuSection>
           {({ className }) => (
             <div className="delegationPanel">
-            <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
-            <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
+              <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
+              <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
             <br></br>
             Transfer Validity
             <TextField onChange={this.logAddress} placeholder="Address"/>
@@ -276,7 +280,6 @@ class Mvp extends Component {
            <Button appearance="primary" className="subjectButton" onClick={this.createEvent}>
            Create
            </Button>
-
            <Button appearance="danger" className="ownerButton" onClick={this.initialiseOwnership}>
            Initialise
            </Button>
@@ -321,6 +324,7 @@ class Mvp extends Component {
         negative={parseInt(this.state.eventNegative)}
         positive={parseInt(this.state.eventPositive)}
         neutral={parseInt(this.state.eventNeutral)}
+        demoTarget={this.state.demoTarget}
         user={this.state.userMetrics}
         identity={this.findIdentity}
         height={this.state.vxHeight}
@@ -392,16 +396,78 @@ class Mvp extends Component {
     })
   }
 
- timeTravel = async() => {
-    for(var x = 0 ; x < 100 ; x++){
-      this.state.web3.currentProvider.send({
-        jsonrpc: '2.0',
-        method: 'evm_mine',
-        params: [],
-        id: 0,
-      })
-    }
+ onboardingDemo = async() => {
+   var onboardingComponent;
+   var onboardingTitle;
+   var onboardingText;
+   var maintainDemo;
+   var targetRadius;
+
+   if(this.state.onboardIndex == 0){
+     onboardingComponent = "eventImage"
+     onboardingTitle = "Validation Topic"
+     targetRadius = 100
+     onboardingText =  `This is the voting subject, the aim of
+     this event is for you to contribute your general sentiment
+     towards the overall quality evaluated on behalf
+     of the initiative.`
+   } else if(this.state.onboardIndex == 1){
+     onboardingTitle = "Valdiation Statistics"
+     onboardingComponent = "eventStats"
+     onboardingText =  `Hover over each of these modals, to get a better insight towards
+     the subject name, symbol , type, number of partcipants, current statistics for
+     positive, negative and neutral votes committed.`
+     targetRadius = 0
+   } else if(this.state.onboardIndex == 2){
+     onboardingTitle = "Delegation Metrics"
+     onboardingComponent = "votingMetrics"
+     onboardingText =  <div>
+     <p>These values represent your delegation state, users first need to stake
+     their token balances in order to vote, this ensures a one person, one vote operation.</p>
+     <br></br>
+     <p>The weight parameter relates to one's VLDY balance, where 10,000 VLDY equates to one vote, this is your
+     general stake that will be committed to the option of choice.</p>
+     </div>
+     targetRadius = 100
+   } else if(this.state.onboardIndex == 3){
+     onboardingComponent = "menuNavigation"
+     onboardingTitle = "Menu Navigation"
+     targetRadius = 100
+     onboardingText =  `Here we can access the delegation sidebar and the multiple menus,
+     voting, transactional and the historical database of previous events.`
+   } else if(this.state.onboardIndex == 4) {
+     onboardingComponent = "menuNavigation"
+     onboardingTitle = "Navigation Toggle"
+     targetRadius = 100
+     onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
+     identity, view past event scores, transact the VLDY token and triggering token staking.`
+ }  else if(this.state.onboardIndex == 5) {
+     onboardingComponent = "menuNavigation"
+     onboardingTitle = "Validation Bubbles"
+     targetRadius = 100
+     onboardingText =  <div>
+     <p>These bubbles represent votes, each size deterimines the weight and
+     each color defines the option chosen, green for positive, red for negative, blue for neutral
+     and finally purple for ones own tokens once when they are active in staking.</p>
+     <br></br>
+     <p>To vote it's simple, drag the purple bubbles to a cluster of choice, you'll see a modal pop up
+     when a vote is detected, drag and drop all of the associated bubbles to recieve a transaction query
+     via metamask. Confirm and you've successfully casted a vote, the application should refresh and you
+     then verify the vote by hovering over bubbles within that option, which will reveal metadata for each
+     bubble.</p>
+     <br></br>
+     <p>Happy voting!</p>
+     </div>
  }
+   this.setState({
+     onboardRadius: targetRadius,
+     onboardIndex: this.state.onboardIndex+1,
+     onboardTarget: onboardingComponent,
+     onboardTitle: onboardingTitle,
+     onboardingText: onboardingText,
+   })
+
+}
 
   handleDismiss = () => {
     this.setState(prevState => ({
@@ -758,9 +824,10 @@ class Mvp extends Component {
         <p>Incorrect Network</p>
         </div>
         )
-      }  else {
+      }
     return (
       <div className="App">
+        <SpotlightManager>
         <NavigationProvider>
         <ThemeProvider
           theme={theme => ({
@@ -769,18 +836,49 @@ class Mvp extends Component {
           })}>
         <LayoutManager
           globalNavigation={() =>  (
+            <SpotlightTarget name="menuNavigation">
             <GlobalNav primaryItems={[
-              { key: 'blank', icon: userIcon, label: 'Stats' },
+              { key: 'null', icon: blankIcon, label: 'null', onClick: () => console.log("oi") },
               { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true , wallet: false, admin: false }) },
               { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false , wallet: true, admin: false }) },
               { key: 'settings', icon: bullseyeIcon, label: 'settings' , onClick: () => this.setState({ toggle: false , wallet: false, admin: true }) },
             ]} secondaryItems ={[  ]} />
+            </SpotlightTarget>
           )}
           productNavigation={renderer}
         >
+        <UIControllerSubscriber>
+          {navigationUIController => (
+              <SpotlightTransition>
+              <Spotlight
+                actions={[{ text: "Next" , onClick: () => {
+                  if(this.state.onboardIndex == 4){
+                     navigationUIController.toggleCollapse()
+                  } else if(this.state.onboardIndex == 5){
+                     navigationUIController.toggleCollapse()
+                   } if(this.state.onboardIndex != 6 ){
+                     this.onboardingDemo()
+                   } else {
+                     this.setState({
+                       onboardTarget: null,
+                       onboardIndex: 0
+                     })
+                   }
+                } }]}
+                dialogPlacement="right top"
+                target={this.state.onboardTarget}
+                key={this.state.onboardTarget}
+                heading={this.state.onboardTitle}
+                targetRadius={this.state.onboardRadius}>
+                {this.state.onboardingText}
+                </Spotlight>
+                </SpotlightTransition>
+              )}
+            </UIControllerSubscriber>
         </LayoutManager>
       </ThemeProvider>
       </NavigationProvider>
+        <SpotlightTarget name="eventStats">
         <div className="eventStats">
           <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
             &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faInfo} size='lg'/>
@@ -807,9 +905,13 @@ class Mvp extends Component {
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
          </Paper>
         </div>
+        </SpotlightTarget>
+        <SpotlightTarget name="eventImage">
         <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
           <img className="eventImage" src={this.state.eventImage} />
         </Paper>
+        </SpotlightTarget>
+        <SpotlightTarget name="votingMetrics">
         <div className="votingMetrics">
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faStreetView} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
@@ -820,6 +922,12 @@ class Mvp extends Component {
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faWeightHanging} size='lg'/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
         </div>
+        </SpotlightTarget>
+        <div className="helpButton">
+          <Button appearance="help" onClick={this.onboardingDemo}>
+          &nbsp;Help&nbsp;
+          </Button>
+        </div>
         <div className="votingBubbles">
           {this.state.bubbleComponent}
         </div>
@@ -828,7 +936,7 @@ class Mvp extends Component {
            return (
              <AutoDismissFlag
               description={`Your current delegation stack in this option is: ${this.state.bubbleState} out of ${this.state.bubbleStack}`}
-              icon={<FontAwesomeIcon color="#815aff" icon={faUser} size='lg'/>}
+              icon={<FontAwesomeIcon color="#ffffff" icon={faUser} size='lg'/>}
               actions={[{ content: 'Ok', onClick: this.handleDismiss }]}
               appearance={this.state.optionString}
               title={this.state.option}
@@ -836,9 +944,9 @@ class Mvp extends Component {
               key={flagId}
             /> )})}
            </FlagGroup>
+         </SpotlightManager>
       </div>
       );
-    }
   }
 }
 

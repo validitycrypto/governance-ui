@@ -268,13 +268,26 @@ left: 9vw;
 
 .votingMetrics {
   position: fixed;
-  left: 1.25vw;
-  top: 2.5vh;
+  left: 1.5vw;
+  top: 1.5vh;
   font-size: 1.25vw;
   z-index: 10000;
   color: #ffffff;
+  padding: .75vw;
 }
 
+.helpButton {
+  position: fixed;
+  border-color: white;
+  border-radius: .5vw;
+  z-index: 10000;
+  color: white;
+  border: solid;
+  float: right;
+  top: 1.775vh;
+  right: 10%;
+
+}
 
 .votingStatus {
   position: relative;
