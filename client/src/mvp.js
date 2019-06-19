@@ -1,54 +1,48 @@
 // Core
-import React, { Component, Fragment } from 'react';
-import firebase from 'firebase'
+import React, { Component, Fragment } from "react";
+import firebase from "firebase"
 
 // Solc
 import Validation from "./contracts/communalValidation.json";
-import ERC20d from "./contracts/ERC20d.json";
 
 // UX
-import {UIControllerSubscriber,  GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, light, dark, settings, ContainerHeader, HeaderSection, Item, ThemeProvider, modeGenerator } from '@atlaskit/navigation-next';
-import { faStreetView, faEdit, faInfo, faShareAlt, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faStore, faTag, faWallet, faCog, faVoteYea, faWeightHanging, faUser, faUsers, faUserTag, faStar, faShieldAlt, faLink, faCheck, faTimes  } from '@fortawesome/free-solid-svg-icons'
-import { Spotlight, SpotlightManager, SpotlightTarget, SpotlightTransition } from '@atlaskit/onboarding';
-import { InlineDialog, Flag, AutoDismissFlag, FlagGroup } from '@atlaskit/flag'
-import { fade } from '@material-ui/core/styles/colorManipulator'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEthereum } from '@fortawesome/free-brands-svg-icons'
-import Page, { Grid, GridColumn } from '@atlaskit/page'
-import Avatar, { AvatarItem } from '@atlaskit/avatar'
-import InfoIcon from '@atlaskit/icon/glyph/info'
-import { Reset, Theme } from '@atlaskit/theme'
-import TextField from '@atlaskit/field-text'
-import Paper from '@material-ui/core/Paper'
-import Select from '@atlaskit/select'
-import Button from '@atlaskit/button'
-import { colors } from '@atlaskit/theme';
+import { UIControllerSubscriber,  GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, ContainerHeader, Item, ThemeProvider, modeGenerator } from "@atlaskit/navigation-next";
+import { faStreetView, faShareAlt, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faInfo, faTag, faWallet, faWeightHanging, faUser, faUsers, faStar, faShieldAlt, faCheck, faTimes  } from "@fortawesome/free-solid-svg-icons"
+import { Spotlight, SpotlightManager, SpotlightTarget, SpotlightTransition } from "@atlaskit/onboarding";
+import { AutoDismissFlag, FlagGroup } from "@atlaskit/flag"
+import { fade } from "@material-ui/core/styles/colorManipulator"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faEthereum } from "@fortawesome/free-brands-svg-icons"
+import TextField from "@atlaskit/field-text"
+import Paper from "@material-ui/core/Paper"
+import Select from "@atlaskit/select"
+import Button from "@atlaskit/button"
+import Avatar from "@atlaskit/avatar"
 
 // External Components
-import Delegation from './delegation'
+import Delegation from "./delegation"
 
 // Utils
-import Convertor from 'hex2dec'
+import Convertor from "hex2dec"
 
 // CSS
-import "react-toggle/style.css"
+import styled from 'styled-components'
 import "./css/mvp.css"
 
 // Preset Icons
-const crosshairsIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCrosshairs} className="eventsIcon" size='1x'/>
-const positiveIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCheck} className="positiveIcon" size='lg'/>
-const bullseyeIcon = () => <FontAwesomeIcon color="#ffffff" icon={faBullseye} className="starIcon" size='1x'/>
-const negativeIcon = () => <FontAwesomeIcon color="#ffffff" icon={faTimes} className="neutralIcon" size='lg'/>
-const trustIcon = () => <FontAwesomeIcon color="#ffffff" icon={faShieldAlt} className="starIcon" size='1x'/>
-const identityIcon = () => <FontAwesomeIcon color="#ffffff" icon={faIdCard} className="starIcon" size='1x'/>
-const ethIcon = () => <FontAwesomeIcon color="#ffffff" icon={faEthereum} className="starIcon" size='1x'/>
-const tokenIcon = () => <FontAwesomeIcon color="#ffffff" icon={faTag} className="starIcon" size='1x'/>
-const starIcon = () => <FontAwesomeIcon color="#ffffff" icon={faStar} className="starIcon" size='1x'/>
-const neutralIcon = () => <FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size='1x'/>
-const walletIcon = () => <FontAwesomeIcon color="#ffffff" icon={faWallet} size='lg'/>
-const userIcon = () => <FontAwesomeIcon color="#ffffff" icon={faUser} size='lg'/>
+const crosshairsIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCrosshairs} className="eventsIcon" size="1x"/>
+const positiveIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCheck} className="positiveIcon" size="lg"/>
+const bullseyeIcon = () => <FontAwesomeIcon color="#ffffff" icon={faBullseye} className="starIcon" size="1x"/>
+const negativeIcon = () => <FontAwesomeIcon color="#ffffff" icon={faTimes} className="neutralIcon" size="lg"/>
+const trustIcon = () => <FontAwesomeIcon color="#ffffff" icon={faShieldAlt} className="starIcon" size="1x"/>
+const identityIcon = () => <FontAwesomeIcon color="#ffffff" icon={faIdCard} className="starIcon" size="1x"/>
+const ethIcon = () => <FontAwesomeIcon color="#ffffff" icon={faEthereum} className="starIcon" size="1x"/>
+const tokenIcon = () => <FontAwesomeIcon color="#ffffff" icon={faTag} className="starIcon" size="1x"/>
+const starIcon = () => <FontAwesomeIcon color="#ffffff" icon={faStar} className="starIcon" size="1x"/>
+const neutralIcon = () => <FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size="1x"/>
+const walletIcon = () => <FontAwesomeIcon color="#ffffff" icon={faWallet} size="lg"/>
+const userIcon = () => <FontAwesomeIcon color="#ffffff" icon={faUser} size="lg"/>
 const blankIcon = () => <svg style={{height: "5vh"}}/>
-const cogIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCog} size='lg'/>
 
 // Standards
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
@@ -57,22 +51,7 @@ const positiveVote = "0x506f7369746976650000000000000000000000000000000000000000
 const decimal = Math.pow(10,18)
 
 // Components
-const themeModes = { light, dark, settings };
-const GlobalNavigation = () => (
-  <GlobalNav primaryItems={[
-    { key: 'market', icon: userIcon, label: 'Stats' },
-    { key: 'wager', icon: walletIcon, label: 'Wallet' },
-    { key: 'settings', icon: cogIcon, label: 'settings' },
-  ]} secondaryItems={[]} />
-);
-
-const customThemeMode = modeGenerator({
-  product: {
-    text: '#ffffff',
-    background: '#815aff',
-  },
-});
-
+const customThemeMode = modeGenerator({ product: { text: "#ffffff", background: "#815aff" },});
 
 firebase.initializeApp({
     apiKey: "AIzaSyBX9yoKTTg4a33ETJ0hydmWcmEPMBWYBhU",
@@ -90,18 +69,18 @@ class Mvp extends Component {
     super(props)
     this.state = {
       network: this.props.network,
+      token: this.props.contract,
       bubbleComponent: <div/>,
       web3: this.props.web3,
       onboardTarget: null,
       demoTarget: null,
       onboardIndex: 0,
       log: [[],[],[],[]],
-      themeMode: 'dark',
+      themeMode: "dark",
       pastEvents: [],
       pastData: {},
       toggle: true,
       account: null,
-      token: null ,
       dapp: null,
       flags: [],
       pool: 0,
@@ -128,6 +107,7 @@ class Mvp extends Component {
       await this.eventPositive(this.state.eventSubject, this.state.round)
       await this.eventNegative(this.state.eventSubject, this.state.round)
       await this.eventNeutral(this.state.eventSubject, this.state.round)
+      await this.getParticipants()
       await this.getBalances()
       await this.gatherMetrics()
       await this.getEventImage(this.state.eventSubject)
@@ -151,6 +131,7 @@ class Mvp extends Component {
       await this.eventPositive(this.state.eventSubject, this.state.round)
       await this.eventNegative(this.state.eventSubject, this.state.round)
       await this.eventNeutral(this.state.eventSubject, this.state.round)
+      await this.getParticipants()
       await this.getBalances()
       await this.isStaking()
       await this.isVoted()
@@ -161,25 +142,16 @@ class Mvp extends Component {
   }
 
   componentDidMount = async () => {
-
-    if(this.state.web3 != false){
+    if(window.ethereum !== false){
       const accounts = await this.state.web3.eth.getAccounts();
-      const tokenContract = ERC20d.networks[this.state.network];
       const validationContract = Validation.networks[this.state.network];
-      const instance1 = new this.state.web3.eth.Contract(
-              ERC20d.abi,
-              tokenContract && tokenContract.address,
-            );
-      const instance2 = new this.state.web3.eth.Contract(
-             Validation.abi,
+      const validationInstance = new this.state.web3.eth.Contract(Validation.abi,
              validationContract && validationContract.address,
-             );
-      instance1.setProvider(this.state.web3.currentProvider)
-      instance2.setProvider(this.state.web3.currentProvider)
+      );
+      validationInstance.setProvider(this.state.web3.currentProvider)
       await this.setState({
         account: accounts[0],
-          token: instance1,
-           dapp: instance2 });
+           dapp: validationInstance });
       await this.initialiseData()
     }
   };
@@ -255,7 +227,7 @@ class Mvp extends Component {
   };
 
   renderAdmin= () => {
-    if(this.state.account == "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"){
+    if(this.state.account === "0x3B00c1BfF934C47B8FBb359e5e2098a1991d4928"){
     return (
       <Fragment>
       <ContainerHeader
@@ -266,10 +238,10 @@ class Mvp extends Component {
             <div className="delegationPanel">
             <Select className="subjectType" onChange={this.logType}
                 options={[
-                  { label: 'dApp', value: "dApp"  },
-                  { label: 'Coin', value: "Coin" },
-                  { label: 'Token', value: "Token" },
-                  { label: 'Exchange', value: "Exchange" },
+                  { label: "dApp", value: "dApp"  },
+                  { label: "Coin", value: "Coin" },
+                  { label: "Token", value: "Token" },
+                  { label: "Exchange", value: "Exchange" },
                 ]}
                 placeholder="Type"
               />
@@ -299,14 +271,14 @@ class Mvp extends Component {
             <div className="delegationPanel">
             {this.state.pastEvents.map(data => (
               <div><br></br>
-              <Paper style={{ padding: '1vw', backgroundColor: fade('#ffffff', 0.125) }}>
+              <Paper style={{ padding: "1vw", backgroundColor: fade("#ffffff", 0.125) }}>
               <div className="databaseLogo"><Avatar src={this.state.pastData[data].image} /></div>
-              <div className="databaseName"><FontAwesomeIcon color="#ffffff" icon={faInfo} size='1x'/>&nbsp;&nbsp;&nbsp;{data} ({this.state.pastData[data].ticker})</div>
-              <div className="databaseType"><FontAwesomeIcon color="#ffffff" icon={faCoins} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
-              <div className="databasePositive"><FontAwesomeIcon color="#ffffff" icon={faCheck} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
-              <div className="databaseNegative"><FontAwesomeIcon color="#ffffff" icon={faTimes} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
-              <div className="databaseNeutral"><FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].neutral} </div>
-              <div className="databaseRating"><FontAwesomeIcon color="#ffffff" icon={faStar} size='1x'/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].rating}</div>
+              <div className="databaseName"><FontAwesomeIcon color="#ffffff" icon={faInfo} size="1x"/>&nbsp;&nbsp;&nbsp;{data} ({this.state.pastData[data].ticker})</div>
+              <div className="databaseType"><FontAwesomeIcon color="#ffffff" icon={faCoins} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
+              <div className="databasePositive"><FontAwesomeIcon color="#ffffff" icon={faCheck} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
+              <div className="databaseNegative"><FontAwesomeIcon color="#ffffff" icon={faTimes} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
+              <div className="databaseNeutral"><FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].neutral} </div>
+              <div className="databaseRating"><FontAwesomeIcon color="#ffffff" icon={faStar} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].rating}</div>
               </Paper></div>
             ))}
             </div>
@@ -390,7 +362,7 @@ class Mvp extends Component {
   }
 
   getvID = async() => {
-    const vID = await this.state.token.methods.getvID(this.state.account).call()
+    const vID = await this.state.token.methods.validityId(this.state.account).call()
     await this.setState({
       id: vID
     })
@@ -400,10 +372,9 @@ class Mvp extends Component {
    var onboardingComponent;
    var onboardingTitle;
    var onboardingText;
-   var maintainDemo;
    var targetRadius;
 
-   if(this.state.onboardIndex == 0){
+   if(this.state.onboardIndex === 0){
      onboardingComponent = "eventImage"
      onboardingTitle = "Validation Topic"
      targetRadius = 100
@@ -411,37 +382,37 @@ class Mvp extends Component {
      this event is for you to contribute your general sentiment
      towards the overall quality evaluated on behalf
      of the initiative.`
-   } else if(this.state.onboardIndex == 1){
+   } else if(this.state.onboardIndex === 1){
      onboardingTitle = "Valdiation Statistics"
      onboardingComponent = "eventStats"
      onboardingText =  `Hover over each of these modals, to get a better insight towards
      the subject name, symbol , type, number of partcipants, current statistics for
      positive, negative and neutral votes committed.`
      targetRadius = 0
-   } else if(this.state.onboardIndex == 2){
+   } else if(this.state.onboardIndex === 2){
      onboardingTitle = "Delegation Metrics"
      onboardingComponent = "votingMetrics"
      onboardingText =  <div>
      <p>These values represent your delegation state, users first need to stake
      their token balances in order to vote, this ensures a one person, one vote operation.</p>
      <br></br>
-     <p>The weight parameter relates to one's VLDY balance, where 10,000 VLDY equates to one vote, this is your
+     <p>The weight parameter relates to one"s VLDY balance, where 10,000 VLDY equates to one vote, this is your
      general stake that will be committed to the option of choice.</p>
      </div>
      targetRadius = 100
-   } else if(this.state.onboardIndex == 3){
+   } else if(this.state.onboardIndex === 3){
      onboardingComponent = "menuNavigation"
      onboardingTitle = "Menu Navigation"
      targetRadius = 100
      onboardingText =  `Here we can access the delegation sidebar and the multiple menus,
      voting, transactional and the historical database of previous events.`
-   } else if(this.state.onboardIndex == 4) {
+   } else if(this.state.onboardIndex === 4) {
      onboardingComponent = "menuNavigation"
      onboardingTitle = "Navigation Toggle"
      targetRadius = 100
      onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
      identity, view past event scores, transact the VLDY token and triggering token staking.`
- }  else if(this.state.onboardIndex == 5) {
+ }  else if(this.state.onboardIndex === 5) {
      onboardingComponent = "menuNavigation"
      onboardingTitle = "Validation Bubbles"
      targetRadius = 100
@@ -450,9 +421,9 @@ class Mvp extends Component {
      each color defines the option chosen, green for positive, red for negative, blue for neutral
      and finally purple for ones own tokens once when they are active in staking.</p>
      <br></br>
-     <p>To vote it's simple, drag the purple bubbles to a cluster of choice, you'll see a modal pop up
+     <p>To vote it"s simple, drag the purple bubbles to a cluster of choice, you"ll see a modal pop up
      when a vote is detected, drag and drop all of the associated bubbles to recieve a transaction query
-     via metamask. Confirm and you've successfully casted a vote, the application should refresh and you
+     via metamask. Confirm and you"ve successfully casted a vote, the application should refresh and you
      then verify the vote by hovering over bubbles within that option, which will reveal metadata for each
      bubble.</p>
      <br></br>
@@ -564,7 +535,6 @@ class Mvp extends Component {
 
   getEvent = async() => {
     const stat = await this.state.dapp.methods.currentEvent.call()
-    console.log(this.state.web3.utils.toAscii(stat))
     await this.setState({
       eventDecode: this.state.web3.utils.toAscii(stat),
       eventSubject: stat
@@ -575,6 +545,13 @@ class Mvp extends Component {
     const stat = await this.state.dapp.methods.currentRound.call()
     await this.setState({
       round: parseInt(stat)
+    })
+  }
+
+  getParticipants = async() => {
+    const stat = await this.state.dapp.methods.currentParticipants.call()
+    await this.setState({
+      participants: parseInt(stat)
     })
   }
 
@@ -660,7 +637,7 @@ class Mvp extends Component {
   }
 
   getEventImage = async(_subject) => {
-    await db.collection(_subject).orderBy("http", 'desc').get().then((result) => {
+    await db.collection(_subject).orderBy("http", "desc").get().then((result) => {
       var imageSource;
       result.forEach(item =>
         imageSource = item.data().http)
@@ -669,7 +646,7 @@ class Mvp extends Component {
   }
 
   getPastImage = async(_subject) => {
-    return await db.collection(_subject).orderBy("http", 'desc').limit(1).get()
+    return await db.collection(_subject).orderBy("http", "desc").limit(1).get()
     .then((result) => {
       var imageSource;
       result.forEach(item => {
@@ -684,7 +661,7 @@ class Mvp extends Component {
         await result.forEach(async(item) => {
           var eventSubject = item.data().eventHex
           var convertedValue = await this.state.web3.utils.toAscii(eventSubject)
-          if(eventSubject != undefined){
+          if(eventSubject !== undefined){
           var eventType = await this.state.web3.utils.toAscii(await this.pastType(eventSubject, 1))
           var eventTicker = await this.pastTicker(eventSubject, 1)
           var eventImage = await this.getPastImage(eventSubject)
@@ -712,8 +689,8 @@ class Mvp extends Component {
   isStaking = async() => {
     var input;
     const stat = await this.state.token.methods.isStaking(this.state.account).call()
-    if(stat == true){ input = "True"
-    } else if(stat == false){ input = "False"}
+    if(stat === true){ input = "True"
+    } else if(stat === false){ input = "False"}
     await this.setState({
       stake: input
     })
@@ -722,8 +699,8 @@ class Mvp extends Component {
   isVoted = async() => {
     var input;
     const stat = await this.state.dapp.methods.isVoted(this.state.account).call()
-    if(stat == true){ input = "True"
-    } else if(stat == false){ input = "False"}
+    if(stat === true){ input = "True"
+    } else if(stat === false){ input = "False"}
     await this.setState({
       voted: input
     })
@@ -772,23 +749,23 @@ class Mvp extends Component {
 
   getLog = async () => {
     var delegationLog = { }
-    await this.state.token.events.Vote({ fromBlock: 0, toBlock: 'latest'}, (event,error) => { })
-    .on('data', async(eventResult) => {
-      var activeEvent = JSON.stringify(eventResult.returnValues.subject).replace(/["]+/g, '');
-      var blockNumber = JSON.stringify(eventResult.blockNumber).replace(/["]+/g, '');
-      var transactionHash = JSON.stringify(eventResult.transactionHash).replace(/["]+/g, '');
+    await this.state.token.events.Vote({ fromBlock: 0, toBlock: "latest"}, (event,error) => { })
+    .on("data", async(eventResult) => {
+      var activeEvent = JSON.stringify(eventResult.returnValues.subject).replace(/["]+/g, "");
+      var blockNumber = JSON.stringify(eventResult.blockNumber).replace(/["]+/g, "");
+      var transactionHash = JSON.stringify(eventResult.transactionHash).replace(/["]+/g, "");
       if(activeEvent === this.state.eventSubject){
-        var choice = JSON.stringify(eventResult.returnValues.choice).replace(/["]+/g, '')
-        var identifier = JSON.stringify(eventResult.returnValues.vID).replace(/["]+/g, '')
-        var weight = Convertor.hexToDec(JSON.stringify(eventResult.returnValues.weight._hex).replace(/["]+/g, ''))
+        var choice = JSON.stringify(eventResult.returnValues.choice).replace(/["]+/g, "")
+        var identifier = JSON.stringify(eventResult.returnValues.id).replace(/["]+/g, "")
+        var weight = Convertor.hexToDec(JSON.stringify(eventResult.returnValues.weight._hex).replace(/["]+/g, ""))
         var identity = await this.findIdentity(identifier)
         var address = await this.getAddress(identifier)
         delegationLog[identifier] = { address, transactionHash, blockNumber, identity, choice, weight }
         await this.setState({log: delegationLog});
         }
-    }).on('changed', (event) => {
+    }).on("changed", (event) => {
         // remove event from local database
-    }).on('error', console.error);
+    }).on("error", console.error);
 }
 
   initialiseOwnership = async() => {
@@ -806,18 +783,18 @@ class Mvp extends Component {
   }
 
   render() {
-    const { shouldRenderSkeleton, shouldShowContainer, themeMode } = this.state;
+    const { shouldRenderSkeleton } = this.state;
     const renderer = shouldRenderSkeleton
       ? this.renderSkeleton
       : this.renderSidebar;
-      if(!this.props.web3){
+      if(!window.ethereum){
         return(
           <div className="errorModal">
           <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faTimes}/></p>
           <p>Metamask is not detected</p>
           </div>
         )
-      } else if(this.state.network != 4447){
+      } else if(this.state.network === 1){
         return(
         <div className="errorModal">
         <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faEthereum}/></p>
@@ -838,10 +815,10 @@ class Mvp extends Component {
           globalNavigation={() =>  (
             <SpotlightTarget name="menuNavigation">
             <GlobalNav primaryItems={[
-              { key: 'null', icon: blankIcon, label: 'null', onClick: () => console.log("oi") },
-              { key: 'market', icon: userIcon, label: 'Stats', onClick: () => this.setState({ toggle: true , wallet: false, admin: false }) },
-              { key: 'wager', icon: walletIcon, label: 'Wallet', onClick: () => this.setState({ toggle: false , wallet: true, admin: false }) },
-              { key: 'settings', icon: bullseyeIcon, label: 'settings' , onClick: () => this.setState({ toggle: false , wallet: false, admin: true }) },
+              { key: "null", icon: blankIcon, label: "null", onClick: () => console.log("oi") },
+              { key: "market", icon: userIcon, label: "Stats", onClick: () => this.setState({ toggle: true , wallet: false, admin: false }) },
+              { key: "wager", icon: walletIcon, label: "Wallet", onClick: () => this.setState({ toggle: false , wallet: true, admin: false }) },
+              { key: "settings", icon: bullseyeIcon, label: "settings" , onClick: () => this.setState({ toggle: false , wallet: false, admin: true }) },
             ]} secondaryItems ={[  ]} />
             </SpotlightTarget>
           )}
@@ -852,11 +829,11 @@ class Mvp extends Component {
               <SpotlightTransition>
               <Spotlight
                 actions={[{ text: "Next" , onClick: () => {
-                  if(this.state.onboardIndex == 4){
+                  if(this.state.onboardIndex === 4){
                      navigationUIController.toggleCollapse()
-                  } else if(this.state.onboardIndex == 5){
+                  } else if(this.state.onboardIndex === 5){
                      navigationUIController.toggleCollapse()
-                   } if(this.state.onboardIndex != 6 ){
+                   } if(this.state.onboardIndex !== 6 ){
                      this.onboardingDemo()
                    } else {
                      this.setState({
@@ -880,49 +857,56 @@ class Mvp extends Component {
       </NavigationProvider>
         <SpotlightTarget name="eventStats">
         <div className="eventStats">
-          <Paper className="eventName" style={{ padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
-            &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faInfo} size='lg'/>
+          <Paper className="eventName" style={{ padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
+            &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faInfo} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}
           </Paper>
-          <Paper className="eventTicker" style={{ padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faShareAlt} size='lg'/>
+          <Paper className="eventTicker" style={{ padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faShareAlt} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ticker: {this.state.eventTicker}
           </Paper>
-          <Paper className="eventType" style={{ backgroundColor: fade('#815aff', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCoins} size='lg'/>
+          <Paper className="eventType" style={{ backgroundColor: fade("#815aff", 0.825) }}>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCoins} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type: {this.state.eventType}
           </Paper>
-          <Paper className="eventPositive" style={{ backgroundColor: fade('#815aff', 0.825) }}>
-            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCheck} size='lg'/>
+          <Paper className="eventPositive" style={{ backgroundColor: fade("#815aff", 0.825) }}>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCheck} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Positive: {this.state.eventPositive}
           </Paper>
-          <Paper className="eventNeutral" style={{ backgroundColor: fade('#815aff', 0.825) }}>
-            &nbsp;<FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size='1x'/>
+          <Paper className="eventNeutral" style={{ backgroundColor: fade("#815aff", 0.825) }}>
+            &nbsp;<FontAwesomeIcon color="#ffffff" icon={faBalanceScale} size="1x"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Neutral: {this.state.eventNeutral}
          </Paper>
-         <Paper className="eventNegative" style={{ backgroundColor: fade('#815aff', 0.825) }}>
-            &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faTimes} size='lg'/>
+         <Paper className="eventNegative" style={{ backgroundColor: fade("#815aff", 0.825) }}>
+            &nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faTimes} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
          </Paper>
         </div>
         </SpotlightTarget>
         <SpotlightTarget name="eventImage">
-        <Paper className="eventBorder" style={{ borderRadius: '5vw', padding: '.5vw', backgroundColor: fade('#815aff', 0.825) }}>
+        <Paper className="eventBorder" style={{ borderRadius: "5vw", padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
           <img className="eventImage" src={this.state.eventImage} />
         </Paper>
         </SpotlightTarget>
         <SpotlightTarget name="votingMetrics">
         <div className="votingMetrics">
-            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faStreetView} size='lg'/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faUsers} size="lg"/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Participants: {this.state.participants}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCrosshairs} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faCrosshairs} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voted: {this.state.voted}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faWeightHanging} size='lg'/>
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faStreetView} size="lg"/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Staking: {this.state.stake}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faWeightHanging} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Weight: {this.state.voteBal}
-        </div>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         </div>
         </SpotlightTarget>
+        <div className="validatingIdentifier">
+        {this.state.id}
+        </div>
         <div className="helpButton">
           <Button appearance="help" onClick={this.onboardingDemo}>
           &nbsp;Help&nbsp;
@@ -936,8 +920,8 @@ class Mvp extends Component {
            return (
              <AutoDismissFlag
               description={`Your current delegation stack in this option is: ${this.state.bubbleState} out of ${this.state.bubbleStack}`}
-              icon={<FontAwesomeIcon color="#ffffff" icon={faUser} size='lg'/>}
-              actions={[{ content: 'Ok', onClick: this.handleDismiss }]}
+              icon={<FontAwesomeIcon color="#ffffff" icon={faUser} size="lg"/>}
+              actions={[{ content: "Ok", onClick: this.handleDismiss }]}
               appearance={this.state.optionString}
               title={this.state.option}
               id={flagId}

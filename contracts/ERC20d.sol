@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.8;
 
 import "./SafeMath.sol";
 
@@ -11,7 +11,7 @@ contract ERC20d {
     bytes32 constant NEG = 0x4e65676174697665000000000000000000000000000000000000000000000000;
 
     struct _delegate {
-        bytes32 _delegationIdentity;
+        bytes32 _delegateIdentity;
         bytes32 _positiveVotes;
         bytes32 _negativeVotes;
         bytes32 _neutralVotes;
@@ -23,13 +23,13 @@ contract ERC20d {
     mapping (address => mapping (address => uint)) private _allowed;
     mapping (address => uint) private _balances;
 
-    mapping (bytes => _delegate) private _stats;
-    mapping (bytes => address) private _wallet;
+    mapping (bytes32 => _delegate) private _stats;
+    mapping (bytes32 => address) private _wallet;
+    mapping (address => bytes32) private _vID;
     mapping (address => bool) private _active;
     mapping (address => bool) private _stake;
-    mapping (address => bytes) private _vID;
-    mapping (bytes => uint) private _trust;
-    mapping (bytes => bool) private _voted;
+    mapping (bytes32 => uint) private _trust;
+    mapping (bytes32 => bool) private _voted;
 
     address private _founder = msg.sender;
     address private _admin = address(0x0);
@@ -47,13 +47,11 @@ contract ERC20d {
     }
 
     modifier _verifyID(address _account) {
-        if(!isActive(_account)) {
-            createID(_account);
-        }
+        if(!isActive(_account)) createID(_account);
         _;
     }
 
-    modifier _trustLimit(bytes _id) {
+    modifier _trustLimit(bytes32 _id) {
         require(_trust[_id] < block.number);
         _;
     }
@@ -91,14 +89,14 @@ contract ERC20d {
     function setIdentity(bytes32 _identity) public {
         require(isActive(msg.sender));
 
-        _stats[getvID(msg.sender)]._delegationIdentity = _identity;
+        _stats[getvID(msg.sender)]._delegateIdentity = _identity;
     }
 
-    function name() public view returns (string) {
+    function name() public view returns (string memory) {
         return _name;
     }
 
-    function symbol() public view returns (string) {
+    function symbol() public view returns (string memory) {
         return _symbol;
     }
 
@@ -114,7 +112,7 @@ contract ERC20d {
         return _totalSupply;
     }
 
-    function isVoted(bytes _id)  public view returns (bool) {
+    function isVoted(bytes32 _id)  public view returns (bool) {
         return _voted[_id];
     }
 
@@ -130,39 +128,39 @@ contract ERC20d {
         return _balances[_owner];
     }
 
-    function getvID(address _account) public view returns (bytes) {
+    function getvID(address _account) public view returns (bytes32) {
         return _vID[_account];
     }
 
-    function getIdentity(bytes _id) public view returns (bytes32) {
-         return _stats[_id]._delegationIdentity;
+    function getIdentity(bytes32 _id) public view returns (bytes32) {
+         return _stats[_id]._delegateIdentity;
     }
 
-    function getAddress(bytes _id) public view returns (address) {
+    function getAddress(bytes32 _id) public view returns (address) {
         return _wallet[_id];
     }
 
-    function trustLevel(bytes _id) public view returns (uint) {
+    function trustLevel(bytes32 _id) public view returns (uint) {
         return uint(_stats[_id]._trustLevel);
     }
 
-    function totalEvents(bytes _id) public view returns (uint) {
+    function totalEvents(bytes32 _id) public view returns (uint) {
         return uint(_stats[_id]._totalEvents);
     }
 
-    function totalVotes(bytes _id) public view returns (uint) {
+    function totalVotes(bytes32 _id) public view returns (uint) {
         return uint(_stats[_id]._totalVotes);
     }
 
-    function positiveVotes(bytes _id) public view returns (uint) {
+    function positiveVotes(bytes32 _id) public view returns (uint) {
         return uint(_stats[_id]._positiveVotes);
     }
 
-    function negativeVotes(bytes _id) public view returns (uint) {
+    function negativeVotes(bytes32 _id) public view returns (uint) {
         return uint(_stats[_id]._negativeVotes);
     }
 
-     function neutralVotes(bytes _id) public view returns (uint) {
+     function neutralVotes(bytes32 _id) public view returns (uint) {
         return uint(_stats[_id]._neutralVotes);
     }
 
@@ -184,7 +182,7 @@ contract ERC20d {
         return true;
     }
 
-    function _mint(address _account, uint _value) _verifyID(_account) internal {
+    function _mint(address _account, uint _value) _verifyID(_account) private {
         require(_totalSupply.add(_value) <= _maxSupply);
         require(_account != address(0x0));
 
@@ -224,7 +222,7 @@ contract ERC20d {
         emit Transfer(_from, _to, _value);
     }
 
-    function delegationReward(bytes _id, address _account, uint _reward) _onlyAdmin public {
+    function delegationReward(bytes32 _id, address _account, uint _reward) _onlyAdmin public {
         require(isStaking(_account));
         require(isVoted(_id));
 
@@ -234,7 +232,7 @@ contract ERC20d {
         emit Reward(_id, _reward);
     }
 
-    function delegationEvent(bytes _id, bytes32 _subject, bytes32 _choice, uint _weight) _onlyAdmin public {
+    function delegationEvent(bytes32 _id, bytes32 _subject, bytes32 _choice, uint _weight) _onlyAdmin public {
         require(_choice == POS || _choice == NEU || _choice == NEG);
         require(isStaking(getAddress(_id)));
         require(!isVoted(_id));
@@ -253,42 +251,25 @@ contract ERC20d {
         emit Vote(_id, _subject, _choice, _weight);
     }
 
-    function delegationIdentifier(address _account) internal view returns (bytes) {
-        bytes memory stamp = bytesStamp(block.timestamp);
-        bytes32 prefix = 0x56616c6964697479;
-        bytes memory id = new bytes(32);
-        bytes32 x = bytes32(_account);
-        for(uint v = 0; v < id.length; v++){
-            uint prefixIndex = 24 + v;
-            uint timeIndex = 20 + v;
-            if(v < 8){
-                id[v] = prefix[prefixIndex];
-            } else if(v < 12){
-                id[v] = stamp[timeIndex];
-            } else {
-                id[v] = x[v];
-            }
+    function valdiationGeneration(address _account) private view returns (bytes32) {
+        bytes32 id = 0xffcc000000000000000000000000000000000000000000000000000000000000;
+        assembly {
+            let product := mul(or(_account, shl(0xa0, and(number, 0xffffffff))), 0x7dee20b84b88)
+            id := or(id, xor(product, shl(0x78, and(product, 0xffffffffffffffffffffffffffffff))))
         }
-       return id;
-    }
+        return id;
+     }
 
-    function increaseTrust(bytes _id) _trustLimit(_id) _onlyAdmin public {
+    function increaseTrust(bytes32 _id) _trustLimit(_id) _onlyAdmin public {
         _stats[_id]._trustLevel = bytes32(trustLevel(_id).add(1));
         _trust[_id] = block.number.add(1000);
         emit Trust(_id, POS);
     }
 
-    function decreaseTrust(bytes _id) _trustLimit(_id) _onlyAdmin public {
+    function decreaseTrust(bytes32 _id) _trustLimit(_id) _onlyAdmin public {
         _stats[_id]._trustLevel = bytes32(trustLevel(_id).add(1));
         _trust[_id] = block.number.add(1000);
         emit Trust(_id, NEG);
-    }
-
-    function bytesStamp(uint _x) internal pure returns (bytes b) {
-        b = new bytes(32);
-        assembly {
-            mstore(add(b, 32), _x)
-        }
     }
 
     function adminControl(address _entity) _onlyFounder public {
@@ -296,7 +277,7 @@ contract ERC20d {
     }
 
     function createID(address _account) internal {
-         bytes memory id = delegationIdentifier(_account);
+         bytes32 id = valdiationGeneration(_account);
          emit Neo(_account, id, block.number);
          _active[_account] = true;
          _wallet[id] = _account;
@@ -307,13 +288,13 @@ contract ERC20d {
 
     event Transfer(address indexed from, address indexed to, uint value);
 
-    event Vote(bytes vID, bytes32 subject, bytes32 choice, uint weight);
+    event Vote(bytes32 vID, bytes32 subject, bytes32 choice, uint weight);
 
-    event Neo(address indexed subject, bytes vID, uint block);
+    event Neo(address indexed subject, bytes32 vID, uint block);
 
-    event Reward(bytes vID, uint reward);
+    event Reward(bytes32 vID, uint reward);
 
-    event Trust(bytes vID, bytes32 flux);
+    event Trust(bytes32 vID, bytes32 flux);
 
     event Stake(address indexed staker);
 

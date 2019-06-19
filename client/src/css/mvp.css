@@ -104,13 +104,13 @@ td, th {
 }
 
 .validatingIdentifier {
-  position: absolute;
+  position: fixed;
   writing-mode: tb-rl;
-  font-size: 1.0vw;
-  left: 25px;
-  top: 25vh;
+  font-size: 1.05vw;
+  left: 2%;
+  top: 30%;
   color: white;
-  z-index: 333;
+  z-index: 99999999;
 }
 
 .eventBorder {
@@ -268,7 +268,7 @@ left: 9vw;
 
 .votingMetrics {
   position: fixed;
-  left: 1.5vw;
+  left: .5vw;
   top: 1.5vh;
   font-size: 1.25vw;
   z-index: 10000;

@@ -12,14 +12,24 @@
 }
 
 .bubbleIdenticon {
-  position: relative;
+  position: absolute;
   right: 1vw;
-  border-radius: 50%;
+  top: 5vh;
+  width: 7.5vw;
   float: right;
 }
 
+.accountIdenticon {
+  border: .3vw white solid;
+  background-color: white;
+  border-radius: 50%;
+}
+
 .bubbleIdentity {
+  position: relative;
   float: right;
+  text-align: right;
+  margin-right: 1vw;
 }
 
 .bubblePercent {
