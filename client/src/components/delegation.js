@@ -1,5 +1,5 @@
 // Core
-import React from "react";
+import React, { Component } from "react";
 
 // UX
 import { Spotlight, SpotlightManager, SpotlightTarget, SpotlightTransition } from "@atlaskit/onboarding";
@@ -11,7 +11,7 @@ import { scaleOrdinal } from "@vx/scale"
 import { LinearGradient } from "@vx/gradient"
 import { Drag, raise } from "@vx/drag"
 
-import "./css/bubble.css"
+import "../assets/css/bubble.css"
 
 // Voting standards
 const negativeVote = "0x4e65676174697665000000000000000000000000000000000000000000000000"
@@ -60,7 +60,7 @@ function computeBubbles(_amount) {
   }
 
 
-class Delegation extends React.Component {
+class Delegation extends Component {
   constructor(props) {
     super(props);
     var bubbleData = this.transcribeData(props.pool, props.user)

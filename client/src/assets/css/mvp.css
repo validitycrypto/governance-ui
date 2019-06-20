@@ -397,13 +397,12 @@ left: 9vw;
 
   .validatingIdentifier {
     font-size: 1.25vw;
-    top: 22vh;
+    top: 26.25%;
+    left: 1.75%;
   }
 
-}
-
-@media screen and (min-width: 750px) and (min-height: 750px) {
-
-
+  .helpButton {
+    top: 1.5%;
+  }
 
 }

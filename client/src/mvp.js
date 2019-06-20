@@ -7,7 +7,7 @@ import Validation from "./contracts/communalValidation.json";
 
 // UX
 import { UIControllerSubscriber,  GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, ContainerHeader, Item, ThemeProvider, modeGenerator } from "@atlaskit/navigation-next";
-import { faStreetView, faShareAlt, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faInfo, faTag, faWallet, faWeightHanging, faUser, faUsers, faStar, faShieldAlt, faCheck, faTimes  } from "@fortawesome/free-solid-svg-icons"
+import { faDesktop, faStreetView, faShareAlt, faBullseye, faCoins, faIdCard, faCrosshairs, faBalanceScale, faInfo, faTag, faWallet, faWeightHanging, faUser, faUsers, faStar, faShieldAlt, faCheck, faTimes  } from "@fortawesome/free-solid-svg-icons"
 import { Spotlight, SpotlightManager, SpotlightTarget, SpotlightTransition } from "@atlaskit/onboarding";
 import { AutoDismissFlag, FlagGroup } from "@atlaskit/flag"
 import { fade } from "@material-ui/core/styles/colorManipulator"
@@ -20,14 +20,14 @@ import Button from "@atlaskit/button"
 import Avatar from "@atlaskit/avatar"
 
 // External Components
-import Delegation from "./delegation"
+import Delegation from "./components/delegation"
 
 // Utils
 import Convertor from "hex2dec"
 
 // CSS
 import styled from 'styled-components'
-import "./css/mvp.css"
+import "./assets/css/mvp.css"
 
 // Preset Icons
 const crosshairsIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCrosshairs} className="eventsIcon" size="1x"/>
@@ -790,15 +790,22 @@ class Mvp extends Component {
       if(!window.ethereum){
         return(
           <div className="errorModal">
-          <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faTimes}/></p>
-          <p>Metamask is not detected</p>
+            <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faTimes}/></p>
+            <p>Metamask is not detected</p>
           </div>
         )
       } else if(this.state.network === 1){
         return(
         <div className="errorModal">
-        <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faEthereum}/></p>
-        <p>Incorrect Network</p>
+          <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faEthereum}/></p>
+          <p>Incorrect network</p>
+        </div>
+        )
+      } else if(window.screen.height < 750 && window.screen.width < 900){
+        return(
+        <div className="errorModal">
+          <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faDesktop}/></p>
+          <p>Not supported on native devices</p>
         </div>
         )
       }
@@ -808,7 +815,7 @@ class Mvp extends Component {
         <NavigationProvider>
         <ThemeProvider
           theme={theme => ({
-            ...theme,
+            ..theme,
             mode: customThemeMode,
           })}>
         <LayoutManager

@@ -1,0 +1,25 @@
+@font-face {
+    font-family: apple-sf;
+    src: url("../fonts/Apple-SF/sf.otf") format("opentype");
+}
+
+@font-face {
+    font-family: apple-sf;
+    font-weight: bold;
+    src: url("../fonts/Apple-SF/sf-bold.otf") format("opentype");
+}
+
+
+@font-face {
+    font-family: apple-sf;
+    font-style: italic;
+    src: url("../fonts/Apple-SF/sf-italic.otf") format("opentype");
+}
+
+
+@font-face {
+  font-family: apple-sf;
+    font-style: italic;
+    font-weight: bold;
+    src: url("../fonts/Apple-SF/sf-bold-italic.otf") format("opentype");
+}
