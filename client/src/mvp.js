@@ -3,7 +3,8 @@ import React, { Component, Fragment } from "react";
 import firebase from "firebase"
 
 // Solc
-import Validation from "./contracts/communalValidation.json";
+import Validation from "../contracts/communalValidation.json";
+import ERC20d from "../contracts/ERC20d.json";
 
 // UX
 import { UIControllerSubscriber,  GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, ContainerHeader, Item, ThemeProvider, modeGenerator } from "@atlaskit/navigation-next";
@@ -20,14 +21,14 @@ import Button from "@atlaskit/button"
 import Avatar from "@atlaskit/avatar"
 
 // External Components
-import Delegation from "./components/delegation"
+import Delegation from "../components/delegation"
 
 // Utils
 import Convertor from "hex2dec"
 
 // CSS
 import styled from 'styled-components'
-import "./assets/css/mvp.css"
+import "../assets/css/mvp.css"
 
 // Preset Icons
 const crosshairsIcon = () => <FontAwesomeIcon color="#ffffff" icon={faCrosshairs} className="eventsIcon" size="1x"/>
@@ -68,10 +69,7 @@ class Mvp extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      network: this.props.network,
-      token: this.props.contract,
       bubbleComponent: <div/>,
-      web3: this.props.web3,
       onboardTarget: null,
       demoTarget: null,
       onboardIndex: 0,
@@ -141,19 +139,27 @@ class Mvp extends Component {
       await this.renderBubbles()
   }
 
-  componentDidMount = async () => {
-    if(window.ethereum !== false){
-      const accounts = await this.state.web3.eth.getAccounts();
-      const validationContract = Validation.networks[this.state.network];
-      const validationInstance = new this.state.web3.eth.Contract(Validation.abi,
-             validationContract && validationContract.address,
-      );
-      validationInstance.setProvider(this.state.web3.currentProvider)
+  initialiseDapp = async () => {
+    const metaMask = await this.props.initialiseWeb3();
+    const accounts = await metaMask.web3.eth.getAccounts();
+    const validationContract = Validation.networks[metaMask.network];
+    const tokenContract = ERC20d.networks[metaMask.network];
+    const validationInstance = new metaMask.web3.eth.Contract(Validation.abi,
+           validationContract && validationContract.address,
+    );
+    const tokenInstance = new metaMask.web3.eth.Contract(ERC20d.abi,
+      tokenContract && tokenContract.address,
+    );
+      tokenInstance.setProvider(metaMask.web3.currentProvider)
+      validationInstance.setProvider(metaMask.web3.currentProvider)
       await this.setState({
+        dapp: validationInstance,
+        token: tokenInstance,
         account: accounts[0],
-           dapp: validationInstance });
-      await this.initialiseData()
-    }
+        network: metaMask.network,
+        web3: metaMask.web3
+     });
+    await this.initialiseData()
   };
 
 
@@ -794,7 +800,7 @@ class Mvp extends Component {
             <p>Metamask is not detected</p>
           </div>
         )
-      } else if(this.state.network === 1){
+      } else if(this.props.network === 1){
         return(
         <div className="errorModal">
           <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faEthereum}/></p>
@@ -810,12 +816,12 @@ class Mvp extends Component {
         )
       }
     return (
-      <div className="App">
+      <div className="mvpNavigation">
         <SpotlightManager>
         <NavigationProvider>
         <ThemeProvider
           theme={theme => ({
-            ..theme,
+            ...theme,
             mode: customThemeMode,
           })}>
         <LayoutManager
@@ -917,6 +923,11 @@ class Mvp extends Component {
         <div className="helpButton">
           <Button appearance="help" onClick={this.onboardingDemo}>
           &nbsp;Help&nbsp;
+          </Button>
+        </div>
+        <div className="connectButton">
+          <Button appearance="help" onClick={this.initialiseDapp}>
+          &nbsp;Connect&nbsp;
           </Button>
         </div>
         <div className="votingBubbles">

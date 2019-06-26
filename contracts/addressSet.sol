@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.8;
 
 /// @title An implementation of the set data structure for addresses.
 /// @author Noah Zinsmeister

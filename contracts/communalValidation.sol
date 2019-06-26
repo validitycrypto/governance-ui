@@ -59,6 +59,10 @@ contract communalValidation {
       round = _round;
   }
 
+  function currentParticipants() public view returns (uint round) {
+    return _event[_live][_round]._delegates.length();
+  }
+
   function isVoted(address _voter) public view returns (bool) {
       return _event[_live][_round]._delegates.contains(_voter);
   }
@@ -94,7 +98,7 @@ contract communalValidation {
 
   function voteSubmit(bytes32 _choice) _delegateCheck(msg.sender) public {
       _event[_live][_round]._delegates.insert(msg.sender);
-      bytes memory id = _VLDY.getvID(msg.sender);
+      bytes32 id = _VLDY.validityId(msg.sender);
       uint weight = votingWeight(msg.sender);
 
       if(_choice == POS) {

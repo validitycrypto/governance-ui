@@ -25,7 +25,7 @@ body, html  {
 
 }
 
-.App {
+.mvpNavigation {
   position: relative;
   height: 100vh;
   top: -87.5vh;
@@ -289,6 +289,19 @@ left: 9vw;
 
 }
 
+.connectButton {
+  position: fixed;
+  border-color: white;
+  border-radius: .5vw;
+  z-index: 10000;
+  color: white;
+  border: solid;
+  float: right;
+  top: 1.775vh;
+  right: 17.5%;
+
+}
+
 .votingStatus {
   position: relative;
   top: 22.5vh;
@@ -402,7 +415,7 @@ left: 9vw;
   }
 
   .helpButton {
-    top: 1.5%;
+    top: 1.75%;
   }
 
 }
