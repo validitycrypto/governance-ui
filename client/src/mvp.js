@@ -1,6 +1,5 @@
 // Core
 import React, { Component, Fragment } from "react";
-import firebase from "firebase"
 
 // Solc
 import Validation from "../contracts/communalValidation.json";
@@ -24,8 +23,8 @@ import Avatar from "@atlaskit/avatar"
 import Delegation from "../components/delegation"
 
 // Utils
+import { primaryInstance } from "../utils/firebaseConfig"
 import Convertor from "hex2dec"
-
 // CSS
 import styled from 'styled-components'
 import "../assets/css/mvp.css"
@@ -54,21 +53,11 @@ const decimal = Math.pow(10,18)
 // Components
 const customThemeMode = modeGenerator({ product: { text: "#ffffff", background: "#815aff" },});
 
-firebase.initializeApp({
-    apiKey: "AIzaSyBX9yoKTTg4a33ETJ0hydmWcmEPMBWYBhU",
-    authDomain: "validity-mvp.firebaseapp.com",
-    databaseURL: "https://validity-mvp.firebaseio.com",
-    projectId: "validity-mvp",
-    storageBucket: "validity-mvp.appspot.com",
-    messagingSenderId: "388843201152",
-    appId: "1:388843201152:web:192e3cfcec60b81b"
-  });
-const db = firebase.firestore()
-
 class Mvp extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      firebaseDb: this.props.firebase,
       bubbleComponent: <div/>,
       onboardTarget: null,
       demoTarget: null,
@@ -150,18 +139,18 @@ class Mvp extends Component {
     const tokenInstance = new metaMask.web3.eth.Contract(ERC20d.abi,
       tokenContract && tokenContract.address,
     );
-      tokenInstance.setProvider(metaMask.web3.currentProvider)
-      validationInstance.setProvider(metaMask.web3.currentProvider)
-      await this.setState({
+    tokenInstance.setProvider(metaMask.web3.currentProvider)
+    validationInstance.setProvider(metaMask.web3.currentProvider)
+    await this.setState({
         dapp: validationInstance,
         token: tokenInstance,
         account: accounts[0],
         network: metaMask.network,
         web3: metaMask.web3
      });
+    window.addEventListener("resize", this.vxDimensions);
     await this.initialiseData()
   };
-
 
   renderSidebar = () => {
     if(this.state.toggle) {
@@ -279,7 +268,7 @@ class Mvp extends Component {
               <div><br></br>
               <Paper style={{ padding: "1vw", backgroundColor: fade("#ffffff", 0.125) }}>
               <div className="databaseLogo"><Avatar src={this.state.pastData[data].image} /></div>
-              <div className="databaseName"><FontAwesomeIcon color="#ffffff" icon={faInfo} size="1x"/>&nbsp;&nbsp;&nbsp;{data} ({this.state.pastData[data].ticker})</div>
+              <div className="databaseName"><FontAwesomeIcon color="#ffffff" icon={faInfo} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].ticker}</div>
               <div className="databaseType"><FontAwesomeIcon color="#ffffff" icon={faCoins} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].type} </div>
               <div className="databasePositive"><FontAwesomeIcon color="#ffffff" icon={faCheck} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].positive} </div>
               <div className="databaseNegative"><FontAwesomeIcon color="#ffffff" icon={faTimes} size="1x"/>&nbsp;&nbsp;&nbsp;{this.state.pastData[data].negative} </div>
@@ -632,8 +621,8 @@ class Mvp extends Component {
     }
 
   logEvent = async() => {
-    db.collection("events").add({ eventHex: this.state.subject })
-    db.collection(this.state.subject).add({
+    this.state.firebaseDb.collection("events").add({ eventHex: this.state.subject })
+    this.state.firebaseDb.collection(this.state.subject).add({
         http: this.state.httpSource
     }).then(function(docRef) {
         console.log("Documentwritten with ID: ", docRef.id);
@@ -643,7 +632,7 @@ class Mvp extends Component {
   }
 
   getEventImage = async(_subject) => {
-    await db.collection(_subject).orderBy("http", "desc").get().then((result) => {
+    await this.state.firebaseDb.collection(_subject).orderBy("http", "desc").get().then((result) => {
       var imageSource;
       result.forEach(item =>
         imageSource = item.data().http)
@@ -652,7 +641,7 @@ class Mvp extends Component {
   }
 
   getPastImage = async(_subject) => {
-    return await db.collection(_subject).orderBy("http", "desc").limit(1).get()
+    return await this.state.firebaseDb.collection(_subject).orderBy("http", "desc").limit(1).get()
     .then((result) => {
       var imageSource;
       result.forEach(item => {
@@ -663,7 +652,7 @@ class Mvp extends Component {
 
   getPastEvents = async() => {
     var eventArray = {}; var pastArray = [];
-       await db.collection("events").get().then(async(result) => {
+       await this.state.firebaseDb.collection("events").get().then(async(result) => {
         await result.forEach(async(item) => {
           var eventSubject = item.data().eventHex
           var convertedValue = await this.state.web3.utils.toAscii(eventSubject)

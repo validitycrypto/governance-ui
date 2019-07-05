@@ -8,7 +8,6 @@ body, html  {
 
 .errorModal {
   position: absolute;
-  z-index: 999999999;
   font-weight: bold;
   text-align: center;
   margin: auto 0;
@@ -219,8 +218,8 @@ td, th {
 .databaseRating {
 position: relative;
 font-size: 1.25vw;
-top: -.5vh;
-left: 9vw;
+top: -.75vh;
+left: 6.5vw;
 }
 
 .eventType:hover {
