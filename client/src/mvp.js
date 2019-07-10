@@ -4,6 +4,8 @@ import React, { Component, Fragment } from "react";
 // Solc
 import Validation from "../contracts/communalValidation.json";
 import ERC20d from "../contracts/ERC20d.json";
+import Faucet from "../contracts/Faucet.json";
+import ReactGA from "react-ga";
 
 // UX
 import { UIControllerSubscriber,  GlobalNav, LayoutManager, NavigationProvider, MenuSection, SkeletonContainerView, ContainerHeader, Item, ThemeProvider, modeGenerator } from "@atlaskit/navigation-next";
@@ -51,7 +53,7 @@ const positiveVote = "0x506f7369746976650000000000000000000000000000000000000000
 const decimal = Math.pow(10,18)
 
 // Components
-const customThemeMode = modeGenerator({ product: { text: "#ffffff", background: "#815aff" },});
+const customThemeMode = modeGenerator({ product: { text: "#ffffff", background: "#906eff" },});
 
 class Mvp extends Component {
   constructor(props) {
@@ -68,10 +70,15 @@ class Mvp extends Component {
       pastData: {},
       toggle: true,
       account: null,
+      network: 3,
       dapp: null,
       flags: [],
       pool: 0,
     };
+  }
+
+  componentWillMount = () => {
+    ReactGA.pageview('/MVP');
   }
 
   initialiseData = async () => {
@@ -132,16 +139,20 @@ class Mvp extends Component {
     const metaMask = await this.props.initialiseWeb3();
     const accounts = await metaMask.web3.eth.getAccounts();
     const validationContract = Validation.networks[metaMask.network];
+    const faucetContract = Faucet.networks[metaMask.network];
     const tokenContract = ERC20d.networks[metaMask.network];
     const validationInstance = new metaMask.web3.eth.Contract(Validation.abi,
-           validationContract && validationContract.address,
-    );
-    const tokenInstance = new metaMask.web3.eth.Contract(ERC20d.abi,
+           validationContract && validationContract.adress,
+    ); const tokenInstance = new metaMask.web3.eth.Contract(ERC20d.abi,
       tokenContract && tokenContract.address,
+    ); const faucetInstance = new metaMask.web3.eth.Contract(Faucet.abi,
+      tokenContract && faucetContract.address,
     );
-    tokenInstance.setProvider(metaMask.web3.currentProvider)
-    validationInstance.setProvider(metaMask.web3.currentProvider)
+    validationInstance.options.address = "0xb0192607f73dadf85577ca1720282ff9c30b6569";
+    faucetInstance.options.address = "0xd54a0eb72ced60f6383c8dbbbac4119d28f45ebb";
+    tokenInstance.options.address = "0xd3c15f4ef14ab2b2541e3cfc7846931e8f30d07a";
     await this.setState({
+        faucet: faucetInstance,
         dapp: validationInstance,
         token: tokenInstance,
         account: accounts[0],
@@ -150,14 +161,22 @@ class Mvp extends Component {
      });
     window.addEventListener("resize", this.vxDimensions);
     await this.initialiseData()
+    ReactGA.event({
+      category: 'Navigation',
+      action: 'MVP',
+      label: 'Initialise'
+   });
   };
 
   renderSidebar = () => {
     if(this.state.toggle) {
+      ReactGA.event({ category: 'Navigation', action: 'MVP', label: 'Statistics'})
       return (this.renderStatistics())
     } else if(this.state.wallet){
+      ReactGA.event({ category: 'Navigation', action: 'MVP',label: 'Wallet'});
       return (this.renderWallet())
     } else if(this.state.admin){
+      ReactGA.event({ category: 'Navigation', action: 'MVP',label: 'Database'});
       return (this.renderAdmin())
     }
   }
@@ -178,17 +197,20 @@ class Mvp extends Component {
               <Item before={positiveIcon} text={this.state.positive} subText="Positive" />
               <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
-              <br></br>
-              Register Identity
-              <TextField onChange={this.logIdentity} placeholder="Identity"/>
-              <div className="transactionalOperatives">
-                <Button appearance="primary" className="addressButton" onClick={this.registerIdentity}>
-                  Register
-                  </Button>
-                    <Button appearance="help" className="stakeButton" onClick={this.eventStake}>
-                      Stake
-                    </Button>
+              <br></br><br></br>
+              <div className="generateButton">
+                <Button appearance="warning" onClick={this.conformValidityId}>Generate</Button>
+              </div>
+              <div className="stakeButton">
+                <Button appearance="help" onClick={this.eventStake}>Stake</Button>
+              </div>
+              <div className="identityRegistration">
+                Register Identity
+                <TextField onChange={this.logIdentity} placeholder="Identity"/>
+                <div className="registerButton">
+                  <Button appearance="primary" onClick={this.registerIdentity}> Register </Button>
                 </div>
+              </div>
             </div>
           )}
         </MenuSection>
@@ -205,15 +227,18 @@ class Mvp extends Component {
         <MenuSection>
           {({ className }) => (
             <div className="delegationPanel">
+              <Item before={ethIcon} text={this.state.gasBal} subText="ETH" />
               <Item before={tokenIcon} text={this.state.tokenBal} subText="VLDY" />
-              <Item before={ethIcon} text={this.state.gasBal} subText="EGEM" />
-            <br></br>
-            Transfer Validity
-            <TextField onChange={this.logAddress} placeholder="Address"/>
-            <TextField onChange={this.logAmount} placeholder="Amount"/>
-              <Button appearance="primary" className="transferButton" onClick={this.transferValidty}>
-                Transfer
-              </Button>
+              <br></br>
+              Transfer Validity
+              <TextField onChange={this.logAddress} placeholder="Address"/>
+              <TextField onChange={this.logAmount} placeholder="Amount"/>
+              <div className="transferButton">
+                <Button appearance="primary" onClick={this.transferValidty}> Transfer </Button>
+              </div>
+              <div className="faucetButton">
+                <Button appearance="warning" onClick={this.redeemReward}> Faucet </Button>
+              </div>
             </div>
           )}
         </MenuSection>
@@ -370,7 +395,11 @@ class Mvp extends Component {
    var targetRadius;
 
    if(this.state.onboardIndex === 0){
-     onboardingComponent = "eventImage"
+     ReactGA.event({
+       category: 'Navigation',
+       action: 'MVP',
+       label: 'Onboarding'
+    }); onboardingComponent = "eventImage"
      onboardingTitle = "Validation Topic"
      targetRadius = 100
      onboardingText =  `This is the voting subject, the aim of
@@ -432,7 +461,6 @@ class Mvp extends Component {
      onboardTitle: onboardingTitle,
      onboardingText: onboardingText,
    })
-
 }
 
   handleDismiss = () => {
@@ -594,7 +622,7 @@ class Mvp extends Component {
   }
 
   pastNeutral = async(_subject, _round) => {
-  var stat = await this.state.dapp.methods.eventNeutral(_subject, _round).call()
+    var stat = await this.state.dapp.methods.eventNeutral(_subject, _round).call()
     return Convertor.hexToDec(stat._hex);
   }
 
@@ -611,14 +639,49 @@ class Mvp extends Component {
   }
 
   registerIdentity = async() => {
-      await this.state.token.methods.setIdentity(this.state.nickname)
-      .send({ from: this.state.account, gas: 3725000}, async(error, transactionHash) => {
-        if(error) { console.log(error)
-        } else if(transactionHash) {
-          await this.getIdentity()
+    await new Promise((resolve, reject) =>
+      this.state.token.methods.setIdentity(this.state.nickname)
+      .send({ from: this.state.account, gas: 3725000})
+      .on('confirmation', (confirmationNumber, receipt) => {
+        if(confirmationNumber > 1){
+          ReactGA.event({ category: 'Transactional',
+          action: 'Identity',label: 'True'});
+          this.getIdentity()
+          resolve(receipt)
         }
       })
-    }
+    )
+  }
+
+  conformValidityId = async() => {
+    await new Promise((resolve, reject) =>
+      this.state.token.methods.conformIdentity()
+      .send({ from: this.state.account, gas: 3725000})
+      .on('confirmation', (confirmationNumber, receipt) => {
+        if(confirmationNumber > 1){
+          ReactGA.event({ category: 'Transactional',
+          action: 'ValidityID',label: 'True'})
+          this.getvID()
+          resolve(receipt)
+        }
+      })
+    )
+  }
+
+  redeemReward = async() => {
+    await new Promise((resolve, reject) =>
+      this.state.faucet.methods.redeem()
+      .send({ from: this.state.account, gas: 3725000})
+      .on('confirmation', (confirmationNumber, receipt) => {
+        if(confirmationNumber > 1){
+          ReactGA.event({ category: 'Transactional',
+           action: 'Faucet', label: 'True' })
+           this.getBalances()
+           resolve(receipt)
+        }
+      })
+    )
+  }
 
   logEvent = async() => {
     this.state.firebaseDb.collection("events").add({ eventHex: this.state.subject })
@@ -713,33 +776,49 @@ class Mvp extends Component {
   }
 
   transferValidty = async() => {
-      await this.state.token.methods.transfer(this.state.recipent, this.state.amount)
-      .send({from: this.state.account, gas: 3725000 }, async(error, transactionHash) => {
-        if(error) { console.log(error)
-        } else if(transactionHash) {
-          await this.getBalances();
-         }
+    await new Promise((resolve, reject) =>
+      this.state.token.methods.transfer(this.state.recipent, this.state.amount)
+      .send({from: this.state.account, gas: 3725000 })
+      .on('confirmation', (confirmationNumber, receipt) => {
+          if(confirmationNumber > 1){
+            ReactGA.event({ category: 'Transactional',
+            action: 'Transfer', label: 'True' })
+            this.getBalances()
+            resolve(receipt)
+          }
       })
-    }
+    )
+  }
 
   voteEvent = async(_decision) => {
-      await this.state.dapp.methods.voteSubmit(_decision)
-      .send({from: this.state.account, gas: 3725000 }, async(error, transactionHash) => {
-        if(error) { console.log(error)
-        } else if(transactionHash) {
-          await this.refreshData();
-        }
-      })
+    await new Promise((resolve, reject) =>
+      this.state.dapp.methods.voteSubmit(_decision)
+      .send({from: this.state.account, gas: 3725000 })
+      .on('confirmation', (confirmationNumber, receipt) => {
+          if(confirmationNumber > 1){
+            ReactGA.event({category: 'Transactional',
+            action: 'Vote', label: 'True'})
+            this.refreshData()
+            resolve(receipt)
+          }
+       })
+     )
   }
 
   eventStake = async() => {
-    await this.state.token.methods.toggleStake()
-    .send({from: this.state.account, gas: 3725000 } , async(error, transactionHash) => {
-      if(error) { console.log(error)
-      } else if(transactionHash) {
-        await this.refreshData();
-       }
-    })
+    const stakeStatus = await this.state.token.methods.isStaking(this.state.account).call()
+    await new Promise((resolve, reject) =>
+      this.state.token.methods.toggleStake()
+      .send({from: this.state.account, gas: 3725000 })
+      .on('confirmation', (confirmationNumber, receipt) => {
+          if(confirmationNumber > 1){
+            ReactGA.event({ category: 'Transactional',
+            action: 'Stake', label: `${!stakeStatus}` })
+            this.refreshData()
+            resolve(receipt)
+          }
+      })
+    )
   }
 
   getLog = async () => {
@@ -782,25 +861,28 @@ class Mvp extends Component {
     const renderer = shouldRenderSkeleton
       ? this.renderSkeleton
       : this.renderSidebar;
-      if(!window.ethereum){
+       if(window.screen.height < 750 && window.screen.width < 900){
+        ReactGA.event({ category: 'MVP', action: 'Mobile', label: 'True'  });
+        return(
+        <div className="errorModal">
+          <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faDesktop}/></p>
+          <p>Not supported on native devices</p>
+        </div>
+        )
+      } else if(!window.ethereum){
+        ReactGA.event({ category: 'MVP', action: 'Metamask', label: 'False'  });
         return(
           <div className="errorModal">
             <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faTimes}/></p>
             <p>Metamask is not detected</p>
           </div>
         )
-      } else if(this.props.network === 1){
+      } else if(this.state.network !== 3){
+        ReactGA.event({ category: 'MVP', action: 'Network', label: 'False'  });
         return(
         <div className="errorModal">
           <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faEthereum}/></p>
           <p>Incorrect network</p>
-        </div>
-        )
-      } else if(window.screen.height < 750 && window.screen.width < 900){
-        return(
-        <div className="errorModal">
-          <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faDesktop}/></p>
-          <p>Not supported on native devices</p>
         </div>
         )
       }
