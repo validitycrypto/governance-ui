@@ -210,15 +210,15 @@ class Mvp extends Component {
                 <Button appearance="help" onClick={this.eventStake}>Stake</Button>
               </div>
               </SpotlightTarget>
+              <SpotlightTarget name="identityInput">
               <div className="identityRegistration">
                 Register Identity
-                <SpotlightTarget name="identityInput">
                   <TextField onChange={this.logIdentity} placeholder="Identity"/>
-                </SpotlightTarget>
                 <div className="registerButton">
                   <Button appearance="primary" onClick={this.registerIdentity}> Register </Button>
                 </div>
               </div>
+              </SpotlightTarget>
             </div>
           )}
         </MenuSection>
@@ -448,26 +448,26 @@ class Mvp extends Component {
       onboardingComponent = "generateButton"
       onboardingTitle = "Create ValidityID"
       targetRadius = 100
-      onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
-      identity, view past event scores, transact the VLDY token and triggering token staking.`
+      onboardingText =  `To become a validator, one must firstly generate a ValidityID, this each users
+      self-soverign identity to contribute to the eco-system and is the root of all their delegation data.`
   } else if(this.state.onboardIndex === 6) {
        onboardingComponent = "identityValue"
        onboardingTitle = "Delegate Identity"
        targetRadius = 100
-       onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
-       identity, view past event scores, transact the VLDY token and triggering token staking.`
+       onboardingText =  `This is the custom identity of choice that one and submit, it is interchangable and is more
+       reknowned as a nickname of some sort.`
    } else if(this.state.onboardIndex === 7) {
      onboardingComponent = "identityInput"
       onboardingTitle = "Register Identity"
       targetRadius = 100
-      onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
-      identity, view past event scores, transact the VLDY token and triggering token staking.`
+      onboardingText =  `To register, type your peffered name in this text box and trigger the register button below.`
   } else if(this.state.onboardIndex === 8) {
       onboardingComponent = "stakeButton"
       onboardingTitle = "Stake Tokens"
       targetRadius = 100
-      onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
-      identity, view past event scores, transact the VLDY token and triggering token staking.`
+      onboardingText =  `To engage in voting a user must first stake that can be executed via this button but in order to do that the must have previously
+      generated a ValidityID and hold a balance greater than one vote ≈ 10,000 VLDY. After confirmation of the transaction, one should see some purple bubbles
+      to the centre of the page.`
   } else if(this.state.onboardIndex === 9) {
      onboardingComponent = "menuNavigation"
      onboardingTitle = "Validation Bubbles"
