@@ -190,6 +190,7 @@ class Mvp extends Component {
         <MenuSection>
           {({ className }) => (
             <div className="delegationPanel">
+              <SpotlightTarget name="identityValue">
               <Item before={identityIcon} text={this.state.identity} subText="Identity" />
               <Item before={crosshairsIcon} text={this.state.events} subText="Events" />
               <Item before={starIcon} text={this.state.total} subText="Total" />
@@ -197,16 +198,23 @@ class Mvp extends Component {
               <Item before={positiveIcon} text={this.state.positive} subText="Positive" />
               <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
+              </SpotlightTarget>
               <br></br><br></br>
+              <SpotlightTarget name="generateButton">
               <div className="generateButton">
                 <Button appearance="warning" onClick={this.conformValidityId}>Generate</Button>
               </div>
+              </SpotlightTarget>
+              <SpotlightTarget name="stakeButton">
               <div className="stakeButton">
                 <Button appearance="help" onClick={this.eventStake}>Stake</Button>
               </div>
+              </SpotlightTarget>
               <div className="identityRegistration">
                 Register Identity
-                <TextField onChange={this.logIdentity} placeholder="Identity"/>
+                <SpotlightTarget name="identityInput">
+                  <TextField onChange={this.logIdentity} placeholder="Identity"/>
+                </SpotlightTarget>
                 <div className="registerButton">
                   <Button appearance="primary" onClick={this.registerIdentity}> Register </Button>
                 </div>
@@ -436,7 +444,31 @@ class Mvp extends Component {
      targetRadius = 100
      onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
      identity, view past event scores, transact the VLDY token and triggering token staking.`
- }  else if(this.state.onboardIndex === 5) {
+  }  else if(this.state.onboardIndex === 5) {
+      onboardingComponent = "generateButton"
+      onboardingTitle = "Create ValidityID"
+      targetRadius = 100
+      onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
+      identity, view past event scores, transact the VLDY token and triggering token staking.`
+  } else if(this.state.onboardIndex === 6) {
+       onboardingComponent = "identityValue"
+       onboardingTitle = "Delegate Identity"
+       targetRadius = 100
+       onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
+       identity, view past event scores, transact the VLDY token and triggering token staking.`
+   } else if(this.state.onboardIndex === 7) {
+     onboardingComponent = "identityInput"
+      onboardingTitle = "Register Identity"
+      targetRadius = 100
+      onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
+      identity, view past event scores, transact the VLDY token and triggering token staking.`
+  } else if(this.state.onboardIndex === 8) {
+      onboardingComponent = "stakeButton"
+      onboardingTitle = "Stake Tokens"
+      targetRadius = 100
+      onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
+      identity, view past event scores, transact the VLDY token and triggering token staking.`
+  } else if(this.state.onboardIndex === 9) {
      onboardingComponent = "menuNavigation"
      onboardingTitle = "Validation Bubbles"
      targetRadius = 100
@@ -695,6 +727,7 @@ class Mvp extends Component {
   }
 
   getEventImage = async(_subject) => {
+    console.log(_subject);
     await this.state.firebaseDb.collection(_subject).orderBy("http", "desc").get().then((result) => {
       var imageSource;
       result.forEach(item =>
@@ -915,9 +948,9 @@ class Mvp extends Component {
                 actions={[{ text: "Next" , onClick: () => {
                   if(this.state.onboardIndex === 4){
                      navigationUIController.toggleCollapse()
-                  } else if(this.state.onboardIndex === 5){
+                  } else if(this.state.onboardIndex === 9){
                      navigationUIController.toggleCollapse()
-                   } if(this.state.onboardIndex !== 6 ){
+                   } if(this.state.onboardIndex !== 10 ){
                      this.onboardingDemo()
                    } else {
                      this.setState({
