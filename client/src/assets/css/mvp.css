@@ -43,7 +43,7 @@ table, thead, tbody, td, tr {
   position: absolute;
   padding: 5vw;
   left: 5vw;
-  top: -20vh;
+  top: -25vh;
 }
 
 td, th {
@@ -105,7 +105,7 @@ td, th {
 .validatingIdentifier {
   position: fixed;
   writing-mode: tb-rl;
-  font-size: 1.05vw;
+  font-size: 1vw;
   left: 2%;
   top: 30%;
   color: white;
@@ -123,7 +123,15 @@ td, th {
 
 .transferButton {
   position: relative;
+  border: solid;
+  border-color: #815aff;
+  border-radius: .5vw;
+  width: 5.525em;
   top: 2.5vh;
+}
+
+.transferButton:hover {
+  border-color: #22ffa0;
 }
 
 .eventStats {
@@ -168,11 +176,9 @@ td, th {
 
 }
 
-
 .eventTicker:hover {
   transform: translateX(-15vw);
 }
-
 
 .databaseLogo {
   position: relative;
@@ -216,10 +222,10 @@ td, th {
 
 
 .databaseRating {
-position: relative;
-font-size: 1.25vw;
-top: -.75vh;
-left: 6.5vw;
+  position: relative;
+  font-size: 1.25vw;
+  top: -.75vh;
+  left: 6.5vw;
 }
 
 .eventType:hover {
@@ -277,28 +283,33 @@ left: 6.5vw;
 
 .helpButton {
   position: fixed;
-  border-color: white;
-  border-radius: .5vw;
   z-index: 10000;
-  color: white;
   border: solid;
+  border-color: #bda8ff;
+  border-radius: .5vw;
   float: right;
   top: 1.775vh;
   right: 10%;
+}
 
+.helpButton:hover {
+  border-color: #22ffa0
 }
 
 .connectButton {
   position: fixed;
-  border-color: white;
-  border-radius: .5vw;
   z-index: 10000;
-  color: white;
   border: solid;
+  border-color: #bda8ff;
+  border-radius: .5vw;
   float: right;
   top: 1.775vh;
   right: 17.5%;
 
+}
+
+.connectButton:hover {
+  border-color: #22ffa0
 }
 
 .votingStatus {
@@ -377,17 +388,56 @@ left: 6.5vw;
 }
 
 .stakeButton {
-  position: absolute;
-  left: 8vw;
-
+  position: relative;
+  border: solid;
+  border-color: #bda8ff;
+  border-radius: .5vw;
+  left: 7.5vw;
+  width: 4.6em;
+  top: -5.5vh;
 }
 
-.voteButton {
-  position: absolute;
-  top: 30vh;
-  left: 20vw;
-  font-size: 1.25vw;
+.stakeButton:hover {
+  border-color: #22ffa0;
+}
 
+.generateButton {
+  position: relative;
+  border: solid;
+  border-color: #ff8c00;
+  border-radius: .5vw;
+  width: 6em;
+}
+
+.generateButton:hover {
+  border-color: white;
+}
+
+.faucetButton {
+  position: relative;
+  border: solid;
+  border-color: #ff8c00;
+  border-radius: .5vw;
+  width: 4.99em;
+  left: 7vw;
+  top: -2.95vh;
+}
+
+.faucetButton:hover {
+  border-color: white;
+}
+
+.registerButton {
+  position: relative;
+  border: solid;
+  border-color: #815aff;
+  border-radius: .5vw;
+  width: 5.6em;
+  top: 2.5vh;
+}
+
+.registerButton:hover {
+  border-color: #22ffa0;
 }
 
 .ownerButton {
@@ -404,6 +454,17 @@ left: 6.5vw;
   top: 3.5px;
 }
 
+.identityRegistration{
+  position: relative;
+
+}
+
+.addressButton {
+  position: relative;
+  top: 2.5vh;
+}
+
+
 
 @media screen and (min-width: 1000px) and (min-height: 750px) {
 
@@ -416,5 +477,185 @@ left: 6.5vw;
   .helpButton {
     top: 1.75%;
   }
+
+}
+
+@media only screen and (min-width: 2000px) and (min-height: 1000px) {
+
+
+  /* Sidebar */
+  .css-1f67lxo , .css-7shaiq {
+    font-size: 1vw !important;
+    width: 4vw !important;
+  }
+
+  /* Drawer wrapper */
+  .delegationPanel {
+    padding-top: 10vh !important;
+
+    left: 1vw;
+  }
+
+  /* Button */
+  .css-wryk0, .css-11o1245{
+    height: 7em !important;
+  }
+
+  /* Button Icon */
+  .starIcon, .css-cpl69x, .css-1s1i71a {
+    font-size: .75vw !important;
+  }
+
+  /* Button text */
+  .css-4u87vn,  .css-1s1i71a {
+    font-size: .75vw !important;
+  }
+
+
+  /* Sidebar buttons */
+  .css-sea5qf {
+    padding-top: 2.5vh !important;
+  }
+
+  /* Sidebar button */
+  .css-0 {
+    margin-bottom: 3.75vh;
+  }
+
+  .votingMetrics {
+    top: 1.875vh;
+    font-size: 1vw;
+    height: 10vh;
+  }
+
+  .validatingIdentifier {
+
+    left: 1.6%;
+    top: 32.5%;
+    font-size: .775vw;
+  }
+
+  .helpButton {
+    border-width: .175vw;
+    border-radius: .375vw;
+    font-size: .975vw;
+    top: 2%;
+    right: 7.5%;
+  }
+
+  .connectButton {
+    border-width: .175vw;
+    border-radius: .375vw;
+    font-size: .975vw;
+    top: 2%;
+    right: 13.75%;
+  }
+
+  .eventName, .eventTicker, .eventType , .eventPositive, .eventNegative, .eventNeutral {
+    border-radius: .5vw !important;
+  }
+
+  .stakeButton {
+    font-size: .675vw;
+    border-radius: .15vw;
+    top: -4vh;
+    width: 3.75em;
+    left: 3.75vw;
+
+  }
+
+  .generateButton {
+    font-size: .675vw;
+    border-radius: .15vw;
+    left: -.5vw;
+    width: 5.2em;
+  }
+
+  .registerButton {
+    font-size: .675vw;
+    border-radius: .15vw;
+    left: -.5vw;
+    width: 4.875em;
+  }
+
+  .faucetButton {
+    font-size: .675vw;
+    border-radius: .15vw;
+    left: .175vw;
+    width: 4.2em;
+    top: 5vh;
+  }
+
+  .transferButton {
+    font-size: .675vw;
+    border-radius: .15vw;
+    width: 4.875em;
+  }
+
+
+  .identityRegistration, .Content-ve26fj-1.hqyPWx , .Input__InputElement-sc-1o6bj35-0.bfCuIo{
+    font-size: .75vw !important;
+  }
+
+  .databaseLogo {
+    top: .75vh;
+  }
+
+  .databaseName {
+    font-size: .75vw;
+    top: -2.5vh;
+    left: 2vw;
+  }
+
+  .databaseType {
+    top: -1vh;
+    left: 2vw;
+    font-size: .75vw;
+  }
+
+  .databasePositive {
+    font-size: .75vw;
+    top: -.25vh;
+    left: -.25vw;
+  }
+
+  .databaseNeutral {
+    font-size: .75vw;
+    top: -.5vh;
+    left: -.25vw;
+  }
+
+  .databaseNegative {
+    font-size: .75vw;
+    top: 4.25vh;
+    left: -.15vw;
+  }
+
+  .databaseRating {
+    font-size: .75vw;
+    top: -.75vh;
+    left: 6.5vw;
+    visibility: hidden;
+  }
+
+  .delegationPanel {
+      padding: 1.75vw;
+  }
+
+
+.Card__Container-sc-1vayiwt-0{
+      font-size: .75vw !important;
+      padding: .25vw !important;
+  }
+
+  .votingBubbles {
+    top: -5vh;
+  }
+
+
+  .eventStats {
+    top: 30vh;
+  }
+
 
 }

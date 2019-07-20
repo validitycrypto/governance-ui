@@ -24,7 +24,7 @@ const stake = ["#815aff"]
 const largeBubble =  10000;
 const mediumBubble =  2500;
 const smallBubble =  500;
-const tinyBubble =  14;
+const tinyBubble =  27;
 const minuteBubble = 2;
 
 function computeBubbles(_amount) {
@@ -169,8 +169,8 @@ class Delegation extends Component {
 
         if(radius <= 5){
           if(i < 25){
-          operativeX = (i * (_optionId/(radius*2))) + Math.floor(5 * Math.random());
-          operativeY = (i * (_optionId/(radius*2))) + Math.floor(5 * Math.random());
+          operativeX = (i^25 * (_optionId/(radius^3))) + Math.floor(25 * Math.random());
+          operativeY = (i^25 * (_optionId/(radius^3))) + Math.floor(25 * Math.random());
         } else {
           operativeX = (i/4 * (_optionId/(radius*2))) + Math.floor(25 * Math.random());
           operativeY = (i/4 * (_optionId/(radius*2))) + Math.floor(25 * Math.random());
@@ -186,19 +186,19 @@ class Delegation extends Component {
           if(this.props.neutral === 0) bubbleWeight = 0
           bubbleOption = this.props.neutral
           operativeY = operativeY * (-1)
-          xcord = 800
-          ycord = window.screen.height*0.75;
+          xcord = window.screen.width*0.65;
+          ycord = window.screen.height*0.675;
         } else if(_option === negativeVote){
           if(this.props.negative === 0) bubbleWeight = 0
           bubbleOption = this.props.negative
           operativeY = operativeY * (-1)
-          xcord = 175
-          ycord = window.screen.height*0.75;
+          xcord = window.screen.width*0.125
+          ycord = window.screen.height*0.675;
         } else if(_option === positiveVote){
           if(this.props.positive === 0) bubbleWeight = 0
           bubbleOption = this.props.positive
-          xcord = 175;
-          ycord = 200
+          xcord = window.screen.width*0.125
+          ycord = window.screen.height*0.25;
         } else if(_option === "0x0"){
           bubbleOption = _stack
           xcord = window.screen.width*0.45;
@@ -231,7 +231,7 @@ class Delegation extends Component {
       <SpotlightTransition>
         <Spotlight
           actions={[{ onClick: () => this.setState({ target: null }), text: "Dismiss"}]}
-          dialogPlacement="bottom left"
+          dialogPlacement="left bottom"
           target={this.state.target}
           key={this.state.target}
           heading={`Bubble ${this.state.target}`}
