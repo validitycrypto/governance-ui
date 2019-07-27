@@ -146,11 +146,11 @@ class Mvp extends Component {
     ); const tokenInstance = new metaMask.web3.eth.Contract(ERC20d.abi,
       tokenContract && tokenContract.address,
     ); const faucetInstance = new metaMask.web3.eth.Contract(Faucet.abi,
-      tokenContract && faucetContract.address,
+      faucetContract && faucetContract.address,
     );
-    validationInstance.options.address = "0xb0192607f73dadf85577ca1720282ff9c30b6569";
-    faucetInstance.options.address = "0xd54a0eb72ced60f6383c8dbbbac4119d28f45ebb";
-    tokenInstance.options.address = "0xd3c15f4ef14ab2b2541e3cfc7846931e8f30d07a";
+    validationInstance.options.address = "0x2b916c108c03963bc49e08ddad367544f9c0f5b2";
+    faucetInstance.options.address = "0x916e9d17b96f593298d2d7a40d748a4306b0be30";
+    tokenInstance.options.address = "0xCeC407AfCa610dC6dFd3891ae0CeE5ED7a0EeAcA";
     await this.setState({
         faucet: faucetInstance,
         dapp: validationInstance,
@@ -192,13 +192,13 @@ class Mvp extends Component {
             <div className="delegationPanel">
               <SpotlightTarget name="identityValue">
               <Item before={identityIcon} text={this.state.identity} subText="Identity" />
+              </SpotlightTarget>
+              <Item before={starIcon} text={this.state.trust} subText="Viability" />
               <Item before={crosshairsIcon} text={this.state.events} subText="Events" />
-              <Item before={starIcon} text={this.state.total} subText="Total" />
-              <Item before={trustIcon} text={this.state.trust} subText="Trust" />
               <Item before={positiveIcon} text={this.state.positive} subText="Positive" />
               <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
-              </SpotlightTarget>
+              <Item before={crosshairsIcon} text={this.state.total} subText="Total" />
               <br></br><br></br>
               <SpotlightTarget name="generateButton">
               <div className="generateButton">
@@ -212,12 +212,12 @@ class Mvp extends Component {
               </SpotlightTarget>
               <div className="identityRegistration">
                 Register Identity
-                <SpotlightTarget name="identityInput">
                   <TextField onChange={this.logIdentity} placeholder="Identity"/>
-                </SpotlightTarget>
+                <SpotlightTarget name="identityInput">
                 <div className="registerButton">
                   <Button appearance="primary" onClick={this.registerIdentity}> Register </Button>
                 </div>
+                </SpotlightTarget>
               </div>
             </div>
           )}
@@ -255,7 +255,8 @@ class Mvp extends Component {
   };
 
   renderAdmin= () => {
-    if(this.state.account === "0x3B00c1BfF934C47B8FBb359e5e2098a1991d4928"){
+    console.log(this.state.account);
+    if(this.state.account === "0xccCbF98AE04fD57810F4833fE6a9a5726A162a01"){
     return (
       <Fragment>
       <ContainerHeader
@@ -563,7 +564,7 @@ class Mvp extends Component {
   }
 
   getTrust = async() => {
-    const stat = await this.state.token.methods.trustLevel(this.state.id).call()
+    const stat = await this.state.token.methods.viability(this.state.id).call()
     await this.setState({
       trust: parseFloat(stat).toFixed(2)
     })
@@ -946,7 +947,13 @@ class Mvp extends Component {
               <SpotlightTransition>
               <Spotlight
                 actions={[{ text: "Next" , onClick: () => {
-                  if(this.state.onboardIndex === 4){
+                  if(this.state.onboardIndex === 1){
+                     var componentTarget = document.getElementsByClassName("eventName")[0];
+                     componentTarget.style.transform =  "translateX(-15vw)";
+                  } else if(this.state.onboardIndex === 2) {
+                    var componentTarget = document.getElementsByClassName("eventName")[0];
+                    componentTarget.style.transform =  "";
+                  } else if(this.state.onboardIndex === 4){
                      navigationUIController.toggleCollapse()
                   } else if(this.state.onboardIndex === 9){
                      navigationUIController.toggleCollapse()
@@ -972,12 +979,13 @@ class Mvp extends Component {
         </LayoutManager>
       </ThemeProvider>
       </NavigationProvider>
-        <SpotlightTarget name="eventStats">
         <div className="eventStats">
+        <SpotlightTarget name="eventStats">
           <Paper className="eventName" style={{ padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
             &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faInfo} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}
           </Paper>
+          </SpotlightTarget>
           <Paper className="eventTicker" style={{ padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faShareAlt} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ticker: {this.state.eventTicker}
@@ -999,7 +1007,6 @@ class Mvp extends Component {
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
          </Paper>
         </div>
-        </SpotlightTarget>
         <SpotlightTarget name="eventImage">
         <Paper className="eventBorder" style={{ borderRadius: "5vw", padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
           <img className="eventImage" src={this.state.eventImage} />

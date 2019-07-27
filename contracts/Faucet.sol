@@ -7,7 +7,7 @@ contract Faucet {
 
     using SafeMath for uint;
 
-    uint constant tokenReward = 50000000000000000000000;
+    uint constant tokenReward = 500000000000000000000000;
     uint constant etherReward = 500000000000000000;
 
     mapping (address => uint) public _limitor;
