@@ -3,7 +3,7 @@ pragma solidity ^0.5.8;
 import "./addressSet.sol";
 import "./ERC20d.sol";
 
-contract communalValidation {
+contract CommunalValidation {
 
   using addressSet for addressSet.Set;
   using SafeMath for uint;

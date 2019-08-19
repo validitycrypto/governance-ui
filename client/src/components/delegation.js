@@ -25,7 +25,7 @@ const largeBubble =  10000;
 const mediumBubble =  2500;
 const smallBubble =  500;
 const tinyBubble =  27;
-const minuteBubble = 2;
+const minuteBubble = 5;
 
 function computeBubbles(_amount) {
     var minuteAmount = 0; var mediumAmount = 0; var smallAmount = 0;
@@ -167,42 +167,38 @@ class Delegation extends Component {
         var operativeY = 7.5 * Math.floor(radius^10 * Math.random());
         var operativeX = 7.5 * Math.floor(radius^10 * Math.random());
 
-        if(radius <= 5){
-          if(i < 25){
-          operativeX = (i^25 * (_optionId/(radius^3))) + Math.floor(25 * Math.random());
-          operativeY = (i^25 * (_optionId/(radius^3))) + Math.floor(25 * Math.random());
-        } else {
-          operativeX = (i/4 * (_optionId/(radius*2))) + Math.floor(25 * Math.random());
-          operativeY = (i/4 * (_optionId/(radius*2))) + Math.floor(25 * Math.random());
+        if(radius <= 7.5){
+          operativeX = (i^25 * (_optionId/(radius^3))) + Math.floor(5 * Math.random());
+          operativeY = (i^25 * (_optionId/(radius^3))) + Math.floor(5 * Math.random());
         }
-          if(i % 2 === 0){
-            operativeY = operativeY * (-1);
-          } else {
-            operativeX = operativeX * (-1);
-          }
+
+        if(i % 2 === 0){
+          operativeY = operativeY * (-1);
+        } else {
+          operativeX = operativeX * (-1);
         }
 
         if(_option === neutralVote){
           if(this.props.neutral === 0) bubbleWeight = 0
           bubbleOption = this.props.neutral
           operativeY = operativeY * (-1)
-          xcord = window.screen.width*0.65;
-          ycord = window.screen.height*0.675;
+          xcord = window.innerWidth*0.65;
+          ycord = window.innerHeight*0.825;
         } else if(_option === negativeVote){
           if(this.props.negative === 0) bubbleWeight = 0
           bubbleOption = this.props.negative
           operativeY = operativeY * (-1)
-          xcord = window.screen.width*0.125
-          ycord = window.screen.height*0.675;
+          xcord = window.innerWidth*0.125
+          ycord = window.innerHeight*0.825;
         } else if(_option === positiveVote){
           if(this.props.positive === 0) bubbleWeight = 0
           bubbleOption = this.props.positive
-          xcord = window.screen.width*0.125
-          ycord = window.screen.height*0.25;
+          xcord = window.innerWidth*0.125
+          ycord = window.innerHeight*0.325;
         } else if(_option === "0x0"){
           bubbleOption = _stack
-          xcord = window.screen.width*0.45;
-          ycord = window.screen.height*0.5;
+          xcord = window.innerWidth*0.45;
+          ycord = window.innerHeight*0.55;
         }
 
        return {
@@ -218,8 +214,8 @@ class Delegation extends Component {
           tx: _metaData.transactionHash,
           percent: (bubbleWeight/_stack * 100).toFixed(2),
           totalPercent: (bubbleWeight/bubbleOption * 100).toFixed(2),
-          x: xcord + operativeX * Math.cos(2 * Math.PI * i / radius),
-          y: ycord + operativeY * Math.sin(2 * Math.PI * i / radius)
+          x: xcord + (operativeX * Math.cos(Math.PI * i / radius)),
+          y: ycord + (operativeY * Math.sin(Math.PI * i / radius))
         };
       });
   }

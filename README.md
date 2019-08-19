@@ -1,11 +1,10 @@
 # Validity MVP 
-Created, designed and developed by @samgos (founder)
+### Live at [vldy.org](https://vldy.org)
 
 #### Technology stack
 
-* communalValidation (*smart contract*)
-* truffle-react-box (*react.js, node.js*)
-* vx-drag (*node.js, react.js*)
-* ERC20d (*smart contract*)
-* atlaskit (*react.js*)
-
+* [@Samsyyyy](https://twitter.com/Samsyyyy)'s [WebGL/Three.js mutating field](https://codepen.io/Samsy/pen/emWppX/)
+* [Semantic UI](https://react.semantic-ui.com/)
+* [Material UI](https://material-ui.com/)
+* [Atlaskit](https://atlaskit.atlassian.com/)
+* [react-box](https://github.com/truffle-box/react-box)

@@ -11,7 +11,7 @@ body, html  {
   font-weight: bold;
   text-align: center;
   margin: auto 0;
-  font-size: 3vw;
+  font-size: 2.5vw;
   top: -75vh;
   left: 0;
   right: 0;
@@ -37,6 +37,19 @@ body, html  {
 
 table, thead, tbody, td, tr {
 
+}
+
+
+.styledFlag-qhniyv-0.ckyZOd {
+  background-color: rgba(12, 255, 109, 0.875) !important;
+}
+
+.styledFlag-qhniyv-0.EPGsn {
+  background-color: rgba(255, 12, 158, 0.875) !important;
+}
+
+.styledFlag-qhniyv-0.ddrHMm {
+  background-color: rgba(12, 187, 255, 0.875) !important;
 }
 
 .votingBubbles {
@@ -105,9 +118,9 @@ td, th {
 .validatingIdentifier {
   position: fixed;
   writing-mode: tb-rl;
-  font-size: 1vw;
+  font-size: 1.075vw;
   left: 2%;
-  top: 30%;
+  top: 28.75%;
   color: white;
   z-index: 99999999;
 }
@@ -273,7 +286,7 @@ td, th {
 
 .votingMetrics {
   position: fixed;
-  left: .5vw;
+  left: 10vw;
   top: 1.5vh;
   font-size: 1.25vw;
   z-index: 10000;
@@ -394,7 +407,7 @@ td, th {
   border-radius: .5vw;
   left: 7.5vw;
   width: 4.6em;
-  top: -5.5vh;
+  top: -5.25vh;
 }
 
 .stakeButton:hover {
@@ -447,6 +460,15 @@ td, th {
 }
 
 
+.concludeButton {
+  position: relative;
+  top: 87.5px;
+  left: -137.5px;
+}
+
+
+
+
 .colorMain {
   position: relative;
   color: white;
@@ -464,8 +486,6 @@ td, th {
   top: 2.5vh;
 }
 
-
-
 @media screen and (min-width: 1000px) and (min-height: 750px) {
 
   .validatingIdentifier {
@@ -480,8 +500,59 @@ td, th {
 
 }
 
-@media only screen and (min-width: 2000px) and (min-height: 1000px) {
+@media only screen and (device-height: 1080px) and (device-width: 1920px) {
 
+  .votingMetrics {
+    left: 7.5vw;
+    top: .5vh;
+    font-size:1vw;
+  }
+
+  .helpButton {
+    border-radius: .25vw;
+    top: 1.5vh;
+    right: 6.25%;
+  }
+
+  .connectButton {
+    border-radius: .25vw;
+    top: 1.5vh;
+    right: 11.75%;
+
+  }
+
+  .validatingIdentifier {
+    left: 1.125%;
+    top: 22.5%;
+    font-size: 1.1vw;
+  }
+
+  .generateButton {
+    border-radius: .35vw;
+    left: -.5vw;
+  }
+
+  .registerButton {
+    border-radius: .35vw;
+    left: -.5vw;
+  }
+
+  .faucetButton {
+    border-radius: .35vw;
+    left: .175vw;
+    top: 5vh;
+  }
+
+  .stakeButton {
+    border-radius: .35vw;
+    top: -3.75vh;
+    left: 5vw;
+  }
+
+
+}
+
+@media only screen and (min-width: 2000px) and (min-height: 1000px) {
 
   /* Sidebar */
   .css-1f67lxo , .css-7shaiq {
@@ -511,7 +582,6 @@ td, th {
     font-size: .75vw !important;
   }
 
-
   /* Sidebar buttons */
   .css-sea5qf {
     padding-top: 2.5vh !important;
@@ -529,7 +599,6 @@ td, th {
   }
 
   .validatingIdentifier {
-
     left: 1.6%;
     top: 32.5%;
     font-size: .775vw;
@@ -591,7 +660,6 @@ td, th {
     border-radius: .15vw;
     width: 4.875em;
   }
-
 
   .identityRegistration, .Content-ve26fj-1.hqyPWx , .Input__InputElement-sc-1o6bj35-0.bfCuIo{
     font-size: .75vw !important;

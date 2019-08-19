@@ -7,8 +7,7 @@ contract Faucet {
 
     using SafeMath for uint;
 
-    uint constant tokenReward = 500000000000000000000000;
-    uint constant etherReward = 500000000000000000;
+    uint constant tokenReward = 1000000000000000000000000;
 
     mapping (address => uint) public _limitor;
 
@@ -25,7 +24,6 @@ contract Faucet {
 
         _limitor[msg.sender] = block.timestamp.add(3600);
         VLDY.transfer(msg.sender, tokenReward);
-        msg.sender.transfer(etherReward);
     }
 
 }

@@ -2,7 +2,7 @@
 import React, { Component, Fragment } from "react";
 
 // Solc
-import Validation from "../contracts/communalValidation.json";
+import Validation from "../contracts/CommunalValidation.json";
 import ERC20d from "../contracts/ERC20d.json";
 import Faucet from "../contracts/Faucet.json";
 import ReactGA from "react-ga";
@@ -62,15 +62,15 @@ class Mvp extends Component {
       firebaseDb: this.props.firebase,
       bubbleComponent: <div/>,
       onboardTarget: null,
+      log: [[],[],[],[]],
       demoTarget: null,
       onboardIndex: 0,
-      log: [[],[],[],[]],
       themeMode: "dark",
       pastEvents: [],
       pastData: {},
       toggle: true,
       account: null,
-      network: 3,
+      network: 4,
       dapp: null,
       flags: [],
       pool: 0,
@@ -111,8 +111,6 @@ class Mvp extends Component {
 
   refreshData = async () => {
       await this.getLog()
-      await this.getEvent()
-      await this.getRound()
       await this.getvID()
       await this.getTotal()
       await this.getNeutral()
@@ -120,17 +118,11 @@ class Mvp extends Component {
       await this.getPositive()
       await this.getEvents()
       await this.getIdentity()
-      await this.eventType(this.state.eventSubject, this.state.round)
-      await this.eventTicker(this.state.eventSubject, this.state.round)
-      await this.eventPositive(this.state.eventSubject, this.state.round)
-      await this.eventNegative(this.state.eventSubject, this.state.round)
-      await this.eventNeutral(this.state.eventSubject, this.state.round)
       await this.getParticipants()
       await this.getBalances()
       await this.isStaking()
       await this.isVoted()
       await this.gatherMetrics()
-      await this.getEventImage(this.state.eventSubject)
       await this.getPastEvents()
       await this.renderBubbles()
   }
@@ -146,11 +138,11 @@ class Mvp extends Component {
     ); const tokenInstance = new metaMask.web3.eth.Contract(ERC20d.abi,
       tokenContract && tokenContract.address,
     ); const faucetInstance = new metaMask.web3.eth.Contract(Faucet.abi,
-      tokenContract && faucetContract.address,
+      faucetContract && faucetContract.address,
     );
-    validationInstance.options.address = "0xb0192607f73dadf85577ca1720282ff9c30b6569";
-    faucetInstance.options.address = "0xd54a0eb72ced60f6383c8dbbbac4119d28f45ebb";
-    tokenInstance.options.address = "0xd3c15f4ef14ab2b2541e3cfc7846931e8f30d07a";
+    validationInstance.options.address = "0x00c1c8821abc108711daa82950c3ba5452899a88";
+    faucetInstance.options.address = "0x1381bd2953a8b990004c2d48a8aaf7293463eadd";
+    tokenInstance.options.address = "0x293b7712fb8e57e8637287f18b61945be78b8e27";
     await this.setState({
         faucet: faucetInstance,
         dapp: validationInstance,
@@ -159,24 +151,22 @@ class Mvp extends Component {
         network: metaMask.network,
         web3: metaMask.web3
      });
-    window.addEventListener("resize", this.vxDimensions);
     await this.initialiseData()
     ReactGA.event({
       category: 'Navigation',
       action: 'MVP',
-      label: 'Initialise'
+      label: 'Connect',
    });
   };
 
   renderSidebar = () => {
     if(this.state.toggle) {
-      ReactGA.event({ category: 'Navigation', action: 'MVP', label: 'Statistics'})
       return (this.renderStatistics())
     } else if(this.state.wallet){
-      ReactGA.event({ category: 'Navigation', action: 'MVP',label: 'Wallet'});
+      ReactGA.event({ category: 'Navigation', action: 'MVP', label: 'Wallet' });
       return (this.renderWallet())
     } else if(this.state.admin){
-      ReactGA.event({ category: 'Navigation', action: 'MVP',label: 'Database'});
+      ReactGA.event({ category: 'Navigation', action: 'MVP', label: 'Database' });
       return (this.renderAdmin())
     }
   }
@@ -192,13 +182,13 @@ class Mvp extends Component {
             <div className="delegationPanel">
               <SpotlightTarget name="identityValue">
               <Item before={identityIcon} text={this.state.identity} subText="Identity" />
+              </SpotlightTarget>
+              <Item before={starIcon} text={this.state.trust} subText="Viability" />
               <Item before={crosshairsIcon} text={this.state.events} subText="Events" />
-              <Item before={starIcon} text={this.state.total} subText="Total" />
-              <Item before={trustIcon} text={this.state.trust} subText="Trust" />
               <Item before={positiveIcon} text={this.state.positive} subText="Positive" />
               <Item before={neutralIcon} text={this.state.neutral} subText="Neutral" />
               <Item before={negativeIcon} text={this.state.negative} subText="Negative" />
-              </SpotlightTarget>
+              <Item before={crosshairsIcon} text={this.state.total} subText="Total" />
               <br></br><br></br>
               <SpotlightTarget name="generateButton">
               <div className="generateButton">
@@ -212,12 +202,12 @@ class Mvp extends Component {
               </SpotlightTarget>
               <div className="identityRegistration">
                 Register Identity
-                <SpotlightTarget name="identityInput">
                   <TextField onChange={this.logIdentity} placeholder="Identity"/>
-                </SpotlightTarget>
+                <SpotlightTarget name="identityInput">
                 <div className="registerButton">
                   <Button appearance="primary" onClick={this.registerIdentity}> Register </Button>
                 </div>
+                </SpotlightTarget>
               </div>
             </div>
           )}
@@ -242,7 +232,7 @@ class Mvp extends Component {
               <TextField onChange={this.logAddress} placeholder="Address"/>
               <TextField onChange={this.logAmount} placeholder="Amount"/>
               <div className="transferButton">
-                <Button appearance="primary" onClick={this.transferValidty}> Transfer </Button>
+                <Button appearance="primary" onClick={this.transferValidity}> Transfer </Button>
               </div>
               <div className="faucetButton">
                 <Button appearance="warning" onClick={this.redeemReward}> Faucet </Button>
@@ -255,7 +245,7 @@ class Mvp extends Component {
   };
 
   renderAdmin= () => {
-    if(this.state.account === "0x3B00c1BfF934C47B8FBb359e5e2098a1991d4928"){
+    if(this.state.account === "0xf2C6C557FBC38A753030dFd69f22d77ba4a18E5E"){
     return (
       <Fragment>
       <ContainerHeader
@@ -282,6 +272,9 @@ class Mvp extends Component {
            </Button>
            <Button appearance="danger" className="ownerButton" onClick={this.initialiseOwnership}>
            Initialise
+           </Button>
+           <Button appearance="warning" className="concludeButton" onClick={this.concludeEvent}>
+           Conclude
            </Button>
             </div>
           )}
@@ -358,7 +351,7 @@ class Mvp extends Component {
     this.setState({ shouldShowContainer: !this.state.shouldShowContainer });
   };
 
-  logAmount = (event) =>  { this.setState({ amount: this.state.web3.utils.toHex(this.state.web3.utils.toBN(event.target.value).mul(this.state.web3.utils.toBN(1e18))) }); }
+  logAmount = (event) =>  { this.setState({ amount: parseFloat(event.target.value) }); }
   logIdentity = (event) =>  { this.setState({ nickname: this.state.web3.utils.fromAscii(event.target.value) }) }
   logSubject = (event) =>  { this.setState({ subject: this.state.web3.utils.fromAscii(event.target.value) }) }
   logTicker = (event) => { this.setState({ ticker: this.state.web3.utils.fromAscii(event.target.value) }) }
@@ -390,8 +383,11 @@ class Mvp extends Component {
   }
 
   getvID = async() => {
-    const vID = await this.state.token.methods.validityId(this.state.account).call()
+    const vID = await this.state.token.methods.validityId(this.state.account).call();
+    var displayID = vID;
+    if(displayID === "0x0000000000000000000000000000000000000000000000000000000000000000") displayID = "";
     await this.setState({
+      displayID,
       id: vID
     })
   }
@@ -401,73 +397,87 @@ class Mvp extends Component {
    var onboardingTitle;
    var onboardingText;
    var targetRadius;
+   var dialogPlacement;
 
    if(this.state.onboardIndex === 0){
      ReactGA.event({
        category: 'Navigation',
        action: 'MVP',
-       label: 'Onboarding'
+       label: 'Help'
     }); onboardingComponent = "eventImage"
      onboardingTitle = "Validation Topic"
      targetRadius = 100
-     onboardingText =  `This is the voting subject, the aim of
+     onboardingText =  <p>This is the voting subject, the aim of
      this event is for you to contribute your general sentiment
-     towards the overall quality evaluated on behalf
-     of the initiative.`
+     regarding the overall quality evaluated by this project.</p>
+     dialogPlacement = "right top";
+
    } else if(this.state.onboardIndex === 1){
      onboardingTitle = "Valdiation Statistics"
-     onboardingComponent = "eventStats"
-     onboardingText =  `Hover over each of these modals, to get a better insight towards
-     the subject name, symbol , type, number of partcipants, current statistics for
-     positive, negative and neutral votes committed.`
+     onboardingComponent = "eventName"
+     onboardingText =  <p>Hover over each of these modals, to get a better 		  insight towards  the subject name, symbol , type, and current statistics for positive, negative and neutral votes committed within this event.</p>
      targetRadius = 0
+     dialogPlacement = "right top";
    } else if(this.state.onboardIndex === 2){
      onboardingTitle = "Delegation Metrics"
      onboardingComponent = "votingMetrics"
      onboardingText =  <div>
      <p>These values represent your delegation state, users first need to stake
      their token balances in order to vote, this ensures a one person, one vote operation.</p>
-     <br></br>
+     <br></br><br></br>
      <p>The weight parameter relates to one"s VLDY balance, where 10,000 VLDY equates to one vote, this is your
      general stake that will be committed to the option of choice.</p>
      </div>
      targetRadius = 100
+     dialogPlacement = "left bottom";
    } else if(this.state.onboardIndex === 3){
      onboardingComponent = "menuNavigation"
      onboardingTitle = "Menu Navigation"
      targetRadius = 100
-     onboardingText =  `Here we can access the delegation sidebar and the multiple menus,
-     voting, transactional and the historical database of previous events.`
+     onboardingText =  <p>Here we can access the delegation sidebar and the multiple menus, such as
+     voting, transactional and the historical ledger of previous event results.</p>
+     dialogPlacement = "right top";
    } else if(this.state.onboardIndex === 4) {
      onboardingComponent = "menuNavigation"
      onboardingTitle = "Navigation Toggle"
      targetRadius = 100
-     onboardingText =  `Toggle the sidebar by clicking the border, here you can register an voting
-     identity, view past event scores, transact the VLDY token and triggering token staking.`
+     onboardingText =  <p>Toggle the sidebar by clicking the border, here you can register an voting
+     identity, view past event scores, transact the VLDY token and triggering token staking to begin voting </p>
+     dialogPlacement = "right top";
   }  else if(this.state.onboardIndex === 5) {
       onboardingComponent = "generateButton"
       onboardingTitle = "Create ValidityID"
       targetRadius = 100
-      onboardingText =  `To become a validator, one must firstly generate a ValidityID, this each users
-      self-soverign identity to contribute to the eco-system and is the root of all their delegation data.`
+      onboardingText =  <p>To become a validator by participating in voting, one must firstly generate a ValidityID, this is each users
+      self-soverign identity to monitor their track-record to the eco-system and is the root of all their delegation data.</p>
+      dialogPlacement = "right top";
   } else if(this.state.onboardIndex === 6) {
        onboardingComponent = "identityValue"
        onboardingTitle = "Delegate Identity"
        targetRadius = 100
-       onboardingText =  `This is the custom identity of choice that one and submit, it is interchangable and is more
-       reknowned as a nickname of some sort.`
+       onboardingText =  <p>This is the custom identity of choice that one and submit, it is interchangable and is more
+       reknowned as a nickname of some sort.</p>
+       dialogPlacement = "right top";
    } else if(this.state.onboardIndex === 7) {
      onboardingComponent = "identityInput"
       onboardingTitle = "Register Identity"
       targetRadius = 100
-      onboardingText =  `To register, type your peffered name in this text box and trigger the register button below.`
+      onboardingText =  <p>To register an identity of choice, type your peffered nickname in this text box and trigger the register button below.</p>
+      dialogPlacement = "right top";
   } else if(this.state.onboardIndex === 8) {
       onboardingComponent = "stakeButton"
       onboardingTitle = "Stake Tokens"
       targetRadius = 100
-      onboardingText =  `To engage in voting a user must first stake that can be executed via this button but in order to do that the must have previously
-      generated a ValidityID and hold a balance greater than one vote ≈ 10,000 VLDY. After confirmation of the transaction, one should see some purple bubbles
-      to the centre of the page.`
+      onboardingText = <div>
+      <p>To engage in voting a user must first stake their tokens to prevent any event manipulation but first one must have
+      generated a ValidityID and hold a balance greater than one vote</p>
+      <br></br><br></br>
+      <p> 1 VOTE ≈ 10,000 VLDY.</p>
+      <br></br><br></br>
+      <p>After confirmation of the transaction, one should see some purple bubbles
+      render to the centre of the page.</p>
+      </div>
+      dialogPlacement = "right top";
   } else if(this.state.onboardIndex === 9) {
      onboardingComponent = "menuNavigation"
      onboardingTitle = "Validation Bubbles"
@@ -476,15 +486,16 @@ class Mvp extends Component {
      <p>These bubbles represent votes, each size deterimines the weight and
      each color defines the option chosen, green for positive, red for negative, blue for neutral
      and finally purple for ones own tokens once when they are active in staking.</p>
-     <br></br>
-     <p>To vote it"s simple, drag the purple bubbles to a cluster of choice, you"ll see a modal pop up
+     <br></br><br></br>
+     <p>To vote it's simple, drag the purple bubbles to a cluster of choice, you"ll see a modal pop up on the bottom left of your screen
      when a vote is detected, drag and drop all of the associated bubbles to recieve a transaction query
-     via metamask. Confirm and you"ve successfully casted a vote, the application should refresh and you
-     then verify the vote by hovering over bubbles within that option, which will reveal metadata for each
+     via metamask. Confirm and you've successfully casted a vote, the application should refresh and you
+     then you can verify the vote by hovering over bubbles within that option, which will reveal metadata for each
      bubble.</p>
-     <br></br>
+     <br></br><br></br>
      <p>Happy voting!</p>
      </div>
+     dialogPlacement = "right top";
  }
    this.setState({
      onboardRadius: targetRadius,
@@ -492,6 +503,7 @@ class Mvp extends Component {
      onboardTarget: onboardingComponent,
      onboardTitle: onboardingTitle,
      onboardingText: onboardingText,
+     onboardPosition: dialogPlacement
    })
 }
 
@@ -563,7 +575,7 @@ class Mvp extends Component {
   }
 
   getTrust = async() => {
-    const stat = await this.state.token.methods.trustLevel(this.state.id).call()
+    const stat = await this.state.token.methods.viability(this.state.id).call()
     await this.setState({
       trust: parseFloat(stat).toFixed(2)
     })
@@ -589,85 +601,106 @@ class Mvp extends Component {
   }
 
   getEvent = async() => {
-    const stat = await this.state.dapp.methods.currentEvent.call()
+    const stat = await this.state.dapp.methods.currentEvent().call()
+
+    if(this.state.web3.utils.isHex(stat)){
     await this.setState({
       eventDecode: this.state.web3.utils.toAscii(stat),
       eventSubject: stat
     })
   }
+  }
 
   getRound = async() => {
-    const stat = await this.state.dapp.methods.currentRound.call()
+    const stat = await this.state.dapp.methods.currentRound().call()
     await this.setState({
       round: parseInt(stat)
     })
   }
 
   getParticipants = async() => {
-    const stat = await this.state.dapp.methods.currentParticipants.call()
+    var stat = await this.state.dapp.methods.currentParticipants().call()
+    if(isNaN(stat)) stat = 0;
     await this.setState({
       participants: parseInt(stat)
-    })
+    });
   }
 
   eventPositive = async(_subject, _round) => {
+    if(this.state.web3.utils.isHex(_subject)){
     var stat = await this.state.dapp.methods.eventPositive(_subject, _round).call()
     await this.setState({
-      eventPositive: Convertor.hexToDec(stat._hex)
-    });
+      eventPositive: Convertor.hexToDec(stat)
+      });
+    }
   }
 
   pastPositive = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventPositive(_subject, _round).call()
-    return Convertor.hexToDec(stat._hex)
+    return Convertor.hexToDec(stat)
   }
 
   eventTicker = async(_subject, _round) => {
-    var stat = await this.state.dapp.methods.eventTicker(_subject, _round).call()
-    await this.setState({
-      eventTicker: this.state.web3.utils.toAscii(stat)
-    });
+    if(this.state.web3.utils.isHex(_subject)){
+      var stat = await this.state.dapp.methods.eventTicker(_subject, _round).call()
+      await this.setState({
+        eventTicker: this.state.web3.utils.toAscii(stat)
+      });
+    }
   }
 
   pastTicker = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventTicker(_subject, _round).call()
-    return this.state.web3.utils.toAscii(stat);
+
+    if(this.state.web3.utils.isHex(stat)){
+      return this.state.web3.utils.toAscii(stat);
+    } else {
+      return "";
+    }
   }
 
   eventNegative = async(_subject, _round) => {
-    var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
-    await this.setState({
-      eventNegative: Convertor.hexToDec(stat._hex)
-    });
+    if(this.state.web3.utils.isHex(_subject)){
+      var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
+      await this.setState({
+        eventNegative: Convertor.hexToDec(stat)
+      });
+    }
   }
 
   pastNegatitve = async(_subject, _round) => {
+    if(this.state.web3.utils.isHex(_subject)){
     var stat = await this.state.dapp.methods.eventNegative(_subject, _round).call()
-    return Convertor.hexToDec(stat._hex);
+    return Convertor.hexToDec(stat);
+    }
   }
 
   eventNeutral = async(_subject, _round) => {
+    if(this.state.web3.utils.isHex(_subject)){
     var stat = await this.state.dapp.methods.eventNeutral(_subject, _round).call()
     await this.setState({
-      eventNeutral: Convertor.hexToDec(stat._hex)
+      eventNeutral: Convertor.hexToDec(stat)
     });
+    }
   }
 
   pastNeutral = async(_subject, _round) => {
     var stat = await this.state.dapp.methods.eventNeutral(_subject, _round).call()
-    return Convertor.hexToDec(stat._hex);
+    return Convertor.hexToDec(stat);
   }
 
   eventType = async(_subject, _round) => {
-    const stat = await this.state.dapp.methods.eventType(_subject, _round).call()
-    await this.setState({
+    if(this.state.web3.utils.isHex(_subject)){
+      const stat = await this.state.dapp.methods.eventType(_subject, _round).call()
+      await this.setState({
       eventType: this.state.web3.utils.toAscii(stat)
-    });
+      });
+    }
   }
 
   pastType = async(_subject, _round) => {
-    const stat = await this.state.dapp.methods.eventType(_subject, _round).call()
-    return stat;
+      const stat = await this.state.dapp.methods.eventType(_subject, _round).call()
+      return this.state.web3.utils.toAscii(stat);
   }
 
   registerIdentity = async() => {
@@ -675,12 +708,15 @@ class Mvp extends Component {
       this.state.token.methods.setIdentity(this.state.nickname)
       .send({ from: this.state.account, gas: 3725000})
       .on('confirmation', (confirmationNumber, receipt) => {
-        if(confirmationNumber > 1){
+        if(confirmationNumber === 1){
           ReactGA.event({ category: 'Transactional',
-          action: 'Identity',label: 'True'});
+          action: 'registerIdentity',label: 'True' });
           this.getIdentity()
           resolve(receipt)
         }
+      }).on('error', (error) => {
+        ReactGA.event({ category: 'Transactional',
+        action: 'registerIdentity', label: 'False' });
       })
     )
   }
@@ -690,12 +726,15 @@ class Mvp extends Component {
       this.state.token.methods.conformIdentity()
       .send({ from: this.state.account, gas: 3725000})
       .on('confirmation', (confirmationNumber, receipt) => {
-        if(confirmationNumber > 1){
+        if(confirmationNumber === 1){
           ReactGA.event({ category: 'Transactional',
-          action: 'ValidityID',label: 'True'})
+          action: 'conformIdentity', label: 'True' })
           this.getvID()
           resolve(receipt)
         }
+      }).on('error', (error) => {
+        ReactGA.event({ category: 'Transactional',
+        action: 'conformIdentity', label: 'False' })
       })
     )
   }
@@ -705,12 +744,16 @@ class Mvp extends Component {
       this.state.faucet.methods.redeem()
       .send({ from: this.state.account, gas: 3725000})
       .on('confirmation', (confirmationNumber, receipt) => {
-        if(confirmationNumber > 1){
+        if(confirmationNumber === 1){
           ReactGA.event({ category: 'Transactional',
-           action: 'Faucet', label: 'True' })
+           action: 'redeemReward', label: 'True' });
            this.getBalances()
            resolve(receipt)
         }
+      }).on('error', (error) => {
+        ReactGA.event({ category: 'Transactional',
+         action: 'redeemReward', label: 'False' });
+         resolve(error);
       })
     )
   }
@@ -727,39 +770,50 @@ class Mvp extends Component {
   }
 
   getEventImage = async(_subject) => {
-    console.log(_subject);
-    await this.state.firebaseDb.collection(_subject).orderBy("http", "desc").get().then((result) => {
-      var imageSource;
-      result.forEach(item =>
-        imageSource = item.data().http)
-        this.setState({ eventImage: imageSource});
-    })
+    if(this.state.web3.utils.isHex(_subject)){
+      var parsedIndex = "0" + _subject.replace(/^0+|0+$/g, "");
+      await this.state.firebaseDb.collection(parsedIndex).limit(1).get().then((result) => {
+        var imageSource;
+        result.forEach(item => {
+           imageSource = item.data().http;
+         }); this.setState({
+           eventImage: imageSource
+         });
+      })
+    }
   }
 
   getPastImage = async(_subject) => {
-    return await this.state.firebaseDb.collection(_subject).orderBy("http", "desc").limit(1).get()
-    .then((result) => {
-      var imageSource;
+    var imageSource;
+    var parsedIndex = "0" + _subject.replace(/^0+|0+$/g, "");
+    await this.state.firebaseDb.collection(parsedIndex).limit(1).get().then((result) => {
       result.forEach(item => {
          imageSource = item.data().http;
-       }); return imageSource;
-    })
+       });
+     }); return imageSource;
   }
 
   getPastEvents = async() => {
     var eventArray = {}; var pastArray = [];
        await this.state.firebaseDb.collection("events").get().then(async(result) => {
         await result.forEach(async(item) => {
-          var eventSubject = item.data().eventHex
-          var convertedValue = await this.state.web3.utils.toAscii(eventSubject)
+          var eventSubject = item.data().eventHex;
           if(eventSubject !== undefined){
-          var eventType = await this.state.web3.utils.toAscii(await this.pastType(eventSubject, 1))
-          var eventTicker = await this.pastTicker(eventSubject, 1)
-          var eventImage = await this.getPastImage(eventSubject)
-          var eventPositive = await this.pastPositive(eventSubject, 1)
-          var eventNegative = await this.pastNegatitve(eventSubject, 1)
-          var eventNeutral = await this.pastNeutral(eventSubject, 1)
-          var eventTotal = parseInt(eventPositive)/(parseInt(eventPositive) + parseInt(eventNegative) + parseInt(eventNeutral)) * 10
+          var eventRaw = eventSubject + "0".repeat(66 -item.data().eventHex.length);
+          eventRaw = this.state.web3.utils.toHex(eventSubject);
+
+          var convertedValue = this.state.web3.utils.toAscii(eventRaw)
+          var eventPositive = await this.pastPositive(eventRaw, 1)
+          var eventNegative = await this.pastNegatitve(eventRaw, 1)
+          var eventNeutral = await this.pastNeutral(eventRaw, 1)
+          var eventTicker = await this.pastTicker(eventRaw, 1)
+
+          var eventImage = await this.getPastImage(eventRaw);
+          var eventType = await this.pastType(eventRaw, 1);
+
+          var eventTotal = parseInt(eventPositive)/(parseInt(eventPositive) +
+          parseInt(eventNegative) + parseInt(eventNeutral)) * 10
+
           var dataEmbed = {
               ticker: eventTicker,
               image: eventImage,
@@ -808,17 +862,23 @@ class Mvp extends Component {
     })
   }
 
-  transferValidty = async() => {
+  transferValidity = async() => {
+    var transferAmount = this.state.web3.utils.toBN(this.state.amount).mul(this.state.web3.utils.toBN(1e18));
+    transferAmount = this.state.web3.utils.hexToNumberString(transferAmount);
     await new Promise((resolve, reject) =>
-      this.state.token.methods.transfer(this.state.recipent, this.state.amount)
+      this.state.token.methods.transfer(this.state.recipent, transferAmount)
       .send({from: this.state.account, gas: 3725000 })
       .on('confirmation', (confirmationNumber, receipt) => {
-          if(confirmationNumber > 1){
+          if(confirmationNumber === 1){
             ReactGA.event({ category: 'Transactional',
-            action: 'Transfer', label: 'True' })
+            action: 'transfer', label: 'True' })
             this.getBalances()
             resolve(receipt)
           }
+      }).on('error', (error) => {
+        ReactGA.event({ category: 'Transactional',
+        action: 'transfer', label: 'False' })
+         resolve(error);
       })
     )
   }
@@ -828,14 +888,31 @@ class Mvp extends Component {
       this.state.dapp.methods.voteSubmit(_decision)
       .send({from: this.state.account, gas: 3725000 })
       .on('confirmation', (confirmationNumber, receipt) => {
-          if(confirmationNumber > 1){
+          if(confirmationNumber === 1){
             ReactGA.event({category: 'Transactional',
-            action: 'Vote', label: 'True'})
+            action: 'voteSubmit', label: 'True' })
+            this.refreshData()
+            resolve(receipt)
+          }
+       }).on('error', (error) => {
+         ReactGA.event({category: 'Transactional',
+         action: 'voteSubmit', label: 'True' })
+          resolve(error);
+       })
+     )
+  }
+
+  concludeEvent = async(_decision) => {
+    await new Promise((resolve, reject) =>
+      this.state.dapp.methods.concludeValidation()
+      .send({from: this.state.account, gas: 3725000 })
+      .on('confirmation', (confirmationNumber, receipt) => {
+          if(confirmationNumber === 1){
             this.refreshData()
             resolve(receipt)
           }
        })
-     )
+    )
   }
 
   eventStake = async() => {
@@ -844,12 +921,16 @@ class Mvp extends Component {
       this.state.token.methods.toggleStake()
       .send({from: this.state.account, gas: 3725000 })
       .on('confirmation', (confirmationNumber, receipt) => {
-          if(confirmationNumber > 1){
+          if(confirmationNumber === 1){
             ReactGA.event({ category: 'Transactional',
-            action: 'Stake', label: `${!stakeStatus}` })
+            action: 'toggleStake', label: 'True' });
             this.refreshData()
             resolve(receipt)
           }
+      }).on('error', (error) => {
+        ReactGA.event({ category: 'Transactional',
+        action: 'toggleStake', label: 'False' });
+         resolve(error);
       })
     )
   }
@@ -864,7 +945,7 @@ class Mvp extends Component {
       if(activeEvent === this.state.eventSubject){
         var choice = JSON.stringify(eventResult.returnValues.choice).replace(/["]+/g, "")
         var identifier = JSON.stringify(eventResult.returnValues.id).replace(/["]+/g, "")
-        var weight = Convertor.hexToDec(JSON.stringify(eventResult.returnValues.weight._hex).replace(/["]+/g, ""))
+        var weight = eventResult.returnValues.weight.replace(/["]+/g, "")
         var identity = await this.findIdentity(identifier)
         var address = await this.getAddress(identifier)
         delegationLog[identifier] = { address, transactionHash, blockNumber, identity, choice, weight }
@@ -876,11 +957,11 @@ class Mvp extends Component {
 }
 
   initialiseOwnership = async() => {
-    await this.state.token.methods.adminControl(this.state.dapp.address)
+    await this.state.token.methods.adminControl(this.state.dapp.options.address)
     .send({ from: this.state.account, gas: 3725000 }, async(error, transactionHash) => {
       if(error) { console.log(error)
         } else if(transactionHash) {
-          await this.state.dapp.methods.initialiseAsset(this.state.token.address)
+          await this.state.dapp.methods.initialiseAsset(this.state.token.options.address)
           .send({ from: this.state.account, gas: 3725000 }, (error, transactionHash) => {
             if(error) { console.log(error)
             } else if(transactionHash) { }
@@ -894,8 +975,8 @@ class Mvp extends Component {
     const renderer = shouldRenderSkeleton
       ? this.renderSkeleton
       : this.renderSidebar;
-       if(window.screen.height < 750 && window.screen.width < 900){
-        ReactGA.event({ category: 'MVP', action: 'Mobile', label: 'True'  });
+       if(window.screen.height < 800 && window.screen.width < 950){
+        ReactGA.event({ category: 'Navigation', action: 'Error', label: 'Mobile' });
         return(
         <div className="errorModal">
           <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faDesktop}/></p>
@@ -903,19 +984,19 @@ class Mvp extends Component {
         </div>
         )
       } else if(!window.ethereum){
-        ReactGA.event({ category: 'MVP', action: 'Metamask', label: 'False'  });
+        ReactGA.event({ category: 'Navigation', action: 'Error', label: 'Web3' });
         return(
           <div className="errorModal">
             <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faTimes}/></p>
             <p>Metamask is not detected</p>
           </div>
         )
-      } else if(this.state.network !== 3){
-        ReactGA.event({ category: 'MVP', action: 'Network', label: 'False'  });
+      } else if(this.state.network !== 4){
+        ReactGA.event({ category: 'Navigation', action: 'Error', label: 'Network' });
         return(
         <div className="errorModal">
           <p><FontAwesomeIcon className="errorLogo" color="red" size="2x" icon={faEthereum}/></p>
-          <p>Incorrect network</p>
+          <p>Incorrect network, please change to Rinkeby</p>
         </div>
         )
       }
@@ -946,7 +1027,13 @@ class Mvp extends Component {
               <SpotlightTransition>
               <Spotlight
                 actions={[{ text: "Next" , onClick: () => {
-                  if(this.state.onboardIndex === 4){
+                  if(this.state.onboardIndex === 1){
+                     var componentTarget = document.getElementsByClassName("eventName")[0];
+                     componentTarget.style.transform =  "translateX(-15vw)";
+                  } else if(this.state.onboardIndex === 2) {
+                    var componentTarget = document.getElementsByClassName("eventName")[0];
+                    componentTarget.style.transform =  "";
+                  } else if(this.state.onboardIndex === 4){
                      navigationUIController.toggleCollapse()
                   } else if(this.state.onboardIndex === 9){
                      navigationUIController.toggleCollapse()
@@ -959,7 +1046,7 @@ class Mvp extends Component {
                      })
                    }
                 } }]}
-                dialogPlacement="right top"
+                dialogPlacement={this.state.onboardPosition}
                 target={this.state.onboardTarget}
                 key={this.state.onboardTarget}
                 heading={this.state.onboardTitle}
@@ -972,12 +1059,13 @@ class Mvp extends Component {
         </LayoutManager>
       </ThemeProvider>
       </NavigationProvider>
-        <SpotlightTarget name="eventStats">
         <div className="eventStats">
+        <SpotlightTarget name="eventName">
           <Paper className="eventName" style={{ padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
             &nbsp;&nbsp;&nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faInfo} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: {this.state.eventDecode}
           </Paper>
+          </SpotlightTarget>
           <Paper className="eventTicker" style={{ padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
             &nbsp;&nbsp;<FontAwesomeIcon color="#ffffff" icon={faShareAlt} size="lg"/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ticker: {this.state.eventTicker}
@@ -999,7 +1087,6 @@ class Mvp extends Component {
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negative: {this.state.eventNegative}
          </Paper>
         </div>
-        </SpotlightTarget>
         <SpotlightTarget name="eventImage">
         <Paper className="eventBorder" style={{ borderRadius: "5vw", padding: ".5vw", backgroundColor: fade("#815aff", 0.825) }}>
           <img className="eventImage" src={this.state.eventImage} />
@@ -1022,7 +1109,7 @@ class Mvp extends Component {
          </div>
         </SpotlightTarget>
         <div className="validatingIdentifier">
-        {this.state.id}
+        {this.state.displayID}
         </div>
         <div className="helpButton">
           <Button appearance="help" onClick={this.onboardingDemo}>
